@@ -1,15 +1,15 @@
 # /// script
 # dependencies = []
 # ///
-"""Render self-edition-cards.csv into cards.html (screen + print at 2.5x3.5in).
+"""Render the-and-cards.csv into cards.html (screen + print at 2.5x3.5in).
 
-Run: uv run build_cards.py
+Run: uv run scripts/build_cards.py
 """
 import csv
 import html
 from pathlib import Path
 
-ROOT = Path(__file__).parent
+ROOT = Path(__file__).resolve().parent.parent
 
 # Icons are drawn on a 24x24 grid as strokes so they match the cards' thin line art.
 ICONS = {
@@ -56,6 +56,9 @@ header h1{margin:0 0 4px;font-size:20px;color:inherit}
 .badge svg{width:72%;height:72%;fill:none;stroke:var(--ink);stroke-width:1.3;stroke-linecap:round;stroke-linejoin:round}
 .text{position:absolute;left:18%;right:18%;top:22%;margin:0;text-align:center;text-transform:uppercase;
   letter-spacing:.14em;line-height:1.9;font-weight:400}
+.card.missing{background:transparent;box-shadow:none;border:2px dashed var(--mut);color:var(--mut)}
+.card.missing::before,.card.missing::after{display:none}
+.card.missing .text{top:45%;opacity:.7}
 .meta{position:absolute;bottom:calc(var(--w)*.03);right:calc(var(--w)*.05);font-size:.7em;color:#aaa;letter-spacing:.05em}
 
 @media print{
@@ -63,11 +66,17 @@ header h1{margin:0 0 4px;font-size:20px;color:inherit}
   .deck{gap:.125in;justify-content:flex-start}
   .card{--w:2.5in;box-shadow:none;outline:1px dashed #ccc;break-inside:avoid}
   .meta{display:none}
+  .card.missing{display:none}
 }
 """
 
 
 def card_html(card_id: str, icon: str, text: str) -> str:
+    if not text:  # placeholder row for a card we don't have yet
+        return (
+            f'<article class="card missing" id="card-{card_id}">'
+            f'<p class="text">Missing</p><span class="meta">#{card_id}</span></article>'
+        )
     return (
         f'<article class="card" data-icon="{icon}" id="card-{card_id}">'
         f'<div class="badge" title="{icon}"><svg viewBox="0 0 24 24" aria-hidden="true">{ICONS[ICON_VARIANT.get(card_id, icon)]}</svg></div>'
@@ -77,21 +86,22 @@ def card_html(card_id: str, icon: str, text: str) -> str:
 
 
 def main() -> None:
-    rows = list(csv.DictReader((ROOT / "self-edition-cards.csv").open()))
-    missing = {r["icon"] for r in rows} - ICONS.keys()
+    rows = list(csv.DictReader((ROOT / "sources" / "the-and-cards.csv").open()))
+    missing = {r["icon"] for r in rows if r["icon"]} - ICONS.keys()
     if missing:
         raise SystemExit(f"No SVG drawn for icon(s): {', '.join(sorted(missing))}")
+    have = sum(1 for r in rows if r["text"])
     cards = "\n".join(card_html(r["card_id"], r["icon"], r["text"]) for r in rows)
     out = f"""<!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1"><title>Self Edition Cards</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@400&display=swap" rel="stylesheet">
 <style>{CSS}</style></head><body>
-<header><h1>{{THE AND}} — Self edition</h1>{len(rows)} cards, generated from <code>self-edition-cards.csv</code> by <code>build_cards.py</code>. Print to get 2.5×3.5in cards.</header>
+<header><h1>{{THE AND}} — Self edition</h1>{have} of {len(rows)} cards transcribed ({len(rows) - have} missing), generated from <code>sources/the-and-cards.csv</code> by <code>scripts/build_cards.py</code>. Print to get 2.5×3.5in cards.</header>
 <main class="deck">
 {cards}
 </main></body></html>"""
     (ROOT / "cards.html").write_text(out)
-    print(f"wrote cards.html with {len(rows)} cards")
+    print(f"wrote cards.html with {have}/{len(rows)} cards ({len(rows) - have} missing)")
 
     # Standalone icon files: the bare glyph, and the glyph in its square badge as printed on cards.
     icon_dir = ROOT / "icons"
