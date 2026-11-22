@@ -1,0 +1,35 @@
+{
+  "name": "000-template",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "lint": "pnpm lint:oxlint && pnpm lint:complexity",
+    "lint:oxlint": "oxlint .",
+    "lint:complexity": "../../scripts/cccc.sh src"
+  },
+  "dependencies": {
+    "@cloudflare/kumo": "2.19.0",
+    "@phosphor-icons/react": "2.1.10",
+    "react": "19.3.1",
+    "react-dom": "19.3.1"
+  },
+  "devDependencies": {
+    "@babel/core": "7.29.13",
+    "@cloudflare/oxlint-config": "0.1.0",
+    "@rolldown/plugin-babel": "0.3.1",
+    "@tailwindcss/vite": "4.3.5",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@vitejs/plugin-react": "6.3.0",
+    "babel-plugin-react-compiler": "1.0.0",
+    "oxlint": "1.94.0",
+    "tailwindcss": "4.3.5",
+    "tsrs": "0.25.0-ts7.1.0-beta",
+    "typescript": "7.0.2",
+    "vite": "8.3.8"
+  }
+}

@@ -1,3 +1,8 @@
 *.apk
 *.xapk
 sources/images/
+node_modules/
+dist/
+.cccc.cache
+*.tsbuildinfo
+.tools/
