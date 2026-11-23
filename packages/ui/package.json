@@ -1,0 +1,42 @@
+{
+  "name": "@playtest-kit/ui",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build",
+    "typecheck": "tsrs --noEmit --fast",
+    "lint": "pnpm lint:oxlint && pnpm lint:complexity",
+    "lint:oxlint": "oxlint .",
+    "lint:complexity": "../../scripts/cccc.sh src"
+  },
+  "peerDependencies": {
+    "@cloudflare/kumo": "2.19.0",
+    "react": "19.3.1",
+    "react-dom": "19.3.1"
+  },
+  "devDependencies": {
+    "@babel/core": "7.29.13",
+    "@cloudflare/kumo": "2.19.0",
+    "@cloudflare/oxlint-config": "0.1.0",
+    "@phosphor-icons/react": "2.1.10",
+    "@rolldown/plugin-babel": "0.3.1",
+    "@storybook/addon-docs": "10.6.8",
+    "@storybook/react-vite": "10.6.8",
+    "@tailwindcss/vite": "4.3.5",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@vitejs/plugin-react": "6.3.0",
+    "babel-plugin-react-compiler": "1.0.0",
+    "oxlint": "1.94.0",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "storybook": "10.6.8",
+    "tailwindcss": "4.3.5",
+    "tsrs": "0.25.0-ts7.1.0-beta",
+    "vite": "8.3.8"
+  }
+}

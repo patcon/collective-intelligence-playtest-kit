@@ -9,6 +9,7 @@
   "scripts": {
     "new-example": "node scripts/new-example.mjs",
     "lint": "pnpm -r --if-present lint",
-    "typecheck": "pnpm -r --if-present typecheck"
+    "typecheck": "pnpm -r --if-present typecheck",
+    "storybook": "pnpm --filter @playtest-kit/ui storybook"
   }
 }
