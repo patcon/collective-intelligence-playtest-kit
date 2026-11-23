@@ -6,3 +6,5 @@ dist/
 .cccc.cache
 *.tsbuildinfo
 .tools/
+.alchemy/
+.env

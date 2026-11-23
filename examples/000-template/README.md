@@ -14,6 +14,9 @@ Starting point for new examples. Copy it with `pnpm new-example <name>` from the
 | --- | --- |
 | `pnpm dev` | Vite dev server |
 | `pnpm build` | Typecheck, then production build |
+| `pnpm deploy:setup` | Connect or reauthorise Cloudflare in your Alchemy profile (interactive, once per machine) |
+| `pnpm run deploy` | Deploy to Cloudflare Workers with [Alchemy](https://alchemy.run) (`alchemy.run.ts`). Needs `run`: bare `pnpm deploy` is a pnpm built-in |
+| `pnpm run destroy` | Delete the deployed Worker for the current stage |
 | `pnpm typecheck` | `tsc --noEmit` |
 | `pnpm lint` | `lint:oxlint` then `lint:complexity` |
 | `pnpm lint:oxlint` | Oxlint with `@cloudflare/oxlint-config` plus the rules below |
