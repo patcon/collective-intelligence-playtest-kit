@@ -17,7 +17,7 @@ Starting point for new examples. Copy it with `pnpm new-example <name>` from the
 | `pnpm deploy:setup` | Connect or reauthorise Cloudflare in your Alchemy profile (interactive, once per machine) |
 | `pnpm run deploy` | Deploy to Cloudflare Workers with [Alchemy](https://alchemy.run) (`alchemy.run.ts`). Needs `run`: bare `pnpm deploy` is a pnpm built-in |
 | `pnpm run destroy` | Delete the deployed Worker for the current stage |
-| `pnpm typecheck` | `tsc --noEmit` |
+| `pnpm typecheck` | [tsrs](https://github.com/oxc-project/tsrs) (Rust port of TypeScript 7) with `--noEmit --fast` |
 | `pnpm lint` | `lint:oxlint` then `lint:complexity` |
 | `pnpm lint:oxlint` | Oxlint with `@cloudflare/oxlint-config` plus the rules below |
 | `pnpm lint:complexity` | [cccc](https://github.com/moznion/cccc) with limits in `cccc.toml` (downloads a pinned binary to `.tools/` on first run) |

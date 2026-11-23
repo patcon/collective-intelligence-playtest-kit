@@ -4,12 +4,12 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc --noEmit && vite build",
+    "build": "tsrs --noEmit --fast && vite build",
     "preview": "vite preview",
     "deploy:setup": "alchemy profile edit",
     "deploy": "alchemy deploy",
     "destroy": "alchemy destroy",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsrs --noEmit --fast",
     "lint": "pnpm lint:oxlint && pnpm lint:complexity",
     "lint:oxlint": "oxlint .",
     "lint:complexity": "../../scripts/cccc.sh src"
@@ -36,7 +36,6 @@
     "oxlint": "1.94.0",
     "tailwindcss": "4.3.5",
     "tsrs": "0.25.0-ts7.1.0-beta",
-    "typescript": "7.0.2",
     "vite": "8.3.8"
   }
 }
