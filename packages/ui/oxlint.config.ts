@@ -22,6 +22,7 @@ export default defineConfig({
   rules: {
     ...cloudflare.rules,
     'no-inline-comments': 'error',
+    'react/void-use-memo': 'error',
     'no-restricted-properties': [
       'error',
       ...effectHooks.map((property) => ({

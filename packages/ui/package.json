@@ -23,11 +23,9 @@
     "three": "0.183.2"
   },
   "devDependencies": {
-    "@babel/core": "7.29.13",
     "@cloudflare/kumo": "2.19.0",
     "@cloudflare/oxlint-config": "0.1.0",
     "@phosphor-icons/react": "2.1.10",
-    "@rolldown/plugin-babel": "0.3.1",
     "@storybook/addon-docs": "10.6.8",
     "@storybook/addon-vitest": "10.6.8",
     "@storybook/react-vite": "10.6.8",
@@ -38,7 +36,7 @@
     "@vitejs/plugin-react": "6.3.0",
     "@vitest/browser": "5.1.0",
     "@vitest/browser-playwright": "5.1.0",
-    "babel-plugin-react-compiler": "1.0.0",
+    "oxc-transform-react": "0.158.0",
     "oxlint": "1.94.0",
     "playwright": "1.65.0",
     "react": "19.3.1",
