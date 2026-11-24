@@ -15,5 +15,5 @@
     "skipLibCheck": true,
     "noEmit": true
   },
-  "include": ["src", ".storybook", "vite.config.ts", "oxlint.config.ts"]
+  "include": ["src", ".storybook", "vite.config.ts", "vitest.config.ts", "oxlint.config.ts"]
 }
