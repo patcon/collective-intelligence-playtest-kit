@@ -3,7 +3,7 @@ import { formatValence, valenceColor } from '../lib/valenceColor.ts';
 
 interface RemoteScreenProps {
   valence: number | null;
-  /** Tint the fill as idle (see `valenceColor`). */
+  /** Fill with the idle colour (see `valenceColor`). */
   idle?: boolean;
   instruction: string;
   notes: Array<string>;

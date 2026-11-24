@@ -9,9 +9,11 @@ describe('valenceColor', () => {
     expect(valenceColor(null)).toBe('rgb(115 115 115)');
   });
 
-  it('tints the same colour halfway to the idle yellow when idle', () => {
-    const tinted = valenceColor(-1, true);
-    expect(tinted).toMatch(/^color-mix\(in srgb, var\(--color-kumo-badge-orange, .+\) 50%, rgb\(220 38 38\)\)$/);
+  it('is the idle badge\u2019s yellow when idle, whatever the valence', () => {
+    const idle = valenceColor(1, true);
+    expect(idle).toMatch(/^var\(--color-kumo-badge-orange, /);
+    expect(valenceColor(-1, true)).toBe(idle);
+    expect(valenceColor(null, true)).toBe(idle);
   });
 });
 

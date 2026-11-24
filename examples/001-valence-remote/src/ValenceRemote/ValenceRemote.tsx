@@ -22,7 +22,7 @@ export interface ValenceRemoteProps {
   onActivity?: (activity: Activity) => void;
   /** When a tilt remote counts as idle, over DEFAULT_IDLE; read once on mount. */
   idle?: Partial<IdleSettings>;
-  /** Tint the screen towards the idle badge's yellow while idle, so it shows on the phone too. */
+  /** Turn the screen the idle badge's yellow while idle, so it shows on the phone too. */
   tintWhenIdle?: boolean;
   /** How the phone reads as valence. Touch also works on desktop. */
   detection?: Detection;
