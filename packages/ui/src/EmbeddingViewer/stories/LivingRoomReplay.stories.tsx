@@ -1,11 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useMemo, useRef, useState } from 'react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
-import useInterval from '../hooks/effects/useInterval.ts';
-import EmbeddingViewer from './EmbeddingViewer.tsx';
+import useInterval from '../../hooks/effects/useInterval.ts';
+import EmbeddingViewer from '../EmbeddingViewer.tsx';
 import livingRoom from './fixtures/living-room.json';
 import { expectNoPageErrors, recordDataset, sleep } from './storyChecks.ts';
-import type { CameraState, EmbeddingViewerProps, FollowMode, Vec3, ViewerPoint } from './types.ts';
+import type { CameraState, EmbeddingViewerProps, FollowMode, Vec3, ViewerPoint } from '../types.ts';
 
 const TICK_MS = 50;
 const TWEEN_MS = 900;

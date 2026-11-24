@@ -1,5 +1,5 @@
 import { Color } from 'three';
-import type { ViewerTrack } from './types.ts';
+import type { ViewerTrack } from '../types.ts';
 
 // Background for every 3D scene: black so the bright gradients (and bloom) read well.
 export const SCENE_BG = new Color(0x00_00_00);

@@ -25,5 +25,5 @@ Export the recording and compact it into the fixture. `export.js` pairs each `li
 ```sh
 ab eval "$(cat scripts/record-v9-fixture/export.js)" > raw-eval.txt
 node -e 'const fs=require("fs");fs.writeFileSync("raw.json",JSON.parse(fs.readFileSync("raw-eval.txt","utf8")))'
-node scripts/record-v9-fixture/compact.mjs raw.json packages/ui/src/EmbeddingViewer/fixtures/living-room.json
+node scripts/record-v9-fixture/compact.mjs raw.json packages/ui/src/EmbeddingViewer/stories/fixtures/living-room.json
 ```

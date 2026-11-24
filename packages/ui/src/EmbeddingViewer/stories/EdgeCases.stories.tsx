@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
-import EmbeddingViewer from './EmbeddingViewer.tsx';
+import EmbeddingViewer from '../EmbeddingViewer.tsx';
 import { clickAt, expectNoPageErrors, findViewerCanvas, litPixels } from './storyChecks.ts';
-import type { CameraState, ViewerPoint } from './types.ts';
+import type { CameraState, ViewerPoint } from '../types.ts';
 
 const CAMERA: CameraState = { position: [0, 0, 3], target: [0, 0, 0], followMode: 'static' };
 const ONLY_POINT: ViewerPoint = { key: 'only', position: [0, 0, 0], track: 0, label: 'The only segment' };

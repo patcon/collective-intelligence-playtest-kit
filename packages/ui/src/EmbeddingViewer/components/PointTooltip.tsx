@@ -1,5 +1,5 @@
-import { lutColor, trackLut } from './palettes.ts';
-import type { ViewerTrack } from './types.ts';
+import { lutColor, trackLut } from '../lib/palettes.ts';
+import type { ViewerTrack } from '../types.ts';
 
 /** Hover label for a point: its track's name, in the track's mid-gradient colour, over the point's label. */
 export default function PointTooltip({

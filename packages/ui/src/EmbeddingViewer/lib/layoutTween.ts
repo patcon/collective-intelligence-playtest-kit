@@ -2,7 +2,7 @@ import type { BufferGeometry, Color } from 'three';
 import { BufferAttribute, DynamicDrawUsage } from 'three';
 import { at, easeInOutCubic, hash01 } from './math.ts';
 import { lutColor, trackLut } from './palettes.ts';
-import type { ViewerPoint, ViewerTrack } from './types.ts';
+import type { ViewerPoint, ViewerTrack } from '../types.ts';
 
 /** How long a layout change takes to tween in. The follow camera glides with the same timing. */
 export const TWEEN_MS = 900;

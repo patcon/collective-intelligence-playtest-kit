@@ -1,4 +1,4 @@
-import type { LiveRenderer } from './livePathVisuals.ts';
+import type { LiveRenderer } from './lib/livePathVisuals.ts';
 
 export type Vec3 = readonly [number, number, number];
 

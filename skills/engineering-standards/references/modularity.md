@@ -9,8 +9,11 @@ without reading unrelated code, and reuse it elsewhere without copying.
 packages/config/      @playtest-kit/config — shared oxlint, Vite and tsconfig presets
 packages/ui/          @playtest-kit/ui — shared components, documented in Storybook
   src/
-    <Component>/      One folder per component: the component, its subcomponents,
-                      pure logic modules, *.test.ts, *.stories.tsx, *.mdx, fixtures/
+    <Component>/      One folder per component
+      <Component>.tsx   The entry component, plus types.ts and <Component>.mdx
+      components/     Subcomponents (.tsx)
+      lib/            Non-React modules (.ts) and their *.test.ts
+      stories/        *.stories.tsx, story helpers, fixtures/
     hooks/            Shared hooks used by 2+ components
     index.ts          Public surface — the only file examples import
 examples/

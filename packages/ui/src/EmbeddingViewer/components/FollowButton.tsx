@@ -2,7 +2,7 @@ import { Button } from '@cloudflare/kumo';
 import type { ButtonProps } from '@cloudflare/kumo';
 import { CircleIcon, RecordIcon, TargetIcon } from '@phosphor-icons/react';
 import type { ReactNode } from 'react';
-import type { FollowMode } from './types.ts';
+import type { FollowMode } from '../types.ts';
 
 /** Per follow mode: the mode the button steps to next, and how the button shows it (neutral / blue / red, as in v9). */
 const FOLLOW_MODES: Readonly<
