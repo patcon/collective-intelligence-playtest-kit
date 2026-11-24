@@ -27,6 +27,7 @@ import { swingFollowCamera } from './followCamera.ts';
 import { TWEEN_MS, createLayoutTween } from './layoutTween.ts';
 import { addTubeLights, createGlowFx, createPathVisual } from './livePathVisuals.ts';
 import { at, easeInOutCubic } from './math.ts';
+import { createPlayheadEaser } from './playheads.ts';
 import type { GlowFx, LiveRenderer, PathVisual } from './livePathVisuals.ts';
 import { SCENE_BG, lutColor, trackLut } from './palettes.ts';
 import type { CameraState, EmbeddingViewerProps, FollowMode, ViewerPoint } from './types.ts';
@@ -160,17 +161,7 @@ function EmbeddingScene({
   const prevPathTangentRef = useRef(new Vector3());
   const playheadsRef = useLatestRef(playheads);
   const activeTrackRef = useRef(activeTrack);
-  const sphereTRef = useRef<Array<number>>(new Array<number>(trackCount).fill(0));
-  /**
-   * Per track: where its playhead was along the path when the current layout
-   * tween started, so it eases to its new spot in step with the points (null:
-   * not tweening, e.g. after a seek mid-tween). Last target seen, to spot seeks
-   * (NaN right after a new layout, whose growth isn't a seek).
-   */
-  const sphereFromTRef = useRef<Array<number | null>>(
-    new Array<number | null>(trackCount).fill(null),
-  );
-  const sphereLastTargetRef = useRef<Array<number>>(new Array<number>(trackCount).fill(0));
+  const [playheadEaser] = useState(() => createPlayheadEaser(trackCount));
   const style = useMemo(
     () => ({ lineWidth, nodeSize, autoRotate, autoRotateSpeed, showGrid }),
     [lineWidth, nodeSize, autoRotate, autoRotateSpeed, showGrid],
@@ -278,9 +269,7 @@ function EmbeddingScene({
     }
     layout.retarget(next, tracksRef.current, s.bgColor);
     syncLines();
-    sphereFromTRef.current = sphereTRef.current.slice();
-    // The path just grew, possibly by several segments: don't mistake that for a seek
-    sphereLastTargetRef.current = sphereLastTargetRef.current.map(() => Number.NaN);
+    playheadEaser.startLayout();
   };
 
   useThreeScene(mountRef, (mount) => {
@@ -397,7 +386,6 @@ function EmbeddingScene({
     }
 
     let animId = 0;
-    const sphereWasVisible = new Array<boolean>(trackCount).fill(false);
     let lastFollowed = activeTrackRef.current;
     let lastFrame = performance.now();
     const animate = () => {
@@ -412,34 +400,15 @@ function EmbeddingScene({
         syncLines();
       }
 
+      playheadEaser.step(
+        playheadsRef.current,
+        layout.trackIndices.map((list) => list.length),
+        tweenK,
+      );
       spheres.forEach((sphere, k) => {
-        const hp = playheadsRef.current[k];
-        const len = layout.trackIndices[k]?.length ?? 0;
-        if (hp !== null && hp !== undefined && len > 0) {
-          const target = Math.min(len - 1, Math.max(0, hp));
-          let from = sphereFromTRef.current[k] ?? null;
-          // A jump in the target mid-tween is a seek: let it use the quick chase below
-          // (NaN compares false, so the new layout's own jump is eased with the points)
-          if (from !== null && Math.abs(target - at(sphereLastTargetRef.current, k)) > 1) {
-            sphereFromTRef.current[k] = null;
-            from = null;
-          }
-          sphereLastTargetRef.current[k] = target;
-          if (!sphereWasVisible[k]) {
-            sphereTRef.current[k] = target;
-          } else if (tweenK !== null && from !== null) {
-            // New layout: ease along the path with the same timing as the points
-            sphereTRef.current[k] = from + (target - from) * tweenK;
-          } else {
-            const t = at(sphereTRef.current, k);
-            sphereTRef.current[k] = t + (target - t) * 0.2;
-          }
-          pathAt(k, at(sphereTRef.current, k), sphere.position);
-          sphere.visible = true;
-          sphereWasVisible[k] = true;
-        } else {
-          sphere.visible = false;
-          sphereWasVisible[k] = false;
+        sphere.visible = playheadEaser.visible[k] ?? false;
+        if (sphere.visible) {
+          pathAt(k, at(playheadEaser.positions, k), sphere.position);
         }
       });
 
@@ -473,7 +442,7 @@ function EmbeddingScene({
         swingFollowCamera(
           offset,
           prevPathTangentRef.current,
-          pathTangentAt(active, at(sphereTRef.current, active)),
+          pathTangentAt(active, at(playheadEaser.positions, active)),
         );
         camPos.copy(newTarget).add(offset);
         camTarget.copy(newTarget);
@@ -649,7 +618,7 @@ function EmbeddingScene({
           if (s && sphere?.visible) {
             const cursorPos = sphere.position.clone();
             if (next === 'following' && tween && (layout.trackIndices[active]?.length ?? 0) > 1) {
-              const tangent = pathTangentAt(active, at(sphereTRef.current, active));
+              const tangent = pathTangentAt(active, at(playheadEaser.positions, active));
               tween.toPos
                 .copy(cursorPos)
                 .addScaledVector(tangent, -0.6)
