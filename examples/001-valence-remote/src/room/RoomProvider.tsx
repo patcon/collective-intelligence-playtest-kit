@@ -1,6 +1,7 @@
 import { useAgent } from 'agents/react';
 import { createContext, use, useState } from 'react';
 import type { ReactNode } from 'react';
+import { usePageVisibility } from '../hooks/effects/usePageVisibility.ts';
 import { parseRoomMessage } from './protocol.ts';
 import type { Role, RoomMessage } from './protocol.ts';
 
@@ -30,7 +31,11 @@ interface RoomProviderProps {
   children: ReactNode;
 }
 
-/** Connects to a `ValenceRoom` as a phone or a viewer, and gives everything below it the room. */
+/**
+ * Connects to a `ValenceRoom` as a phone or a viewer, and gives everything below it the room.
+ * A phone closes its socket while its page is out of view, so the room says it left straight away,
+ * and reconnects (with the same id) when it's back.
+ */
 export function RoomProvider({ room, role, children }: RoomProviderProps) {
   const [status, setStatus] = useState<RoomStatus>('connecting');
   const [subscribers] = useState(() => new Set<Subscriber>());
@@ -52,7 +57,14 @@ export function RoomProvider({ room, role, children }: RoomProviderProps) {
     query: { role },
   });
 
-  const send = (msg: RoomMessage) => agent.send(JSON.stringify(msg));
+  usePageVisibility(role === 'phone', (visible) => (visible ? agent.reconnect() : agent.close(1000, 'hidden')));
+
+  /** Dropped unless the socket is open: a stale valence is no use, so none is queued for later. */
+  const send = (msg: RoomMessage) => {
+    if (agent.readyState === WebSocket.OPEN) {
+      agent.send(JSON.stringify(msg));
+    }
+  };
 
   return <RoomContext value={{ send, status, subscribers }}>{children}</RoomContext>;
 }

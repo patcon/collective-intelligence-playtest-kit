@@ -119,6 +119,9 @@ useRoomStatus(): 'connecting' | 'open' | 'closed'
 - It wraps `useAgent({ agent: 'ValenceRoom', name: room, query: { role } })`, using its raw
   `send` and `onMessage`, so messages are JSON.
 - Components below it get the room from context, so neither page needs transport props.
+- A phone closes its socket while its page is hidden (`visibilitychange`, `pagehide`), so the
+  room sends `left` at once, and reconnects with the same id when the page is visible again.
+  Sends while the socket isn't open are dropped rather than queued.
 - Subscribers sit behind a ref that always holds the latest callback, the same pattern as
   reaction-canvas's `RoomSocketContext.tsx`.
 
