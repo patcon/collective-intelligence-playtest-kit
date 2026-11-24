@@ -16,6 +16,14 @@ interface RoomContextValue {
 
 const RoomContext = createContext<RoomContextValue | null>(null);
 
+/**
+ * The socket's scheme, matching the page's. PartySocket otherwise picks `ws` for private-network
+ * hosts (192.168.*, 10.*), which an HTTPS page on the LAN blocks as mixed content.
+ */
+function socketProtocol(): 'ws' | 'wss' {
+  return window.location.protocol === 'https:' ? 'wss' : 'ws';
+}
+
 interface RoomProviderProps {
   room: string;
   role: Role;
@@ -40,6 +48,7 @@ export function RoomProvider({ room, role, children }: RoomProviderProps) {
       }
     },
     onOpen: () => setStatus('open'),
+    protocol: socketProtocol(),
     query: { role },
   });
 

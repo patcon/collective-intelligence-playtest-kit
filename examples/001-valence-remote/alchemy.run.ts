@@ -1,5 +1,6 @@
 import { DurableObject, Website, providers, state } from '@alchemy.run/cloudflare';
 import { Stack } from 'alchemy';
+import { map } from 'alchemy/Output';
 import { gen } from 'effect/Effect';
 
 const lan = process.env.LAN === '1';
@@ -15,6 +16,10 @@ export default Stack(
       env: { ValenceRoom: DurableObject('ValenceRoom') },
     });
 
-    return { url: website.url };
+    // In dev, `urls` lists localhost and each LAN address, the way `vite --host` does. Alchemy
+    // (2.0.0-beta.87) writes them as http:// even when the dev server serves HTTPS, as it does with LAN=1.
+    const urls = map(website.urls, (all) => (lan ? all.map((url) => url.replace(/^http:/, 'https:')) : all));
+
+    return { url: website.url, urls };
   }),
 );
