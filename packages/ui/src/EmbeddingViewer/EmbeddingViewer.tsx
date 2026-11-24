@@ -1,4 +1,7 @@
-import type { MouseEvent as ReactMouseEvent, RefObject } from 'react';
+import { Button } from '@cloudflare/kumo';
+import type { ButtonProps } from '@cloudflare/kumo';
+import { CircleIcon, RecordIcon, TargetIcon } from '@phosphor-icons/react';
+import type { MouseEvent as ReactMouseEvent, ReactNode, RefObject } from 'react';
 import { useMemo, useRef, useState } from 'react';
 import type { Color } from 'three';
 import {
@@ -48,10 +51,21 @@ const GRID_Y = -1.2;
 const ACTIVE_LINE_OPACITY = 0.75;
 const INACTIVE_LINE_OPACITY = 0.35;
 const easeInOutCubic = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
-const NEXT_FOLLOW_MODE: Readonly<Record<FollowMode, FollowMode>> = {
-  static: 'tracking',
-  tracking: 'following',
-  following: 'static',
+/** Per follow mode: the mode the button steps to next, and how the button shows it (neutral / blue / red, as in v9). */
+const FOLLOW_MODES: Readonly<
+  Record<
+    FollowMode,
+    { next: FollowMode; label: string; icon: ReactNode; variant: ButtonProps['variant'] }
+  >
+> = {
+  static: { next: 'tracking', label: 'Static', icon: <TargetIcon />, variant: 'secondary' },
+  tracking: { next: 'following', label: 'Tracking', icon: <RecordIcon />, variant: 'primary' },
+  following: {
+    next: 'static',
+    label: 'Following',
+    icon: <CircleIcon weight="fill" />,
+    variant: 'destructive',
+  },
 };
 
 interface Buffers {
@@ -761,17 +775,12 @@ function EmbeddingScene({
     }
   };
 
-  const followBtnClass = [
-    'absolute bottom-2 left-2 text-[11px] py-[3px] px-2 cursor-pointer z-10 pointer-events-auto select-none transition-[background,color,border-color] duration-150 rounded border hover:bg-black/75 hover:text-white',
-    followMode === 'tracking'
-      ? 'bg-[rgba(40,100,200,0.35)] border-[rgba(80,140,255,0.6)] text-white'
-      : followMode === 'following'
-        ? 'bg-[rgba(200,50,50,0.35)] border-[rgba(255,80,80,0.6)] text-white'
-        : 'bg-black/55 text-white/65 border-white/[0.18]',
-  ].join(' ');
+  const follow = FOLLOW_MODES[followMode];
 
+  // The scene is always dark, so the chrome over it uses Kumo's dark tokens
   return (
     <div
+      data-mode="dark"
       className="relative w-full h-full min-h-0 cursor-crosshair [&_canvas]:block [&_canvas]:!w-full [&_canvas]:!h-full"
       ref={mountRef}
       onMouseMove={handleMouseMove}
@@ -782,7 +791,7 @@ function EmbeddingScene({
     >
       {tooltip && (
         <div
-          className="absolute pointer-events-none bg-black/80 text-white text-xs py-[5px] px-2 rounded max-w-[240px] whitespace-pre-wrap z-10 leading-[1.4]"
+          className="kumo-tooltip-popup absolute pointer-events-none z-10 max-w-[240px] whitespace-pre-wrap rounded-md bg-kumo-base px-2.5 py-1.5 text-sm text-kumo-default shadow-md outline outline-kumo-line"
           style={{ left: tooltip.x + 12, top: tooltip.y + 12 }}
         >
           <span
@@ -797,12 +806,14 @@ function EmbeddingScene({
           {tooltip.text}
         </div>
       )}
-      <button
-        type="button"
-        className={followBtnClass}
+      <Button
+        size="sm"
+        variant={follow.variant}
+        icon={follow.icon}
+        className="absolute bottom-2 left-2 z-10 select-none"
         onClick={(e) => {
           e.stopPropagation();
-          const next = NEXT_FOLLOW_MODE[followMode];
+          const next = follow.next;
           onFollowModeChange(next);
           followModeRef.current = next;
           const s = sceneRef.current;
@@ -836,12 +847,8 @@ function EmbeddingScene({
           }
         }}
       >
-        {followMode === 'static'
-          ? '◎ Static'
-          : followMode === 'tracking'
-            ? '◉ Tracking'
-            : '⬤ Following'}
-      </button>
+        {follow.label}
+      </Button>
     </div>
   );
 }
