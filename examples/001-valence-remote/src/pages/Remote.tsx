@@ -37,6 +37,7 @@ function ConnectedRemote() {
   return (
     <ValenceRemote
       detection={detectionFromUrl()}
+      greyWhenIdle={new URLSearchParams(window.location.search).has('greyWhenIdle')}
       idle={idleFromUrl()}
       onActivity={setActivity}
       onValence={(v) => send({ type: 'valence', v })}
@@ -46,7 +47,8 @@ function ConnectedRemote() {
 
 /**
  * `/remote`: this device as a phone in the room. `?detection=` picks the mode (default `flip`);
- * `?idleMs=` and `?stillDeg=` override when it counts as idle (see DEFAULT_IDLE).
+ * `?idleMs=` and `?stillDeg=` override when it counts as idle (see DEFAULT_IDLE); `?greyWhenIdle`
+ * turns the screen grey while idle.
  */
 export function Remote({ room }: { room: string }) {
   return (

@@ -22,6 +22,8 @@ export interface ValenceRemoteProps {
   onActivity?: (activity: Activity) => void;
   /** When a tilt remote counts as idle, over DEFAULT_IDLE; read once on mount. */
   idle?: Partial<IdleSettings>;
+  /** Turn the screen grey while idle, rather than keep the valence's colour. */
+  greyWhenIdle?: boolean;
   /** How the phone reads as valence. Touch also works on desktop. */
   detection?: Detection;
   /** Keep the screen awake while running, via the Wake Lock API. */
@@ -39,14 +41,21 @@ function notesFor(touch: boolean, status: OrientationStatus, wakeLockLost: boole
 }
 
 /** Turns a phone into a remote: its orientation (or a finger's height) as a valence from −1 to +1. */
-export function ValenceRemote({ onValence, onActivity, idle, detection = 'flip', keepAwake = true }: ValenceRemoteProps) {
+export function ValenceRemote({
+  onValence,
+  onActivity,
+  idle,
+  greyWhenIdle = false,
+  detection = 'flip',
+  keepAwake = true,
+}: ValenceRemoteProps) {
   const [started, setStarted] = useState(false);
   const [valence, setValence] = useState<Valence>(null);
   const [fingerY, setFingerY] = useState<number | null>(null);
   const [sender] = useState(createSender);
   const touch = detection === 'touch';
   const wakeLock = useWakeLock(started && keepAwake);
-  const tracker = useActivity(started, onActivity, idle);
+  const { activity, tracker } = useActivity(started, onActivity, idle);
 
   const emit = (out: Valence | undefined) => {
     if (out !== undefined) {
@@ -94,6 +103,7 @@ export function ValenceRemote({ onValence, onActivity, idle, detection = 'flip',
   const wakeLockLost = keepAwake && !wakeLock.acquired;
   return (
     <RemoteScreen
+      grey={greyWhenIdle && activity === 'idle'}
       instruction={INSTRUCTIONS[detection]}
       notes={notesFor(touch, orientation.status, wakeLockLost)}
       onPointer={touch ? onPointer : undefined}

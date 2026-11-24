@@ -3,6 +3,8 @@ import { formatValence, valenceColor } from '../lib/valenceColor.ts';
 
 interface RemoteScreenProps {
   valence: number | null;
+  /** Grey out the fill, as when idle. */
+  grey?: boolean;
   instruction: string;
   notes: Array<string>;
   onPointer?: (y: number, event: PointerEvent<HTMLDivElement>) => void;
@@ -17,7 +19,7 @@ function share(event: PointerEvent<HTMLDivElement>): number {
 }
 
 /** The running remote: the whole screen in the valence's colour, with −1/+1 labels and a readout. */
-export function RemoteScreen({ valence, instruction, notes, onPointer, onRelease, children }: RemoteScreenProps) {
+export function RemoteScreen({ valence, grey = false, instruction, notes, onPointer, onRelease, children }: RemoteScreenProps) {
   const handle = (event: PointerEvent<HTMLDivElement>) => onPointer?.(share(event), event);
 
   return (
@@ -29,7 +31,7 @@ export function RemoteScreen({ valence, instruction, notes, onPointer, onRelease
       onPointerCancel={onRelease}
       onPointerMove={handle}
       onPointerUp={onRelease}
-      style={{ backgroundColor: valenceColor(valence) }}
+      style={{ backgroundColor: valenceColor(valence, grey) }}
     >
       {children}
       <span className="pointer-events-none absolute top-4 left-1/2 -translate-x-1/2 font-mono text-lg mix-blend-difference">

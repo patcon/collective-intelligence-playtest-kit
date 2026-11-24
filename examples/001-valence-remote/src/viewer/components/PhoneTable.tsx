@@ -1,6 +1,6 @@
 import { Badge, Empty, Meter, Table } from '@cloudflare/kumo';
 import { DeviceMobileIcon } from '@phosphor-icons/react';
-import { formatValence } from '../../ValenceRemote/lib/valenceColor.ts';
+import { formatValence, valenceColor } from '../../ValenceRemote/lib/valenceColor.ts';
 import type { Activity } from '../../ValenceRemote/lib/activity.ts';
 import { rateOf } from '../lib/phones.ts';
 import type { PhoneRow } from '../lib/phones.ts';
@@ -28,7 +28,10 @@ interface PhoneTableProps {
   now: number;
 }
 
-/** One row per connected phone: its current valence, what its holder is doing, and how often it's sending. */
+/**
+ * One row per connected phone: its current valence (its whole bar tinted the phone's screen colour,
+ * grey when idle), what its holder is doing, and how often it's sending.
+ */
 export function PhoneTable({ phones, now }: PhoneTableProps) {
   if (phones.length === 0) {
     return (
@@ -55,10 +58,13 @@ export function PhoneTable({ phones, now }: PhoneTableProps) {
             <Table.Cell title={row.id}>
               <Meter
                 customValue={formatValence(row.v)}
+                indicatorClassName="bg-none bg-(--valence-color)"
                 label={row.id.slice(0, 8)}
                 max={1}
                 min={-1}
                 showValue
+                trackClassName="bg-[color-mix(in_srgb,var(--valence-color)_35%,transparent)]"
+                style={{ '--valence-color': valenceColor(row.v, row.activity === 'idle') }}
                 value={row.v ?? 0}
               />
             </Table.Cell>
