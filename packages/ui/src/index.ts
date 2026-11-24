@@ -1,5 +1,5 @@
 export { default as EmbeddingViewer } from './EmbeddingViewer/EmbeddingViewer.tsx';
-export type { LiveRenderer } from './EmbeddingViewer/livePathVisuals.ts';
+export type { LiveRenderer } from './EmbeddingViewer/lib/livePathVisuals.ts';
 export type {
   CameraState,
   EmbeddingViewerProps,

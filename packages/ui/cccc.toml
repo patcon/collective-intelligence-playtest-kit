@@ -1,6 +1,0 @@
-# Complexity budget for `pnpm lint:complexity` (https://github.com/moznion/cccc).
-languages      = ["es"]
-max-cognitive  = 15
-max-cyclomatic = 10
-format         = "simple"
-violations     = true

@@ -1,6 +1,6 @@
 import { PerspectiveCamera, Vector3 } from 'three';
 import { expect, fireEvent, waitFor } from 'storybook/test';
-import type { CameraState, Vec3 } from './types.ts';
+import type { CameraState, Vec3 } from '../types.ts';
 
 /**
  * Runs `play` and fails if anything on the page threw meanwhile, the

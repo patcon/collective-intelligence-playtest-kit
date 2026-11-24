@@ -1,7 +1,7 @@
 import { Quaternion, Vector3 } from 'three';
 import { TWEEN_MS } from './layoutTween.ts';
 import { easeInOutCubic } from './math.ts';
-import type { FollowMode } from './types.ts';
+import type { FollowMode } from '../types.ts';
 
 /** Where 'following' glides to when switched on: this far back along the path from the playhead... */
 const FOLLOW_BEHIND = 0.6;

@@ -4,13 +4,13 @@ import { Vector2 } from 'three';
 import useLatestRef from '../hooks/effects/useLatestRef.ts';
 import useOnChange from '../hooks/effects/useOnChange.ts';
 import useThreeScene from '../hooks/effects/useThreeScene.ts';
-import FollowButton from './FollowButton.tsx';
-import { createLayoutTween } from './layoutTween.ts';
-import type { LiveRenderer } from './livePathVisuals.ts';
-import { createPlayheadEaser } from './playheads.ts';
-import PointTooltip from './PointTooltip.tsx';
-import { DEFAULT_NODE_SIZE, createEmbeddingScene } from './scene.ts';
-import type { SceneHandle } from './scene.ts';
+import FollowButton from './components/FollowButton.tsx';
+import { createLayoutTween } from './lib/layoutTween.ts';
+import type { LiveRenderer } from './lib/livePathVisuals.ts';
+import { createPlayheadEaser } from './lib/playheads.ts';
+import PointTooltip from './components/PointTooltip.tsx';
+import { DEFAULT_NODE_SIZE, createEmbeddingScene } from './lib/scene.ts';
+import type { SceneHandle } from './lib/scene.ts';
 import type { CameraState, EmbeddingViewerProps, FollowMode, ViewerPoint } from './types.ts';
 
 type SceneProps = Omit<EmbeddingViewerProps, 'initialCamera' | 'pathStyle'> & {

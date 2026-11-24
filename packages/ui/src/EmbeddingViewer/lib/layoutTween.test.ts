@@ -1,7 +1,7 @@
 import { BufferGeometry, Color } from 'three';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { TWEEN_MS, createLayoutTween } from './layoutTween.ts';
-import type { ViewerPoint, ViewerTrack } from './types.ts';
+import type { ViewerPoint, ViewerTrack } from '../types.ts';
 
 const TRACKS: ReadonlyArray<ViewerTrack> = [{ label: 'A' }, { label: 'B' }];
 const BG = new Color(0, 0, 0);

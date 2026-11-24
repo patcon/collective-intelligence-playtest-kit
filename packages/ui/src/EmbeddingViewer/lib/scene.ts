@@ -22,7 +22,7 @@ import type { LiveRenderer, PathVisual } from './livePathVisuals.ts';
 import { at } from './math.ts';
 import { SCENE_BG } from './palettes.ts';
 import type { PlayheadEaser } from './playheads.ts';
-import type { CameraState, FollowMode, ViewerPoint, ViewerTrack } from './types.ts';
+import type { CameraState, FollowMode, ViewerPoint, ViewerTrack } from '../types.ts';
 
 export const DEFAULT_NODE_SIZE = 0.04;
 
