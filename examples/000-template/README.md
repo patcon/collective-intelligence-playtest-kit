@@ -6,7 +6,8 @@ Starting point for new examples. Copy it with `pnpm new-example <name>` from the
 
 - [Kumo](https://www.npmjs.com/package/@cloudflare/kumo) components, styled through Tailwind v4
 - Vite + React 19 + TypeScript 7
-- React Compiler (Babel preset via `@rolldown/plugin-babel`), so no manual `useMemo`/`useCallback`
+- React Compiler (Oxc, via `@vitejs/plugin-react`), so no manual `useMemo`/`useCallback`
+- Vite, oxlint and TypeScript config come from [`@playtest-kit/config`](../../packages/config)
 
 ## Scripts
 
@@ -19,8 +20,8 @@ Starting point for new examples. Copy it with `pnpm new-example <name>` from the
 | `pnpm run destroy` | Delete the deployed Worker for the current stage |
 | `pnpm typecheck` | [tsrs](https://github.com/oxc-project/tsrs) (Rust port of TypeScript 7) with `--noEmit --fast` |
 | `pnpm lint` | `lint:oxlint` then `lint:complexity` |
-| `pnpm lint:oxlint` | Oxlint with `@cloudflare/oxlint-config` plus the rules below |
-| `pnpm lint:complexity` | [cccc](https://github.com/moznion/cccc) with limits in `cccc.toml` (downloads a pinned binary to `.tools/` on first run) |
+| `pnpm lint:oxlint` | Oxlint with the shared `@playtest-kit/config/oxlint` (Cloudflare preset plus the rules below) |
+| `pnpm lint:complexity` | [cccc](https://github.com/moznion/cccc) with limits in the repo-root `cccc.toml` (downloads a pinned binary to `.tools/` on first run) |
 
 ## House rules (enforced by lint)
 

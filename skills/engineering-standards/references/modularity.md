@@ -6,6 +6,7 @@ without reading unrelated code, and reuse it elsewhere without copying.
 ## Project layout
 
 ```
+packages/config/      @playtest-kit/config — shared oxlint, Vite and tsconfig presets
 packages/ui/          @playtest-kit/ui — shared components, documented in Storybook
   src/
     <Component>/      One folder per component: the component, its subcomponents,
