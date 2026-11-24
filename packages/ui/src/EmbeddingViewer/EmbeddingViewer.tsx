@@ -5,9 +5,7 @@ import type { MouseEvent as ReactMouseEvent, ReactNode, RefObject } from 'react'
 import { useMemo, useRef, useState } from 'react';
 import type { Color } from 'three';
 import {
-  BufferAttribute,
   BufferGeometry,
-  DynamicDrawUsage,
   GridHelper,
   Mesh,
   MeshBasicMaterial,
@@ -26,9 +24,9 @@ import useLatestRef from '../hooks/effects/useLatestRef.ts';
 import useOnChange from '../hooks/effects/useOnChange.ts';
 import useThreeScene from '../hooks/effects/useThreeScene.ts';
 import { swingFollowCamera } from './followCamera.ts';
-import type { Slot } from './layoutTween.ts';
+import { TWEEN_MS, createLayoutTween } from './layoutTween.ts';
 import { addTubeLights, createGlowFx, createPathVisual } from './livePathVisuals.ts';
-import { at, easeInOutCubic, hash01 } from './math.ts';
+import { at, easeInOutCubic } from './math.ts';
 import type { GlowFx, LiveRenderer, PathVisual } from './livePathVisuals.ts';
 import { SCENE_BG, lutColor, trackLut } from './palettes.ts';
 import type { CameraState, EmbeddingViewerProps, FollowMode, ViewerPoint } from './types.ts';
@@ -46,7 +44,6 @@ const DEFAULT_LINE_WIDTH = 3;
 const DEFAULT_NODE_SIZE = 0.04;
 const NO_PLAYHEADS: ReadonlyArray<number | null> = [];
 
-const TWEEN_MS = 900;
 const GRID_SIZE = 6;
 const GRID_DIVISIONS = 24;
 const GRID_Y = -1.2;
@@ -70,60 +67,6 @@ const FOLLOW_MODES: Readonly<
     variant: 'destructive',
   },
 };
-
-interface Buffers {
-  capacity: number;
-  /** The arrays behind `position` and `color`. */
-  pos: Float32Array;
-  col: Float32Array;
-  position: BufferAttribute;
-  color: BufferAttribute;
-  /** Per-point random in [0, 1): glow sprite size and pulse phase. */
-  seed: BufferAttribute;
-  fromPos: Float32Array;
-  toPos: Float32Array;
-  fromCol: Float32Array;
-  toCol: Float32Array;
-}
-
-function makeBuffers(capacity: number): Buffers {
-  const pos = new Float32Array(capacity * 3);
-  const col = new Float32Array(capacity * 3);
-  return {
-    capacity,
-    pos,
-    col,
-    position: new BufferAttribute(pos, 3).setUsage(DynamicDrawUsage),
-    color: new BufferAttribute(col, 3).setUsage(DynamicDrawUsage),
-    seed: new BufferAttribute(
-      Float32Array.from({ length: capacity }, (_, i) => hash01(i)),
-      1,
-    ),
-    fromPos: new Float32Array(capacity * 3),
-    toPos: new Float32Array(capacity * 3),
-    fromCol: new Float32Array(capacity * 3),
-    toCol: new Float32Array(capacity * 3),
-  };
-}
-
-/** Point the geometry at the buffers (the glow shader reads colours as `aColor`). */
-function bindBuffers(geo: BufferGeometry, buf: Buffers) {
-  geo.setAttribute('position', buf.position);
-  geo.setAttribute('color', buf.color);
-  geo.setAttribute('aColor', buf.color);
-  geo.setAttribute('aSeed', buf.seed);
-}
-
-/** The points to show, in order: those whose track is outside the scene's tracks are dropped. */
-function toSlots(points: ReadonlyArray<ViewerPoint>, trackCount: number): Array<Slot> {
-  const slots: Array<Slot> = [];
-  points.forEach((point, index) => {
-    if (Number.isInteger(point.track) && point.track >= 0 && point.track < trackCount) {
-      slots.push({ point, index });
-    }
-  });
-  return slots;
-}
 
 /**
  * Several tracks sharing one embedding space (v9). Points tween in place when
@@ -189,18 +132,8 @@ function EmbeddingScene({
     raycaster: Raycaster;
     bgColor: Color;
   } | null>(null);
-  const buffersRef = useRef<Buffers>(makeBuffers(64));
-  /** Points currently shown (slots 0..count-1 of the buffers). */
-  const countRef = useRef(0);
-  /** Slots drawn: the shown points plus, during a tween, the ones fading out after them. */
-  const drawCountRef = useRef(0);
-  /** The point in each shown slot. */
-  const slotsRef = useRef<ReadonlyArray<Slot>>([]);
-  /** Per track: indices into the shared buffers, in path order. */
-  const trackIdxRef = useRef<Array<Array<number>>>(Array.from({ length: trackCount }, () => []));
-  /** `trackIdxRef` once the fading-out points are gone. */
-  const settledTrackIdxRef = useRef<Array<Array<number>> | null>(null);
-  const tweenStartRef = useRef<number | null>(null);
+  // Outlives the scene, so a remount (StrictMode) picks up mid-tween
+  const [layout] = useState(() => createLayoutTween(trackCount));
   const pendingPointsRef = useRef<ReadonlyArray<ViewerPoint> | null>(points);
   const tracksRef = useLatestRef(tracks);
 
@@ -247,12 +180,12 @@ function EmbeddingScene({
   const onCameraChangeRef = useLatestRef(onCameraChange);
 
   const pointAt = (i: number, out: Vector3) => {
-    const arr = buffersRef.current.pos;
+    const arr = layout.positions;
     return out.set(at(arr, i * 3), at(arr, i * 3 + 1), at(arr, i * 3 + 2));
   };
 
   const pathAt = (track: number, t: number, out: Vector3) => {
-    const idx = trackIdxRef.current[track] ?? [];
+    const idx = layout.trackIndices[track] ?? [];
     const n = idx.length;
     const ct = Math.max(0, Math.min(n - 1, t));
     // Ride the tube's curve when there is one, so the playhead stays inside it
@@ -267,7 +200,7 @@ function EmbeddingScene({
   };
 
   const pathTangentAt = (track: number, t: number) => {
-    const idx = trackIdxRef.current[track] ?? [];
+    const idx = layout.trackIndices[track] ?? [];
     const a = Math.max(0, Math.min(idx.length - 2, Math.floor(t)));
     return pointAt(at(idx, a + 1), new Vector3())
       .sub(pointAt(at(idx, a), new Vector3()))
@@ -280,11 +213,10 @@ function EmbeddingScene({
     if (!s) {
       return;
     }
-    const b = buffersRef.current;
-    const pos = b.pos;
-    const col = b.col;
+    const pos = layout.positions;
+    const col = layout.colors;
     s.paths.forEach((path, k) => {
-      const idx = trackIdxRef.current[k] ?? [];
+      const idx = layout.trackIndices[k] ?? [];
       const p = new Float32Array(idx.length * 3);
       const c = new Float32Array(idx.length * 3);
       idx.forEach((gi, j) => {
@@ -344,97 +276,11 @@ function EmbeddingScene({
       pendingPointsRef.current = next;
       return;
     }
-    const shown = toSlots(next, trackCount);
-    const n = shown.length;
-
-    // Shown points whose key is gone fade out where they are, drawn after the new ones
-    const prevN = countRef.current;
-    const prev = slotsRef.current;
-    const nextKeys = new Set(shown.map((slot) => slot.point.key));
-    // Their old slots
-    const exiting: Array<number> = [];
-    prev.forEach((slot, i) => {
-      if (!nextKeys.has(slot.point.key)) {
-        exiting.push(i);
-      }
-    });
-    const total = n + exiting.length;
-
-    let buf = buffersRef.current;
-    if (total > buf.capacity) {
-      let cap = buf.capacity;
-      while (cap < total) {
-        cap *= 2;
-      }
-      const grown = makeBuffers(cap);
-      grown.pos.set(buf.pos);
-      grown.col.set(buf.col);
-      bindBuffers(s.pointsMesh.geometry, grown);
-      buffersRef.current = buf = grown;
-    }
-    const pos = buf.pos;
-    const col = buf.col;
-    // Where each point is now (possibly mid-tween), before slots get reassigned
-    const oldPos = pos.slice(0, prevN * 3);
-    const oldCol = col.slice(0, prevN * 3);
-    const oldSlot = new Map<ViewerPoint['key'], number>();
-    prev.forEach((slot, i) => {
-      oldSlot.set(slot.point.key, i);
-    });
-
-    const idx: Array<Array<number>> = Array.from({ length: trackCount }, () => []);
-    const bg = s.bgColor;
-    const bgRgb = [bg.r, bg.g, bg.b];
-    shown.forEach(({ point }, i) => {
-      idx[point.track]?.push(i);
-      const o = oldSlot.get(point.key);
-      for (let d = 0; d < 3; d++) {
-        buf.toPos[i * 3 + d] = at(point.position, d);
-        // Known points move from where they were; new ones fade in from the background in place
-        buf.fromPos[i * 3 + d] = o !== undefined ? at(oldPos, o * 3 + d) : at(point.position, d);
-        buf.fromCol[i * 3 + d] = o !== undefined ? at(oldCol, o * 3 + d) : at(bgRgb, d);
-      }
-    });
-    idx.forEach((list, k) => {
-      const lut = trackLut(tracksRef.current[k], k);
-      list.forEach((i, j) => {
-        const c = lutColor(lut, list.length > 1 ? j / (list.length - 1) : 0);
-        buf.toCol[i * 3] = c.r;
-        buf.toCol[i * 3 + 1] = c.g;
-        buf.toCol[i * 3 + 2] = c.b;
-      });
-    });
-
-    // Fading-out points keep their track's path (so its line fades with them) until the tween ends
-    const exitIdx: Array<Array<number>> = Array.from({ length: trackCount }, () => []);
-    exiting.forEach((o, j) => {
-      const i = n + j;
-      exitIdx[prev[o]?.point.track ?? 0]?.push(i);
-      for (let d = 0; d < 3; d++) {
-        buf.fromPos[i * 3 + d] = buf.toPos[i * 3 + d] = at(oldPos, o * 3 + d);
-        buf.fromCol[i * 3 + d] = at(oldCol, o * 3 + d);
-        buf.toCol[i * 3 + d] = at(bgRgb, d);
-      }
-    });
-    pos.set(buf.fromPos.subarray(0, total * 3));
-    col.set(buf.fromCol.subarray(0, total * 3));
-    buf.position.needsUpdate = true;
-    buf.color.needsUpdate = true;
-
-    settledTrackIdxRef.current = exiting.length > 0 ? idx : null;
-    trackIdxRef.current =
-      exiting.length > 0
-        ? idx.map((list, k) => (list.length > 0 ? list : (exitIdx[k] ?? list)))
-        : idx;
-    slotsRef.current = shown;
-    countRef.current = n;
-    drawCountRef.current = total;
-    s.pointsMesh.geometry.setDrawRange(0, total);
+    layout.retarget(next, tracksRef.current, s.bgColor);
     syncLines();
     sphereFromTRef.current = sphereTRef.current.slice();
     // The path just grew, possibly by several segments: don't mistake that for a seek
     sphereLastTargetRef.current = sphereLastTargetRef.current.map(() => Number.NaN);
-    tweenStartRef.current = performance.now();
   };
 
   useThreeScene(mountRef, (mount) => {
@@ -491,8 +337,7 @@ function EmbeddingScene({
     }
 
     const pointsGeo = new BufferGeometry();
-    bindBuffers(pointsGeo, buffersRef.current);
-    pointsGeo.setDrawRange(0, 0);
+    layout.bind(pointsGeo);
     const pointsMat = new PointsMaterial({
       size: styleRef.current.nodeSize,
       sizeAttenuation: true,
@@ -547,8 +392,7 @@ function EmbeddingScene({
       retarget(pendingPointsRef.current);
       pendingPointsRef.current = null;
     } else {
-      // Rebuilt scene (StrictMode remount)
-      pointsGeo.setDrawRange(0, drawCountRef.current);
+      // Rebuilt scene (StrictMode remount): bind() restored the draw range
       syncLines();
     }
 
@@ -561,40 +405,16 @@ function EmbeddingScene({
       const now = performance.now();
       const dt = Math.min(0.1, (now - lastFrame) / 1000);
       lastFrame = now;
-      const n = drawCountRef.current;
+      const n = layout.drawCount;
       // Layout tween progress (null: none running); playheads use it too
-      let tweenK: number | null = null;
-
-      if (tweenStartRef.current !== null) {
-        const b = buffersRef.current;
-        const raw = Math.min(1, (performance.now() - tweenStartRef.current) / TWEEN_MS);
-        const k = easeInOutCubic(raw);
-        tweenK = k;
-        const pos = b.pos;
-        const col = b.col;
-        for (let j = 0; j < n * 3; j++) {
-          pos[j] = at(b.fromPos, j) + (at(b.toPos, j) - at(b.fromPos, j)) * k;
-          col[j] = at(b.fromCol, j) + (at(b.toCol, j) - at(b.fromCol, j)) * k;
-        }
-        b.position.needsUpdate = true;
-        b.color.needsUpdate = true;
-        pointsGeo.computeBoundingSphere();
-        if (raw >= 1) {
-          tweenStartRef.current = null;
-          // Drop the faded-out points and their paths
-          if (settledTrackIdxRef.current) {
-            trackIdxRef.current = settledTrackIdxRef.current;
-            settledTrackIdxRef.current = null;
-            drawCountRef.current = countRef.current;
-            pointsGeo.setDrawRange(0, countRef.current);
-          }
-        }
+      const tweenK = layout.step(now);
+      if (tweenK !== null) {
         syncLines();
       }
 
       spheres.forEach((sphere, k) => {
         const hp = playheadsRef.current[k];
-        const len = trackIdxRef.current[k]?.length ?? 0;
+        const len = layout.trackIndices[k]?.length ?? 0;
         if (hp !== null && hp !== undefined && len > 0) {
           const target = Math.min(len - 1, Math.max(0, hp));
           let from = sphereFromTRef.current[k] ?? null;
@@ -646,7 +466,7 @@ function EmbeddingScene({
       } else if (
         mode === 'following' &&
         followed?.visible &&
-        (trackIdxRef.current[active]?.length ?? 0) > 1
+        (layout.trackIndices[active]?.length ?? 0) > 1
       ) {
         const newTarget = followed.position.clone();
         const offset = camPos.clone().sub(prevFollowTargetRef.current);
@@ -696,6 +516,7 @@ function EmbeddingScene({
       controls.dispose();
       paths.forEach((p) => p.dispose());
       glow?.dispose();
+      layout.bind(null);
       pointsGeo.dispose();
       pointsMat.dispose();
       renderer.dispose();
@@ -730,7 +551,7 @@ function EmbeddingScene({
 
   const hitTest = (e: ReactMouseEvent<HTMLDivElement>) => {
     const s = sceneRef.current;
-    if (!s || countRef.current === 0) {
+    if (!s || layout.count === 0) {
       return null;
     }
     const rect = e.currentTarget.getBoundingClientRect();
@@ -742,8 +563,8 @@ function EmbeddingScene({
     // Slots past the shown points are fading out: not hoverable
     const index = s.raycaster
       .intersectObject(s.pointsMesh)
-      .find((h) => h.index !== undefined && h.index < countRef.current)?.index;
-    const slot = index === undefined ? undefined : slotsRef.current[index];
+      .find((h) => h.index !== undefined && h.index < layout.count)?.index;
+    const slot = index === undefined ? undefined : layout.slots[index];
     return slot ? { slot, x: e.clientX - rect.left, y: e.clientY - rect.top } : null;
   };
 
@@ -827,7 +648,7 @@ function EmbeddingScene({
             next !== 'static' && sphere?.visible ? startCameraTween() : camTweenRef.current;
           if (s && sphere?.visible) {
             const cursorPos = sphere.position.clone();
-            if (next === 'following' && tween && (trackIdxRef.current[active]?.length ?? 0) > 1) {
+            if (next === 'following' && tween && (layout.trackIndices[active]?.length ?? 0) > 1) {
               const tangent = pathTangentAt(active, at(sphereTRef.current, active));
               tween.toPos
                 .copy(cursorPos)
