@@ -22,6 +22,7 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+import { at, hash01 } from './math.ts';
 
 /**
  * Path styles for EmbeddingViewer:
@@ -48,17 +49,6 @@ const FILL_BRIGHTNESS = 1.8;
 
 const BLOOM_REFERENCE_POINTS = 150;
 const MIN_DENSITY_SCALE = 0.25;
-
-/** Stable pseudo-random in [0, 1) so fill particles don't shimmer when the path is rebuilt. */
-export function hash01(n: number): number {
-  const x = Math.sin(n * 12.9898 + 78.233) * 43_758.5453;
-  return x - Math.floor(x);
-}
-
-/** `arr[i]` for an index the caller keeps in range (`noUncheckedIndexedAccess` types every read as maybe undefined). */
-export function at(arr: ArrayLike<number>, i: number): number {
-  return arr[i] ?? 0;
-}
 
 export interface PathEmphasis {
   /** Opacity of the thick line ('original'). */

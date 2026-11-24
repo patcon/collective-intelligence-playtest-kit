@@ -26,7 +26,9 @@ import useLatestRef from '../hooks/effects/useLatestRef.ts';
 import useOnChange from '../hooks/effects/useOnChange.ts';
 import useThreeScene from '../hooks/effects/useThreeScene.ts';
 import { swingFollowCamera } from './followCamera.ts';
-import { addTubeLights, at, createGlowFx, createPathVisual, hash01 } from './livePathVisuals.ts';
+import type { Slot } from './layoutTween.ts';
+import { addTubeLights, createGlowFx, createPathVisual } from './livePathVisuals.ts';
+import { at, easeInOutCubic, hash01 } from './math.ts';
 import type { GlowFx, LiveRenderer, PathVisual } from './livePathVisuals.ts';
 import { SCENE_BG, lutColor, trackLut } from './palettes.ts';
 import type { CameraState, EmbeddingViewerProps, FollowMode, ViewerPoint } from './types.ts';
@@ -52,7 +54,6 @@ const ACTIVE_LINE_OPACITY = 0.75;
 const INACTIVE_LINE_OPACITY = 0.35;
 // Unselected tracks' playheads dim like their paths
 const INACTIVE_PLAYHEAD_OPACITY = 0.35;
-const easeInOutCubic = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 /** Per follow mode: the mode the button steps to next, and how the button shows it (neutral / blue / red, as in v9). */
 const FOLLOW_MODES: Readonly<
   Record<
@@ -111,12 +112,6 @@ function bindBuffers(geo: BufferGeometry, buf: Buffers) {
   geo.setAttribute('color', buf.color);
   geo.setAttribute('aColor', buf.color);
   geo.setAttribute('aSeed', buf.seed);
-}
-
-/** A shown point and its index in the `points` prop. */
-interface Slot {
-  point: ViewerPoint;
-  index: number;
 }
 
 /** The points to show, in order: those whose track is outside the scene's tracks are dropped. */
