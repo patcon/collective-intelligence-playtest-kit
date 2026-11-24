@@ -1,11 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import { parseRoomMessage } from '../../room/protocol.ts';
-import { createActivityTracker, IDLE_MS, spreadDegrees, STILL_DEG } from './activity.ts';
+import { createActivityTracker, DEFAULT_IDLE, spreadDegrees } from './activity.ts';
 import type { Vec } from './valence.ts';
 import chestBreathing from './fixtures/chest-breathing-flip.jsonl?raw';
 import table from './fixtures/table-flip.jsonl?raw';
 
 const RAD = Math.PI / 180;
+const { idleMs: IDLE_MS, stillDeg: STILL_DEG } = DEFAULT_IDLE;
 
 /** Up, for a phone whose screen is tipped `deg` degrees from facing straight up. */
 function tipped(deg: number): Vec {
@@ -40,6 +41,23 @@ describe('tilt', () => {
       tracker.tilt(tipped(10 + ((t / 100) % 2) * STILL_DEG * 0.9), t);
       expect(tracker.at(t)).toBe('idle');
     }
+  });
+});
+
+describe('settings', () => {
+  it('goes idle as soon as a shorter idleMs leaves the movement behind', () => {
+    const tracker = createActivityTracker({ idleMs: 1500, stillDeg: STILL_DEG });
+    tracker.tilt(tipped(10), 0);
+    tracker.tilt(tipped(12), 1000);
+    expect(tracker.at(1499)).toBe('active');
+    expect(tracker.at(1500)).toBe('idle');
+  });
+
+  it('counts smaller spreads as movement with a lower stillDeg', () => {
+    const tracker = createActivityTracker({ idleMs: IDLE_MS, stillDeg: 0.01 });
+    tracker.tilt(tipped(10), 0);
+    tracker.tilt(tipped(10.05), 100);
+    expect(tracker.at(100)).toBe('active');
   });
 });
 

@@ -88,11 +88,13 @@ interface ValenceRemoteProps {
   `SPIN_FLAT`), without the setpoint and calibration functions. Add a few unit tests: face up is +1,
   face down is −1, edge on is 0, spin near flat is null, touch at the top and bottom.
 - **`lib/activity.ts`:** tells active from idle. Tilt is idle once its spread over the last
-  `IDLE_MS` (5 s) stays under `STILL_DEG` (0.1°), as when it's put down; touch is active while a
+  `idleMs` (4 s) stays under `stillDeg` (0.1°), as when it's put down; touch is active while a
   finger is on the screen and idle as soon as it lifts. `hooks/useActivity.ts` reports it.
   Calibrated on recordings in `lib/fixtures/` (copied from the viewer's message log, flip mode):
   a phone on a table spreads at most 0.04°, one pressed to a chest while breathing at least 0.14°
-  over any 5 s. The test replays both. One phone and one person so far: record more to widen it.
+  over any 4 s (as little as 0.07° over 3 s). The test replays both. One phone and one person so far:
+  record more to widen it. Both settings are `DEFAULT_IDLE`, overridden by `ValenceRemote`'s `idle`
+  prop, or on `/remote` by `?idleMs=` and `?stillDeg=`.
 - **`lib/sender.ts`:** v6.0's `SEND_MS` / `SEND_EPSILON` / `KEEPALIVE_MS` logic as a small pure helper.
 - **The orientation listener and permission flow** go in `hooks/effects/useDeviceOrientation.ts`.
   It covers:
