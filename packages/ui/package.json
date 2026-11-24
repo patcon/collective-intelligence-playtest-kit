@@ -12,6 +12,7 @@
     "lint": "pnpm lint:oxlint && pnpm lint:complexity",
     "lint:oxlint": "oxlint .",
     "lint:complexity": "../../scripts/cccc.sh src",
+    "test:unit": "vitest run --project unit",
     "test:stories": "vitest run --project storybook"
   },
   "peerDependencies": {

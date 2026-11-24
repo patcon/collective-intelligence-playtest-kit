@@ -15,6 +15,15 @@ export default mergeConfig(
     test: {
       projects: [
         {
+          // Pure modules (layout tween, playhead easing): plain Node, no browser or WebGL
+          extends: true,
+          test: {
+            name: 'unit',
+            include: ['src/**/*.test.ts'],
+            environment: 'node',
+          },
+        },
+        {
           extends: true,
           plugins: [storybookTest({ configDir: path.join(import.meta.dirname, '.storybook') })],
           test: {
