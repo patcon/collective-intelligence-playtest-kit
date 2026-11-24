@@ -15,7 +15,8 @@ export interface RemoteActivity {
 /**
  * What someone is doing with the remote, reported through `onActivity` whenever it changes:
  * `arrived` until `started`, then `active` or `idle` from what's fed to the returned tracker. Also
- * returns the activity now.
+ * returns the activity now. Tilt is checked every CHECK_MS; a touch or poke takes effect at once,
+ * so the tap that starts the remote doesn't flash it idle first.
  * `idle` overrides DEFAULT_IDLE, read once on mount.
  */
 export function useActivity(
@@ -25,10 +26,22 @@ export function useActivity(
 ): RemoteActivity {
   const [tracker] = useState(() => createActivityTracker({ ...DEFAULT_IDLE, ...idle }));
   const [running, setRunning] = useState<Exclude<Activity, 'arrived'>>('idle');
+  const check = () => setRunning(tracker.at(performance.now()));
 
-  useInterval(() => setRunning(tracker.at(performance.now())), CHECK_MS, started);
+  useInterval(check, CHECK_MS, started);
   const activity: Activity = started ? running : 'arrived';
   useOnChange(activity, onActivity);
 
-  return { activity, tracker };
+  const checked: ActivityTracker = {
+    ...tracker,
+    poke(now) {
+      tracker.poke(now);
+      check();
+    },
+    touch(down) {
+      tracker.touch(down);
+      check();
+    },
+  };
+  return { activity, tracker: checked };
 }
