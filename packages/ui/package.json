@@ -14,14 +14,12 @@
     "lint:complexity": "../../scripts/cccc.sh src",
     "test:stories": "vitest run --project storybook"
   },
-  "dependencies": {
-    "three": "0.183.2"
-  },
   "peerDependencies": {
     "@cloudflare/kumo": "2.19.0",
     "@phosphor-icons/react": "2.1.10",
     "react": "19.3.1",
-    "react-dom": "19.3.1"
+    "react-dom": "19.3.1",
+    "three": "0.183.2"
   },
   "devDependencies": {
     "@babel/core": "7.29.13",
@@ -46,6 +44,7 @@
     "react-dom": "19.3.1",
     "storybook": "10.6.8",
     "tailwindcss": "4.3.5",
+    "three": "0.183.2",
     "tsrs": "0.25.0-ts7.1.0-beta",
     "vite": "8.3.8",
     "vitest": "5.1.0"
