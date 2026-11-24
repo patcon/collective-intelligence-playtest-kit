@@ -400,6 +400,11 @@ export function createEmbeddingScene(mount: HTMLDivElement, o: SceneOptions): Sc
       controls.removeEventListener('change', onControlsChange);
       controls.dispose();
       paths.forEach((p) => p.dispose());
+      spheres.forEach((m) => {
+        m.geometry.dispose();
+        m.material.dispose();
+      });
+      grid.dispose();
       glow?.dispose();
       layout.bind(null);
       pointsGeo.dispose();
