@@ -1,0 +1,23 @@
+import { ArgTypes, Canvas, Meta } from '@storybook/addon-docs/blocks';
+import EmbeddingViewer from './EmbeddingViewer.tsx';
+import * as Stories from './EmbeddingViewer.stories.tsx';
+
+<Meta of={Stories} name="Docs" />
+
+# EmbeddingViewer
+
+A 3D view of points in a shared embedding space, drawn as one path per track with an optional playhead on each. Ported from the v9 view of egregorigami-exploration.
+
+Give each point a stable `key`. When `points` changes, known points tween from where they were, new ones fade in, and missing ones fade out. Playheads ease along their paths in step.
+
+<Canvas of={Stories.SyntheticSpirals} layout="fullscreen" />
+
+This page shows one live viewer on purpose. Browsers cap live WebGL contexts, and a page with many viewers loses the oldest ones (see `docs/experiments/embedding-viewer/`). The other stories are in the sidebar.
+
+## Props
+
+<ArgTypes of={EmbeddingViewer} />
+
+## Install
+
+`three` is a peer dependency, like `react` and Kumo. Pin the same version as this package (0.183.2) so the app doesn't bundle two copies.

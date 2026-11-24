@@ -80,6 +80,7 @@ function SyntheticSpiralsDemo({ showSpiralA, showSpiralB, showSpiralC, ...viewer
 
 const meta = {
   title: 'EmbeddingViewer',
+  tags: ['!autodocs'],
   component: SyntheticSpiralsDemo,
   parameters: { layout: 'fullscreen' },
   decorators: [

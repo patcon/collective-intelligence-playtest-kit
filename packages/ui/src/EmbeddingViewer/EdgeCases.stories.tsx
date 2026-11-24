@@ -10,6 +10,7 @@ const FOLLOW_BUTTON = { name: /Static|Tracking|Following/ };
 
 const meta = {
   title: 'EmbeddingViewer/Edge cases',
+  tags: ['!autodocs'],
   component: EmbeddingViewer,
   parameters: { layout: 'fullscreen' },
   decorators: [

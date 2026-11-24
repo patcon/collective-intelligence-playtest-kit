@@ -99,6 +99,7 @@ function LivingRoomReplay({ fromLayout, toLayout, speed, ...viewer }: ReplayArgs
 
 const meta = {
   title: 'EmbeddingViewer/Parity with v9',
+  tags: ['!autodocs'],
   component: LivingRoomReplay,
   parameters: { layout: 'fullscreen' },
   decorators: [
