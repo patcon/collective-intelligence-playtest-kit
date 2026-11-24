@@ -18,6 +18,20 @@ This page shows one live viewer on purpose. Browsers cap live WebGL contexts, an
 
 <ArgTypes of={EmbeddingViewer} />
 
+## How it's built
+
+| Module | Does |
+| --- | --- |
+| `EmbeddingViewer.tsx` | Connects props to the scene; mouse hover and click |
+| `scene.ts` | three.js scene, render loop, resize, hit-testing, teardown |
+| `layoutTween.ts` | Point buffers and the tween between layouts |
+| `playheads.ts` | Eases each playhead along its path |
+| `followCamera.ts` | Tracking and following camera, glides between modes |
+| `livePathVisuals.ts` | Line, tube and glow path styles |
+| `FollowButton.tsx`, `PointTooltip.tsx` | Kumo chrome over the canvas |
+
+`layoutTween` and `playheads` don't touch WebGL, so they have unit tests in Node (`pnpm test:unit`). Everything else is covered by the stories (`pnpm test:stories`).
+
 ## Install
 
 `three` is a peer dependency, like `react` and Kumo. Pin the same version as this package (0.183.2) so the app doesn't bundle two copies.
