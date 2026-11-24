@@ -200,7 +200,7 @@ function EmbeddingScene({
   return (
     <div
       data-mode="dark"
-      className="relative w-full h-full min-h-0 cursor-crosshair [&_canvas]:block [&_canvas]:!w-full [&_canvas]:!h-full"
+      className="relative size-full min-h-0 cursor-crosshair [&_canvas]:block [&_canvas]:size-full!"
       ref={mountRef}
       onMouseMove={handleMouseMove}
       onMouseDown={(e) => {
