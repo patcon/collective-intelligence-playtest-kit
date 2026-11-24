@@ -75,3 +75,60 @@ export const SinglePoint: Story = {
     });
   },
 };
+
+const segment = (i: number, x: number, y: number): ViewerPoint => ({
+  key: i,
+  position: [x, y, 0],
+  track: 0,
+  label: `Segment ${i}`,
+});
+const MIDDLE = segment(2, 0, 0);
+const PATH: ReadonlyArray<ViewerPoint> = [
+  segment(0, -0.6, 0),
+  segment(1, -0.3, 0.1),
+  MIDDLE,
+  segment(3, 0.3, -0.1),
+  segment(4, 0.6, 0),
+];
+
+/**
+ * Draws `pathStyle`, the playhead rides it into 'following' mode (the camera
+ * swings round behind it), and clicking a point on the path reports it.
+ */
+function pathStyleStory(pathStyle: 'cividis-tube' | 'glow'): Story {
+  const clickSpy = fn<(point: ViewerPoint, index: number) => void>();
+  const cameraSpy = fn<(state: CameraState) => void>();
+  return {
+    args: {
+      points: PATH,
+      playheads: [2],
+      pathStyle,
+      onPointClick: clickSpy,
+      onCameraChange: cameraSpy,
+    },
+    play: async ({ canvasElement }) => {
+      const canvas = within(canvasElement);
+      await expectNoPageErrors(async () => {
+        const viewer = await findViewerCanvas(canvasElement);
+        await waitFor(async () => expect(await litPixels(viewer)).toBeGreaterThan(0));
+        await waitFor(async () => {
+          await clickAt(viewer, MIDDLE.position, CAMERA);
+          await expect(clickSpy).toHaveBeenCalledWith(MIDDLE, 2);
+        });
+        for (const mode of ['tracking', 'following'] as const) {
+          await userEvent.click(await canvas.findByRole('button', FOLLOW_BUTTON));
+          await waitFor(() => expect(cameraSpy.mock.lastCall?.[0].followMode).toBe(mode));
+        }
+        // Following glides behind the playhead
+        await waitFor(() => expect(cameraSpy.mock.lastCall?.[0].position).not.toEqual(CAMERA.position));
+        await waitFor(async () => expect(await litPixels(viewer)).toBeGreaterThan(0));
+      });
+    },
+  };
+}
+
+/** A short path drawn as a shaded tube. The points are hidden, but still hoverable and clickable. */
+export const TubePath: Story = pathStyleStory('cividis-tube');
+
+/** A short path drawn as glowing particles, through bloom. */
+export const GlowPath: Story = pathStyleStory('glow');
