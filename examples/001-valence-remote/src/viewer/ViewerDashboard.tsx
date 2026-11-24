@@ -9,6 +9,7 @@ import { MessageLog } from './components/MessageLog.tsx';
 import { PhoneTable } from './components/PhoneTable.tsx';
 import { applyMessage } from './lib/phones.ts';
 import type { Phones } from './lib/phones.ts';
+import type { Detection } from '../ValenceRemote/lib/valence.ts';
 
 const LOG_LENGTH = 50;
 const CLOCK_MS = 250;
@@ -25,7 +26,8 @@ export function ViewerDashboard({ room }: { room: string }) {
   const [phones, setPhones] = useState<Phones>({});
   const [log, setLog] = useState<Array<string>>([]);
   const [now, setNow] = useState(() => Date.now());
-  const [remoteUrl] = useState(() => `${window.location.origin}/remote`);
+  const [detection, setDetection] = useState<Detection>('flip');
+  const remoteUrl = `${window.location.origin}/remote?detection=${detection}`;
 
   useInterval(() => setNow(Date.now()), CLOCK_MS);
 
@@ -47,7 +49,7 @@ export function ViewerDashboard({ room }: { room: string }) {
           <PhoneTable now={now} phones={Object.values(phones)} />
         </Surface>
         <Surface className="rounded-lg p-4">
-          <JoinQrCode url={remoteUrl} />
+          <JoinQrCode detection={detection} onDetectionChange={setDetection} url={remoteUrl} />
         </Surface>
       </div>
       <Surface className="flex flex-col gap-2 rounded-lg p-4">
