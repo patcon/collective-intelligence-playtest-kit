@@ -1,10 +1,10 @@
 import { Agent } from 'agents';
 import type { Connection, ConnectionContext, WSMessage } from 'agents';
-import { isRole, parsePhoneValence } from '../src/room/protocol.ts';
+import { isRole, parsePhoneMessage } from '../src/room/protocol.ts';
 import type { Role, RoomMessage } from '../src/room/protocol.ts';
 
 /**
- * One room of phones and viewers. Phones send their valence; the room passes it on to every viewer,
+ * One room of phones and viewers. Phones send their valence and activity; the room passes them on to every viewer,
  * stamped with the phone's connection id and the time it arrived, and tells viewers who joins and leaves.
  */
 export class ValenceRoom extends Agent {
@@ -29,9 +29,11 @@ export class ValenceRoom extends Agent {
     if (typeof message !== 'string' || roleOf(connection) !== 'phone') {
       return;
     }
-    const msg = parsePhoneValence(message);
-    if (msg) {
+    const msg = parsePhoneMessage(message);
+    if (msg?.type === 'valence') {
       this.toViewers({ id: connection.id, t: Date.now(), type: 'valence', v: msg.v });
+    } else if (msg?.type === 'activity') {
+      this.toViewers({ activity: msg.activity, id: connection.id, type: 'activity' });
     }
   }
 

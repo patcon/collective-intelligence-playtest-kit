@@ -1,15 +1,34 @@
-import { Empty, Meter, Table } from '@cloudflare/kumo';
+import { Badge, Empty, Meter, Table } from '@cloudflare/kumo';
 import { DeviceMobileIcon } from '@phosphor-icons/react';
 import { formatValence } from '../../ValenceRemote/lib/valenceColor.ts';
-import { formatAge, rateOf } from '../lib/phones.ts';
+import type { Activity } from '../../ValenceRemote/lib/activity.ts';
+import { rateOf } from '../lib/phones.ts';
 import type { PhoneRow } from '../lib/phones.ts';
+
+const ACTIVITY_BADGE: Record<Activity, { label: string; variant: 'neutral' | 'success' | 'warning' }> = {
+  active: { label: 'active', variant: 'success' },
+  idle: { label: 'idle', variant: 'warning' },
+  arrived: { label: 'arrived', variant: 'neutral' },
+};
+
+function ActivityBadge({ activity }: { activity: Activity | null }) {
+  if (activity === null) {
+    return <span className="text-kumo-subtle">—</span>;
+  }
+  const { label, variant } = ACTIVITY_BADGE[activity];
+  return (
+    <Badge appearance="dot" variant={variant}>
+      {label}
+    </Badge>
+  );
+}
 
 interface PhoneTableProps {
   phones: Array<PhoneRow>;
   now: number;
 }
 
-/** One row per connected phone: its current valence, how often it's sending, and when it last did. */
+/** One row per connected phone: its current valence, what its holder is doing, and how often it's sending. */
 export function PhoneTable({ phones, now }: PhoneTableProps) {
   if (phones.length === 0) {
     return (
@@ -26,8 +45,8 @@ export function PhoneTable({ phones, now }: PhoneTableProps) {
       <Table.Header>
         <Table.Row>
           <Table.Head className="w-2/3">Phone and valence</Table.Head>
+          <Table.Head>Activity</Table.Head>
           <Table.Head>Msg/s</Table.Head>
-          <Table.Head>Last</Table.Head>
         </Table.Row>
       </Table.Header>
       <Table.Body>
@@ -43,8 +62,10 @@ export function PhoneTable({ phones, now }: PhoneTableProps) {
                 value={row.v ?? 0}
               />
             </Table.Cell>
+            <Table.Cell>
+              <ActivityBadge activity={row.activity} />
+            </Table.Cell>
             <Table.Cell className="tabular-nums">{rateOf(row, now)}</Table.Cell>
-            <Table.Cell className="whitespace-nowrap tabular-nums">{formatAge(row, now)}</Table.Cell>
           </Table.Row>
         ))}
       </Table.Body>

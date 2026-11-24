@@ -1,5 +1,8 @@
+import { useState } from 'react';
+import { useSendOnOpen } from '../hooks/effects/useSendOnOpen.ts';
 import { RoomProvider, useRoomSend } from '../room/RoomProvider.tsx';
 import { ValenceRemote } from '../ValenceRemote/ValenceRemote.tsx';
+import type { Activity } from '../ValenceRemote/lib/activity.ts';
 import { isDetection } from '../ValenceRemote/lib/valence.ts';
 
 function detectionFromUrl() {
@@ -9,7 +12,16 @@ function detectionFromUrl() {
 
 function ConnectedRemote() {
   const send = useRoomSend();
-  return <ValenceRemote detection={detectionFromUrl()} onValence={(v) => send({ type: 'valence', v })} />;
+  const [activity, setActivity] = useState<Activity | null>(null);
+  useSendOnOpen(activity && { activity, type: 'activity' });
+
+  return (
+    <ValenceRemote
+      detection={detectionFromUrl()}
+      onActivity={setActivity}
+      onValence={(v) => send({ type: 'valence', v })}
+    />
+  );
 }
 
 /** `/remote`: this device as a phone in the room. `?detection=` picks the mode (default `flip`). */

@@ -1,3 +1,6 @@
+import { isActivity } from '../ValenceRemote/lib/activity.ts';
+import type { Activity } from '../ValenceRemote/lib/activity.ts';
+
 /** Who a connection is: a phone sending valence, or a viewer watching the room. */
 export type Role = 'phone' | 'viewer';
 
@@ -15,6 +18,19 @@ export interface RoomValence {
   t: number;
 }
 
+/** A phone → the room: what its holder is doing with it, sent when that changes. */
+export interface PhoneActivity {
+  type: 'activity';
+  activity: Activity;
+}
+
+/** The room → viewers: one phone's activity, with the phone's connection id. */
+export interface RoomActivity {
+  type: 'activity';
+  id: string;
+  activity: Activity;
+}
+
 /** The room → viewers: someone connected. */
 export interface Joined {
   type: 'joined';
@@ -28,7 +44,9 @@ export interface Left {
   id: string;
 }
 
-export type RoomMessage = PhoneValence | RoomValence | Joined | Left;
+export type PhoneMessage = PhoneValence | PhoneActivity;
+
+export type RoomMessage = PhoneMessage | RoomValence | RoomActivity | Joined | Left;
 
 export function isRole(value: unknown): value is Role {
   return value === 'phone' || value === 'viewer';
@@ -43,6 +61,7 @@ interface RawMessage {
   type?: unknown;
   id?: unknown;
   role?: unknown;
+  activity?: unknown;
   v?: unknown;
   t?: unknown;
 }
@@ -56,13 +75,32 @@ function readMessage(raw: string): RawMessage | null {
   }
 }
 
-/** A phone's message from raw socket text, or null if it isn't one. */
-export function parsePhoneValence(raw: string): PhoneValence | null {
-  const msg = readMessage(raw);
-  if (msg?.type !== 'valence' || !isValence(msg.v)) {
-    return null;
+function phoneMessageOf(msg: RawMessage): PhoneMessage | null {
+  if (msg.type === 'valence' && isValence(msg.v)) {
+    return { type: 'valence', v: msg.v };
   }
-  return { type: 'valence', v: msg.v };
+  if (msg.type === 'activity' && isActivity(msg.activity)) {
+    return { activity: msg.activity, type: 'activity' };
+  }
+  return null;
+}
+
+/** A phone's message from raw socket text, or null if it isn't one. */
+export function parsePhoneMessage(raw: string): PhoneMessage | null {
+  const msg = readMessage(raw);
+  return msg && phoneMessageOf(msg);
+}
+
+/** A phone's message as the room passes it on: with the phone's id, and a valence's time. */
+function passedOn(msg: RawMessage, id: string): RoomValence | RoomActivity | null {
+  const phone = phoneMessageOf(msg);
+  if (phone?.type === 'activity') {
+    return { ...phone, id };
+  }
+  if (phone?.type === 'valence' && typeof msg.t === 'number') {
+    return { ...phone, id, t: msg.t };
+  }
+  return null;
 }
 
 /** A message from the room to a viewer, from raw socket text, or null if it isn't one. */
@@ -78,8 +116,5 @@ export function parseRoomMessage(raw: string): RoomMessage | null {
   if (msg.type === 'joined' && isRole(msg.role)) {
     return { id, role: msg.role, type: 'joined' };
   }
-  if (msg.type === 'valence' && isValence(msg.v) && typeof msg.t === 'number') {
-    return { id, t: msg.t, type: 'valence', v: msg.v };
-  }
-  return null;
+  return passedOn(msg, id);
 }

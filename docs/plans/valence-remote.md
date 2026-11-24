@@ -77,6 +77,8 @@ a full-screen fill in the valence colour, −1/+1 labels, a one-line instruction
 interface ValenceRemoteProps {
   /** Throttled (~50 ms, epsilon 0.004) with a 1 s keepalive; null when it can't tell. */
   onValence: (valence: number | null) => void;
+  /** On mount and on change: 'arrived' (on the start screen), 'active', or 'idle'. */
+  onActivity?: (activity: 'arrived' | 'active' | 'idle') => void;
   detection?: 'flip' | 'invert' | 'spin' | 'touch';   // default 'flip'
   keepAwake?: boolean;                                 // default true, via useWakeLock
 }
@@ -85,6 +87,9 @@ interface ValenceRemoteProps {
 - **`lib/valence.ts`:** port v6.0's `valence.ts` almost as is (`upOf`, `detected`, `touchValence`,
   `SPIN_FLAT`), without the setpoint and calibration functions. Add a few unit tests: face up is +1,
   face down is −1, edge on is 0, spin near flat is null, touch at the top and bottom.
+- **`lib/activity.ts`:** tells active from idle. Tilt is idle once the phone stays within
+  `STILL_DEG` (2°) of where it was for `IDLE_MS` (3 s), as when it's put down; touch is active
+  while a finger is on the screen and idle as soon as it lifts. `hooks/useActivity.ts` reports it.
 - **`lib/sender.ts`:** v6.0's `SEND_MS` / `SEND_EPSILON` / `KEEPALIVE_MS` logic as a small pure helper.
 - **The orientation listener and permission flow** go in `hooks/effects/useDeviceOrientation.ts`.
   It covers:
@@ -104,6 +109,8 @@ interface ValenceRemoteProps {
 type RoomMessage =
   | { type: 'valence'; v: number | null }                    // phone → room
   | { type: 'valence'; id: string; v: number | null; t: number } // room → viewers
+  | { type: 'activity'; activity: Activity }               // phone → room, on change and on (re)connect
+  | { type: 'activity'; id: string; activity: Activity }   // room → viewers
   | { type: 'joined'; id: string; role: Role }
   | { type: 'left'; id: string };
 type Role = 'phone' | 'viewer';
@@ -128,7 +135,8 @@ useRoomStatus(): 'connecting' | 'open' | 'closed'
 **Agent (`worker/ValenceRoom.ts`):** `ValenceRoom extends Agent`.
 - `getConnectionTags` reads `?role=` and tags the connection `phone` or `viewer`.
 - `onConnect` and `onClose` send `joined` / `left` to viewers.
-- `onMessage` passes a phone's `valence` on to viewers, adding the phone's connection id and a timestamp.
+- `onMessage` passes a phone's `valence` on to viewers, adding the phone's connection id and a timestamp,
+  and its `activity` with the id.
 - No synced state, no persistence and no batching yet.
 
 **Wiring:** `worker/index.ts` with `routeAgentRequest`, plus the DO binding and migration.
@@ -139,10 +147,11 @@ useRoomStatus(): 'connecting' | 'open' | 'closed'
 
 ### 4. Pages
 
-- **`/remote`:** `RoomProvider role="phone"` → `ValenceRemote onValence={(v) => send({ type: 'valence', v })}`.
+- **`/remote`:** `RoomProvider role="phone"` → `ValenceRemote onValence={(v) => send({ type: 'valence', v })}`,
+  with `onActivity` kept in state and sent by `useSendOnOpen`, which resends it on every reconnect.
   A `?detection=` query parameter picks the mode (default `flip`; desktop tabs use `touch`).
 - **`/` (viewer):** `RoomProvider role="viewer"`, built with Kumo components:
-  - a table with one row per connected phone: id, current valence with a meter, messages per second, and time since its last message;
+  - a table with one row per connected phone: id, current valence with a meter, activity (arrived, active or idle) as a badge, and messages per second;
   - a scrolling log of the last ~50 raw messages, to show what's being sent;
   - a link and QR code to `/remote`, with the QR from `uqr`, as dimensional-reduction used.
 - **Phones on the LAN:** `vite --host` with HTTPS (`@vitejs/plugin-basic-ssl`, or whatever the

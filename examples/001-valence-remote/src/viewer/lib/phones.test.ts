@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { applyMessage, formatAge, rateOf } from './phones.ts';
+import { applyMessage, rateOf } from './phones.ts';
 import type { Phones } from './phones.ts';
 
 const valence = (id: string, v: number | null) => ({ id, t: 0, type: 'valence', v }) as const;
@@ -15,12 +15,18 @@ describe('applyMessage', () => {
 
   it('adds a row for a phone first heard through its valence', () => {
     const phones = applyMessage({}, valence('a', 0.4), 100);
-    expect(phones.a).toMatchObject({ lastAt: 100, v: 0.4 });
+    expect(phones.a).toMatchObject({ recent: [100], v: 0.4 });
   });
 
   it('removes a row when its phone leaves', () => {
     const phones = applyMessage(applyMessage({}, valence('a', 0), 0), { id: 'a', type: 'left' }, 10);
     expect(phones).toEqual({});
+  });
+
+  it("records a phone's activity without counting it as a valence", () => {
+    let phones = applyMessage({}, valence('a', 0.4), 100);
+    phones = applyMessage(phones, { activity: 'idle', id: 'a', type: 'activity' }, 200);
+    expect(phones.a).toMatchObject({ activity: 'idle', recent: [100], v: 0.4 });
   });
 
   it('ignores a valence from a phone without an id', () => {
@@ -41,12 +47,5 @@ describe('rateOf', () => {
     }
     expect(rateOf(row, 1400)).toBe(3);
     expect(rateOf(row, 3000)).toBe(0);
-  });
-});
-
-describe('formatAge', () => {
-  it('shows a dash before the first message, then seconds since the last', () => {
-    expect(formatAge({ id: 'a', lastAt: null, recent: [], v: null }, 0)).toBe('—');
-    expect(formatAge({ id: 'a', lastAt: 1000, recent: [], v: 0 }, 3250)).toBe('2.3 s');
   });
 });

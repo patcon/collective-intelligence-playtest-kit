@@ -6,6 +6,8 @@ interface RemoteScreenProps {
   instruction: string;
   notes: Array<string>;
   onPointer?: (y: number, event: PointerEvent<HTMLDivElement>) => void;
+  /** A finger lifted, or the browser took the pointer away. */
+  onRelease?: () => void;
   children?: ReactNode;
 }
 
@@ -15,7 +17,7 @@ function share(event: PointerEvent<HTMLDivElement>): number {
 }
 
 /** The running remote: the whole screen in the valence's colour, with −1/+1 labels and a readout. */
-export function RemoteScreen({ valence, instruction, notes, onPointer, children }: RemoteScreenProps) {
+export function RemoteScreen({ valence, instruction, notes, onPointer, onRelease, children }: RemoteScreenProps) {
   const handle = (event: PointerEvent<HTMLDivElement>) => onPointer?.(share(event), event);
 
   return (
@@ -24,7 +26,9 @@ export function RemoteScreen({ valence, instruction, notes, onPointer, children 
       data-testid="valence-remote"
       onContextMenu={(event) => event.preventDefault()}
       onPointerDown={handle}
+      onPointerCancel={onRelease}
       onPointerMove={handle}
+      onPointerUp={onRelease}
       style={{ backgroundColor: valenceColor(valence) }}
     >
       {children}
