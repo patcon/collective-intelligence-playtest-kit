@@ -12,14 +12,14 @@ const DETECTION_LABELS: Record<Detection, string> = {
 /** How phones joining from the QR code will run the remote. */
 export interface RemoteSettings {
   detection: Detection;
-  greyWhenIdle: boolean;
+  tintWhenIdle: boolean;
 }
 
 /** The remote's URL with `settings` as query parameters. */
-export function remoteUrl(origin: string, { detection, greyWhenIdle }: RemoteSettings): string {
+export function remoteUrl(origin: string, { detection, tintWhenIdle }: RemoteSettings): string {
   const params = new URLSearchParams({ detection });
-  if (greyWhenIdle) {
-    params.set('greyWhenIdle', '1');
+  if (tintWhenIdle) {
+    params.set('tintWhenIdle', '1');
   }
   return `${origin}/remote?${params}`;
 }
@@ -41,9 +41,9 @@ export function RemoteOptions({ value, onChange }: RemoteOptionsProps) {
         value={value.detection}
       />
       <Switch
-        checked={value.greyWhenIdle}
-        label="Grey when idle"
-        onCheckedChange={(greyWhenIdle) => onChange({ ...value, greyWhenIdle })}
+        checked={value.tintWhenIdle}
+        label="Tint when idle"
+        onCheckedChange={(tintWhenIdle) => onChange({ ...value, tintWhenIdle })}
       />
     </div>
   );

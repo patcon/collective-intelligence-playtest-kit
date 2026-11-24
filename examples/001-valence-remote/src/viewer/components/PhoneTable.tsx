@@ -30,7 +30,7 @@ interface PhoneTableProps {
 
 /**
  * One row per connected phone: its current valence (its whole bar tinted the phone's screen colour,
- * grey when idle), what its holder is doing, and how often it's sending.
+ * and towards yellow when idle), what its holder is doing, and how often it's sending.
  */
 export function PhoneTable({ phones, now }: PhoneTableProps) {
   if (phones.length === 0) {

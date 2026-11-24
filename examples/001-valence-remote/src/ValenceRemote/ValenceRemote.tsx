@@ -22,8 +22,8 @@ export interface ValenceRemoteProps {
   onActivity?: (activity: Activity) => void;
   /** When a tilt remote counts as idle, over DEFAULT_IDLE; read once on mount. */
   idle?: Partial<IdleSettings>;
-  /** Turn the screen grey while idle, rather than keep the valence's colour. */
-  greyWhenIdle?: boolean;
+  /** Tint the screen towards the idle badge's yellow while idle, so it shows on the phone too. */
+  tintWhenIdle?: boolean;
   /** How the phone reads as valence. Touch also works on desktop. */
   detection?: Detection;
   /** Keep the screen awake while running, via the Wake Lock API. */
@@ -45,7 +45,7 @@ export function ValenceRemote({
   onValence,
   onActivity,
   idle,
-  greyWhenIdle = false,
+  tintWhenIdle = false,
   detection = 'flip',
   keepAwake = true,
 }: ValenceRemoteProps) {
@@ -103,7 +103,7 @@ export function ValenceRemote({
   const wakeLockLost = keepAwake && !wakeLock.acquired;
   return (
     <RemoteScreen
-      grey={greyWhenIdle && activity === 'idle'}
+      idle={tintWhenIdle && activity === 'idle'}
       instruction={INSTRUCTIONS[detection]}
       notes={notesFor(touch, orientation.status, wakeLockLost)}
       onPointer={touch ? onPointer : undefined}

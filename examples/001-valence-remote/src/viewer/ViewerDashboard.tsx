@@ -28,7 +28,7 @@ export function ViewerDashboard({ room }: { room: string }) {
   const [phones, setPhones] = useState<Phones>({});
   const [log, setLog] = useState<Array<string>>([]);
   const [now, setNow] = useState(() => Date.now());
-  const [remote, setRemote] = useState<RemoteSettings>({ detection: 'flip', greyWhenIdle: false });
+  const [remote, setRemote] = useState<RemoteSettings>({ detection: 'flip', tintWhenIdle: false });
 
   useInterval(() => setNow(Date.now()), CLOCK_MS);
 
