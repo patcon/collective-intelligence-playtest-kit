@@ -9,3 +9,4 @@ dist/
 .alchemy/
 .env
 storybook-static/
+.claude/worktrees/
