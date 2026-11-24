@@ -50,6 +50,8 @@ const GRID_DIVISIONS = 24;
 const GRID_Y = -1.2;
 const ACTIVE_LINE_OPACITY = 0.75;
 const INACTIVE_LINE_OPACITY = 0.35;
+// Unselected tracks' playheads dim like their paths
+const INACTIVE_PLAYHEAD_OPACITY = 0.35;
 const easeInOutCubic = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 /** Per follow mode: the mode the button steps to next, and how the button shows it (neutral / blue / red, as in v9). */
 const FOLLOW_MODES: Readonly<
@@ -187,7 +189,7 @@ function EmbeddingScene({
     pointsMat: PointsMaterial;
     paths: Array<PathVisual>;
     glow: GlowFx | null;
-    spheres: Array<Mesh>;
+    spheres: Array<Mesh<SphereGeometry, MeshBasicMaterial>>;
     grid: GridHelper;
     raycaster: Raycaster;
     bgColor: Color;
@@ -332,7 +334,13 @@ function EmbeddingScene({
         renderOrder: k === active ? 1 : 0,
       }),
     );
-    s.spheres.forEach((m, k) => m.scale.setScalar(nodeScale * (k === active ? 1.25 : 0.85)));
+    s.spheres.forEach((m, k) => {
+      const isActive = k === active;
+      m.scale.setScalar(nodeScale * (isActive ? 1.25 : 0.85));
+      m.material.transparent = !isActive;
+      m.material.opacity = isActive ? 1 : INACTIVE_PLAYHEAD_OPACITY;
+      m.material.depthWrite = isActive;
+    });
   };
 
   const retarget = (next: ReadonlyArray<ViewerPoint>) => {
