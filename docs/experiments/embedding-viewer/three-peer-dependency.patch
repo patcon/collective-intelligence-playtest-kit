@@ -1,0 +1,128 @@
+diff --git a/examples/000-template/package.json b/examples/000-template/package.json
+index 224b1cd..69c5c33 100644
+--- a/examples/000-template/package.json
++++ b/examples/000-template/package.json
+@@ -17,8 +17,10 @@
+   "dependencies": {
+     "@cloudflare/kumo": "2.19.0",
+     "@phosphor-icons/react": "2.1.10",
++    "@playtest-kit/ui": "workspace:*",
+     "react": "19.3.1",
+-    "react-dom": "19.3.1"
++    "react-dom": "19.3.1",
++    "three": "0.183.2"
+   },
+   "devDependencies": {
+     "@alchemy.run/cloudflare": "2.0.0-beta.87",
+diff --git a/examples/000-template/src/App.tsx b/examples/000-template/src/App.tsx
+index 839bd10..c2f3205 100644
+--- a/examples/000-template/src/App.tsx
++++ b/examples/000-template/src/App.tsx
+@@ -1,21 +1,20 @@
+-import { Button, Surface } from '@cloudflare/kumo';
+-import { PlusIcon } from '@phosphor-icons/react';
+-import { useState } from 'react';
+-import useDocumentTitle from './hooks/effects/useDocumentTitle.ts';
++import { EmbeddingViewer } from '@playtest-kit/ui';
++import type { ViewerPoint, ViewerTrack } from '@playtest-kit/ui';
+ 
+-export default function App() {
+-  const [count, setCount] = useState(0);
+-  useDocumentTitle(`Count: ${count}`);
++const TRACKS: ReadonlyArray<ViewerTrack> = [{ label: 'A' }, { label: 'B' }];
++const POINTS: ReadonlyArray<ViewerPoint> = [
++  { key: 'a0', position: [-1, 0, 0], track: 0 },
++  { key: 'a1', position: [-0.5, 0.5, 0.2], track: 0 },
++  { key: 'a2', position: [0, 1, 0], track: 0 },
++  { key: 'b0', position: [1, 0, 0], track: 1 },
++  { key: 'b1', position: [0.5, -0.5, -0.2], track: 1 },
++  { key: 'b2', position: [0, -1, 0], track: 1 },
++];
+ 
++export default function App() {
+   return (
+-    <main className="mx-auto flex min-h-screen max-w-xl items-center p-4">
+-      <Surface className="flex w-full flex-col gap-4 rounded-lg p-6">
+-        <h1 className="text-xl font-semibold">000-template</h1>
+-        <p>Clicked {count} times.</p>
+-        <Button icon={<PlusIcon />} onClick={() => setCount((n) => n + 1)} variant="primary">
+-          Increment
+-        </Button>
+-      </Surface>
++    <main style={{ height: '100vh' }}>
++      <EmbeddingViewer points={POINTS} tracks={TRACKS} playheads={[1, 1]} />
+     </main>
+   );
+ }
+diff --git a/packages/ui/package.json b/packages/ui/package.json
+index 0e3acb6..81f4b0f 100644
+--- a/packages/ui/package.json
++++ b/packages/ui/package.json
+@@ -13,13 +13,11 @@
+     "lint:oxlint": "oxlint .",
+     "lint:complexity": "../../scripts/cccc.sh src"
+   },
+-  "dependencies": {
+-    "three": "0.183.2"
+-  },
+   "peerDependencies": {
+     "@cloudflare/kumo": "2.19.0",
+     "react": "19.3.1",
+-    "react-dom": "19.3.1"
++    "react-dom": "19.3.1",
++    "three": "0.183.2"
+   },
+   "devDependencies": {
+     "@babel/core": "7.29.13",
+@@ -40,6 +38,7 @@
+     "react-dom": "19.3.1",
+     "storybook": "10.6.8",
+     "tailwindcss": "4.3.5",
++    "three": "0.183.2",
+     "tsrs": "0.25.0-ts7.1.0-beta",
+     "vite": "8.3.8"
+   }
+diff --git a/pnpm-lock.yaml b/pnpm-lock.yaml
+index dc53cb4..3927c37 100644
+--- a/pnpm-lock.yaml
++++ b/pnpm-lock.yaml
+@@ -16,12 +16,18 @@ importers:
+       '@phosphor-icons/react':
+         specifier: 2.1.10
+         version: 2.1.10(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
++      '@playtest-kit/ui':
++        specifier: workspace:*
++        version: link:../../packages/ui
+       react:
+         specifier: 19.3.1
+         version: 19.3.1
+       react-dom:
+         specifier: 19.3.1
+         version: 19.3.1(react@19.3.1)
++      three:
++        specifier: 0.183.2
++        version: 0.183.2
+     devDependencies:
+       '@alchemy.run/cloudflare':
+         specifier: 2.0.0-beta.87
+@@ -73,10 +79,6 @@ importers:
+         version: 8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(yaml@2.9.1)
+ 
+   packages/ui:
+-    dependencies:
+-      three:
+-        specifier: 0.183.2
+-        version: 0.183.2
+     devDependencies:
+       '@babel/core':
+         specifier: 7.29.13
+@@ -132,6 +134,9 @@ importers:
+       tailwindcss:
+         specifier: 4.3.5
+         version: 4.3.5
++      three:
++        specifier: 0.183.2
++        version: 0.183.2
+       tsrs:
+         specifier: 0.25.0-ts7.1.0-beta
+         version: 0.25.0-ts7.1.0-beta

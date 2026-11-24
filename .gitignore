@@ -8,3 +8,5 @@ dist/
 .tools/
 .alchemy/
 .env
+storybook-static/
+.claude/worktrees/
