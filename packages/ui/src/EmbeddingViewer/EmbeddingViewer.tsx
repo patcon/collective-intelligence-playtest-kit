@@ -23,10 +23,11 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import useLatestRef from '../hooks/effects/useLatestRef.ts';
 import useOnChange from '../hooks/effects/useOnChange.ts';
 import useThreeScene from '../hooks/effects/useThreeScene.ts';
-import { swingFollowCamera } from './followCamera.ts';
-import { TWEEN_MS, createLayoutTween } from './layoutTween.ts';
+import { createFollowController } from './followCamera.ts';
+import type { FollowController, FollowTarget } from './followCamera.ts';
+import { createLayoutTween } from './layoutTween.ts';
 import { addTubeLights, createGlowFx, createPathVisual } from './livePathVisuals.ts';
-import { at, easeInOutCubic } from './math.ts';
+import { at } from './math.ts';
 import { createPlayheadEaser } from './playheads.ts';
 import type { GlowFx, LiveRenderer, PathVisual } from './livePathVisuals.ts';
 import { SCENE_BG, lutColor, trackLut } from './palettes.ts';
@@ -68,6 +69,16 @@ const FOLLOW_MODES: Readonly<
     variant: 'destructive',
   },
 };
+
+/** What `onCameraChange` reports: where the camera is headed, not where it is mid-glide. */
+function cameraState(follow: FollowController): CameraState {
+  const { position, target } = follow.destination();
+  return {
+    position: [position.x, position.y, position.z],
+    target: [target.x, target.y, target.z],
+    followMode: follow.mode,
+  };
+}
 
 /**
  * Several tracks sharing one embedding space (v9). Points tween in place when
@@ -124,6 +135,7 @@ function EmbeddingScene({
   const sceneRef = useRef<{
     camera: PerspectiveCamera;
     controls: OrbitControls;
+    follow: FollowController;
     pointsMesh: Points;
     pointsMat: PointsMaterial;
     paths: Array<PathVisual>;
@@ -144,21 +156,6 @@ function EmbeddingScene({
     text: string;
     track: number;
   } | null>(null);
-  const followModeRef = useRef<FollowMode>(followMode);
-  const prevFollowTargetRef = useRef(new Vector3());
-  /**
-   * Camera move in progress (switching follow mode or track): the follow
-   * logic steers `toPos`/`toTarget`, and the real camera eases from where it
-   * was to them with the same timing and easing as the point tween.
-   */
-  const camTweenRef = useRef<{
-    start: number;
-    fromPos: Vector3;
-    fromTarget: Vector3;
-    toPos: Vector3;
-    toTarget: Vector3;
-  } | null>(null);
-  const prevPathTangentRef = useRef(new Vector3());
   const playheadsRef = useLatestRef(playheads);
   const activeTrackRef = useRef(activeTrack);
   const [playheadEaser] = useState(() => createPlayheadEaser(trackCount));
@@ -220,22 +217,21 @@ function EmbeddingScene({
     });
   };
 
-  /** Start easing the camera from where it is now; returns the destination for the follow logic to set. */
-  const startCameraTween = () => {
+  /** The active track's playhead for the follow camera, if it's shown. */
+  const followTarget = (): FollowTarget | null => {
     const s = sceneRef.current;
-    if (!s) {
+    const active = activeTrackRef.current;
+    const sphere = s?.spheres[active];
+    if (!sphere?.visible) {
       return null;
     }
-    const prev = camTweenRef.current;
-    camTweenRef.current = {
-      start: performance.now(),
-      fromPos: s.camera.position.clone(),
-      fromTarget: s.controls.target.clone(),
-      // Mid-move: carry on toward the same place, from where the camera is now
-      toPos: prev ? prev.toPos : s.camera.position.clone(),
-      toTarget: prev ? prev.toTarget : s.controls.target.clone(),
+    return {
+      position: sphere.position,
+      tangent: () =>
+        (layout.trackIndices[active]?.length ?? 0) > 1
+          ? pathTangentAt(active, at(playheadEaser.positions, active))
+          : null,
     };
-    return camTweenRef.current;
   };
 
   const applyActiveStyle = () => {
@@ -297,15 +293,15 @@ function EmbeddingScene({
       camera.position.set(...initialCamera.position);
       controls.target.set(...initialCamera.target);
     }
+    const follow = createFollowController(
+      camera.position,
+      controls.target,
+      followMode,
+      activeTrackRef.current,
+    );
     const onControlsChange = () => {
       // Mid-move, remember where the camera is headed (a remount picks up from there)
-      const pos = camTweenRef.current?.toPos ?? camera.position;
-      const target = camTweenRef.current?.toTarget ?? controls.target;
-      onCameraChangeRef.current?.({
-        position: [pos.x, pos.y, pos.z],
-        target: [target.x, target.y, target.z],
-        followMode: followModeRef.current,
-      });
+      onCameraChangeRef.current?.(cameraState(follow));
     };
     controls.addEventListener('change', onControlsChange);
 
@@ -367,6 +363,7 @@ function EmbeddingScene({
     sceneRef.current = {
       camera,
       controls,
+      follow,
       pointsMesh,
       pointsMat,
       paths,
@@ -386,7 +383,6 @@ function EmbeddingScene({
     }
 
     let animId = 0;
-    let lastFollowed = activeTrackRef.current;
     let lastFrame = performance.now();
     const animate = () => {
       animId = requestAnimationFrame(animate);
@@ -412,51 +408,8 @@ function EmbeddingScene({
         }
       });
 
-      // Follow the active track's playhead. The follow logic steers a logical
-      // camera: the real one, or a camera move's destination while one runs.
-      const active = activeTrackRef.current;
-      const followed = spheres[active];
-      const mode = followModeRef.current;
-      if (active !== lastFollowed && followed?.visible) {
-        // Glide over to the new track's playhead, keeping the same view of it
-        const tween = mode !== 'static' ? startCameraTween() : null;
-        prevFollowTargetRef.current.copy(tween ? tween.toTarget : followed.position);
-        prevPathTangentRef.current.set(0, 0, 0);
-        lastFollowed = active;
-      }
-      const camTween = camTweenRef.current;
-      const camPos = camTween ? camTween.toPos : camera.position;
-      const camTarget = camTween ? camTween.toTarget : controls.target;
-      if (mode === 'tracking' && followed?.visible) {
-        const newTarget = followed.position.clone();
-        camPos.add(newTarget.clone().sub(prevFollowTargetRef.current));
-        camTarget.copy(newTarget);
-        prevFollowTargetRef.current.copy(newTarget);
-      } else if (
-        mode === 'following' &&
-        followed?.visible &&
-        (layout.trackIndices[active]?.length ?? 0) > 1
-      ) {
-        const newTarget = followed.position.clone();
-        const offset = camPos.clone().sub(prevFollowTargetRef.current);
-        swingFollowCamera(
-          offset,
-          prevPathTangentRef.current,
-          pathTangentAt(active, at(playheadEaser.positions, active)),
-        );
-        camPos.copy(newTarget).add(offset);
-        camTarget.copy(newTarget);
-        prevFollowTargetRef.current.copy(newTarget);
-      }
-      if (camTween) {
-        const raw = Math.min(1, (now - camTween.start) / TWEEN_MS);
-        const k = easeInOutCubic(raw);
-        camera.position.lerpVectors(camTween.fromPos, camTween.toPos, k);
-        controls.target.lerpVectors(camTween.fromTarget, camTween.toTarget, k);
-        if (raw >= 1) {
-          camTweenRef.current = null;
-        }
-      }
+      // Follow the active track's playhead
+      follow.step(now, activeTrackRef.current, followTarget());
       controls.update(dt);
       if (glow) {
         glow.render(dt, camera.position.distanceTo(controls.target), n, glowStrengthRef.current);
@@ -608,35 +561,11 @@ function EmbeddingScene({
           e.stopPropagation();
           const next = follow.next;
           onFollowModeChange(next);
-          followModeRef.current = next;
           const s = sceneRef.current;
-          const active = activeTrackRef.current;
-          const sphere = s?.spheres[active];
-          // Static leaves the camera where it is; the others glide onto the playhead
-          const tween =
-            next !== 'static' && sphere?.visible ? startCameraTween() : camTweenRef.current;
-          if (s && sphere?.visible) {
-            const cursorPos = sphere.position.clone();
-            if (next === 'following' && tween && (layout.trackIndices[active]?.length ?? 0) > 1) {
-              const tangent = pathTangentAt(active, at(playheadEaser.positions, active));
-              tween.toPos
-                .copy(cursorPos)
-                .addScaledVector(tangent, -0.6)
-                .add(new Vector3(0, 0.15, 0));
-              tween.toTarget.copy(cursorPos);
-              prevPathTangentRef.current.copy(tangent);
-            }
-            prevFollowTargetRef.current.copy(cursorPos);
-          }
           if (s) {
+            s.follow.setMode(next, followTarget());
             // Report where the camera is headed, not where it is mid-move
-            const pos = tween ? tween.toPos : s.camera.position;
-            const target = tween ? tween.toTarget : s.controls.target;
-            onCameraChange?.({
-              position: [pos.x, pos.y, pos.z],
-              target: [target.x, target.y, target.z],
-              followMode: next,
-            });
+            onCameraChange?.(cameraState(s.follow));
           }
         }}
       >
