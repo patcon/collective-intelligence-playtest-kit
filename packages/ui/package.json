@@ -11,7 +11,8 @@
     "typecheck": "tsrs --noEmit --fast",
     "lint": "pnpm lint:oxlint && pnpm lint:complexity",
     "lint:oxlint": "oxlint .",
-    "lint:complexity": "../../scripts/cccc.sh src"
+    "lint:complexity": "../../scripts/cccc.sh src",
+    "test:stories": "vitest run --project storybook"
   },
   "dependencies": {
     "three": "0.183.2"
@@ -28,19 +29,24 @@
     "@phosphor-icons/react": "2.1.10",
     "@rolldown/plugin-babel": "0.3.1",
     "@storybook/addon-docs": "10.6.8",
+    "@storybook/addon-vitest": "10.6.8",
     "@storybook/react-vite": "10.6.8",
     "@tailwindcss/vite": "4.3.5",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
     "@types/three": "0.183.1",
     "@vitejs/plugin-react": "6.3.0",
+    "@vitest/browser": "5.1.0",
+    "@vitest/browser-playwright": "5.1.0",
     "babel-plugin-react-compiler": "1.0.0",
     "oxlint": "1.94.0",
+    "playwright": "1.65.0",
     "react": "19.3.1",
     "react-dom": "19.3.1",
     "storybook": "10.6.8",
     "tailwindcss": "4.3.5",
     "tsrs": "0.25.0-ts7.1.0-beta",
-    "vite": "8.3.8"
+    "vite": "8.3.8",
+    "vitest": "5.1.0"
   }
 }
