@@ -9,7 +9,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const examplesDir = join(root, 'examples');
 const templateName = '000-template';
 const templateDir = join(examplesDir, templateName);
-const skip = new Set(['node_modules', 'dist', '.cccc.cache']);
+const skip = new Set(['node_modules', 'dist', '.cccc.cache', '.alchemy']);
 
 const slug = (process.argv[2] ?? '')
   .trim()
