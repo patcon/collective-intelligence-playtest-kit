@@ -38,7 +38,9 @@ export function applyMessage(phones: Phones, msg: RoomMessage, now: number) {
   }
   const row = phones[msg.id] ?? emptyRow(msg.id);
   if (msg.type === 'activity') {
-    return { ...phones, [msg.id]: { ...row, activity: msg.activity } };
+    // A phone back at the start screen has no valence, whatever it last sent.
+    const v = msg.activity === 'arrived' ? null : row.v;
+    return { ...phones, [msg.id]: { ...row, activity: msg.activity, v } };
   }
   return { ...phones, [msg.id]: withMessage(row, msg.v, now) };
 }

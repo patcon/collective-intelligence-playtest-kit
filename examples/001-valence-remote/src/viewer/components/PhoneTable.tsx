@@ -30,7 +30,8 @@ interface PhoneTableProps {
 
 /**
  * One row per connected phone: its current valence (its whole bar tinted the phone's screen colour,
- * the idle badge's yellow when idle), what its holder is doing, and how often it's sending.
+ * the idle badge's yellow when idle, and empty with no valence, as at the start screen), what its
+ * holder is doing, and how often it's sending.
  */
 export function PhoneTable({ phones, now }: PhoneTableProps) {
   if (phones.length === 0) {
@@ -65,7 +66,7 @@ export function PhoneTable({ phones, now }: PhoneTableProps) {
                 showValue
                 trackClassName="bg-[color-mix(in_srgb,var(--valence-color)_35%,transparent)]"
                 style={{ '--valence-color': valenceColor(row.v, row.activity === 'idle') }}
-                value={row.v ?? 0}
+                value={row.v ?? -1}
               />
             </Table.Cell>
             <Table.Cell>

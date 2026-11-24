@@ -29,6 +29,12 @@ describe('applyMessage', () => {
     expect(phones.a).toMatchObject({ activity: 'idle', recent: [100], v: 0.4 });
   });
 
+  it('clears the valence of a phone that arrives at the start screen', () => {
+    let phones = applyMessage({}, valence('a', 0.4), 100);
+    phones = applyMessage(phones, { activity: 'arrived', id: 'a', type: 'activity' }, 200);
+    expect(phones.a).toMatchObject({ activity: 'arrived', v: null });
+  });
+
   it('ignores a valence from a phone without an id', () => {
     const phones = applyMessage({}, { type: 'valence', v: 1 }, 0);
     expect(phones).toEqual({});
