@@ -4,6 +4,7 @@ import { useInterval } from '../hooks/effects/useInterval.ts';
 import { useRoomMessages } from '../hooks/effects/useRoomMessages.ts';
 import { useRoomStatus } from '../room/RoomProvider.tsx';
 import type { RoomStatus } from '../room/RoomProvider.tsx';
+import { CopyButton } from './components/CopyButton.tsx';
 import { JoinQrCode } from './components/JoinQrCode.tsx';
 import { MessageLog } from './components/MessageLog.tsx';
 import { PhoneTable } from './components/PhoneTable.tsx';
@@ -53,7 +54,10 @@ export function ViewerDashboard({ room }: { room: string }) {
         </Surface>
       </div>
       <Surface className="flex flex-col gap-2 rounded-lg p-4">
-        <h2 className="font-semibold">Last {LOG_LENGTH} messages</h2>
+        <div className="flex items-center justify-between gap-2">
+          <h2 className="font-semibold">Last {LOG_LENGTH} messages</h2>
+          <CopyButton label="Copy" text={log.join('\n')} />
+        </div>
         <MessageLog entries={log} />
       </Surface>
     </main>
