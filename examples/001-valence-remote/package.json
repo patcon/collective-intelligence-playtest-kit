@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "alchemy dev",
     "build": "tsrs --noEmit --fast && vite build",
-    "preview": "vite preview",
+    "preview": "PREVIEW=1 vite build && PREVIEW=1 vite preview",
     "deploy:setup": "alchemy profile edit",
     "deploy": "alchemy deploy",
     "destroy": "alchemy destroy",
@@ -14,7 +14,8 @@
     "lint:oxlint": "oxlint .",
     "lint:complexity": "../../scripts/cccc.sh src worker",
     "test": "vitest run",
-    "dev:lan": "LAN=1 alchemy dev"
+    "dev:lan": "LAN=1 alchemy dev",
+    "preview:lan": "LAN=1 PREVIEW=1 vite build && LAN=1 PREVIEW=1 vite preview"
   },
   "dependencies": {
     "@cloudflare/kumo": "2.19.0",
@@ -26,6 +27,7 @@
   },
   "devDependencies": {
     "@alchemy.run/cloudflare": "2.0.0-beta.87",
+    "@alchemy.run/cloudflare-runtime": "2.0.0-beta.87",
     "@effect/platform-node": "4.1.5",
     "@playtest-kit/config": "workspace:*",
     "@types/react": "19.3.0",

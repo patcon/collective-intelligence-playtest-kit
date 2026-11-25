@@ -14,7 +14,10 @@ Starting point for new examples. Copy it with `pnpm new-example <name>` from the
 | Script | What it does |
 | --- | --- |
 | `pnpm dev` | Vite dev server |
+| `pnpm dev:lan` | Dev server on your LAN over HTTPS (self-signed), so phones can read tilt |
 | `pnpm build` | Typecheck, then production build |
+| `pnpm preview` | Production build with the Worker, served locally in workerd (rooms work) |
+| `pnpm preview:lan` | `preview`, on your LAN over HTTPS like `dev:lan` |
 | `pnpm deploy:setup` | Connect or reauthorise Cloudflare in your Alchemy profile (interactive, once per machine) |
 | `pnpm run deploy` | Deploy to Cloudflare Workers with [Alchemy](https://alchemy.run) (`alchemy.run.ts`). Needs `run`: bare `pnpm deploy` is a pnpm built-in |
 | `pnpm run destroy` | Delete the deployed Worker for the current stage |
