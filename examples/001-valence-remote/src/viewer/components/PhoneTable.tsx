@@ -37,7 +37,7 @@ export function PhoneTable({ phones, now }: PhoneTableProps) {
   if (phones.length === 0) {
     return (
       <Empty
-        description="Scan the QR code, or open /remote?detection=touch in another tab."
+        description="Scan the QR code, or open its link in another tab."
         icon={<DeviceMobileIcon size={32} />}
         title="No phones yet"
       />

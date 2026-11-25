@@ -46,9 +46,15 @@ export interface Left {
   id: string;
 }
 
+/** A viewer → the room: the settings every phone is to run with. */
+export interface ViewerSettings {
+  type: 'settings';
+  settings: RemoteSettings;
+}
+
 /**
- * A viewer → the room, and the room → everyone (and to each connection as it joins): the settings
- * every phone runs with, or null to let each phone use its own (from its URL).
+ * The room → everyone, and to each connection as it joins: the settings every phone runs with, or
+ * null until a viewer sets them (each phone then uses its own, from its URL).
  */
 export interface SettingsMessage {
   type: 'settings';
@@ -57,7 +63,7 @@ export interface SettingsMessage {
 
 export type PhoneMessage = PhoneValence | PhoneActivity;
 
-export type ViewerMessage = SettingsMessage;
+export type ViewerMessage = ViewerSettings;
 
 export type RoomMessage = PhoneMessage | RoomValence | RoomActivity | Joined | Left | SettingsMessage;
 
@@ -115,7 +121,7 @@ function settingsMessageOf(msg: RawMessage): SettingsMessage | null {
 /** A viewer's message from raw socket text, or null if it isn't one. */
 export function parseViewerMessage(raw: string): ViewerMessage | null {
   const msg = readMessage(raw);
-  return msg && settingsMessageOf(msg);
+  return msg?.type === 'settings' && isRemoteSettings(msg.settings) ? { settings: msg.settings, type: 'settings' } : null;
 }
 
 /** A phone's message as the room passes it on: with the phone's id, and a valence's time. */

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { detected, touchValence, upOf } from './valence.ts';
+import { detected, nextDetection, touchValence, upOf } from './valence.ts';
 import type { Vec } from './valence.ts';
 
 function up(beta: number, gamma: number): Vec {
@@ -54,5 +54,13 @@ describe('touchValence', () => {
     ['the bottom', 1, -1],
   ])('reads %s', (_name, y, expected) => {
     expect(touchValence(y)).toBeCloseTo(expected);
+  });
+});
+
+describe('nextDetection', () => {
+  it('steps through every detection and wraps around', () => {
+    expect(nextDetection('flip')).toBe('invert');
+    expect(nextDetection('spin')).toBe('touch');
+    expect(nextDetection('touch')).toBe('flip');
   });
 });

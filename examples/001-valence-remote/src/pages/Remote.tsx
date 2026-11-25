@@ -4,14 +4,25 @@ import { useSendOnOpen } from '../hooks/effects/useSendOnOpen.ts';
 import { RoomProvider, useRoomSend, useRoomStatus } from '../room/RoomProvider.tsx';
 import type { RemoteSettings } from '../room/remoteSettings.ts';
 import { RoomStatusBadge } from '../room/RoomStatusBadge.tsx';
+import { DetectionBadge } from '../ValenceRemote/components/DetectionBadge.tsx';
 import { ValenceRemote } from '../ValenceRemote/ValenceRemote.tsx';
 import type { Activity, IdleSettings } from '../ValenceRemote/lib/activity.ts';
 import { isDetection } from '../ValenceRemote/lib/valence.ts';
+import type { Detection } from '../ValenceRemote/lib/valence.ts';
 
 function settingsFromUrl(): RemoteSettings {
   const params = new URLSearchParams(window.location.search);
   const detection = params.get('detection');
-  return { detection: isDetection(detection) ? detection : 'flip', tintWhenIdle: params.has('tintWhenIdle') };
+  return {
+    allowSelection: params.has('allowSelection'),
+    detection: isDetection(detection) ? detection : 'flip',
+    tintWhenIdle: params.has('tintWhenIdle'),
+  };
+}
+
+/** The holder's own pick while selection is allowed, otherwise the room's (or URL's) detection. */
+function detectionFor({ allowSelection, detection }: RemoteSettings, picked: Detection | null): Detection {
+  return allowSelection && picked !== null ? picked : detection;
 }
 
 /** A positive number from the URL, or undefined to keep the default. */
@@ -38,18 +49,21 @@ function ConnectedRemote() {
   // Holders can take the connection for granted, so the badge only shows when it isn't open.
   const connected = useRoomStatus() === 'open';
   const [activity, setActivity] = useState<Activity | null>(null);
-  const [pushed, setPushed] = useState<RemoteSettings | null>(null);
+  const [roomSettings, setRoomSettings] = useState<RemoteSettings | null>(null);
+  const [picked, setPicked] = useState<Detection | null>(null);
   useSendOnOpen(activity && { activity, type: 'activity' });
-  useRoomMessages((msg) => msg.type === 'settings' && setPushed(msg.settings));
-  const { detection, tintWhenIdle } = pushed ?? settingsFromUrl();
+  useRoomMessages((msg) => msg.type === 'settings' && setRoomSettings(msg.settings));
+  const settings = roomSettings ?? settingsFromUrl();
+  const detection = detectionFor(settings, picked);
 
   return (
     <ValenceRemote
       badges={connected ? null : <RoomStatusBadge />}
+      controls={settings.allowSelection && <DetectionBadge onChange={setPicked} value={detection} />}
       detection={detection}
       // Switching to or from touch starts over at the start screen, whose tap tilt needs to ask for motion access.
       key={detection === 'touch' ? 'touch' : 'tilt'}
-      tintWhenIdle={tintWhenIdle}
+      tintWhenIdle={settings.tintWhenIdle}
       idle={idleFromUrl()}
       onActivity={setActivity}
       onValence={(v) => send({ type: 'valence', v })}
@@ -60,8 +74,9 @@ function ConnectedRemote() {
 /**
  * `/remote`: this device as a phone in the room. `?detection=` picks the mode (default `flip`);
  * `?idleMs=` and `?stillDeg=` override when it counts as idle (see DEFAULT_IDLE); `?tintWhenIdle`
- * tints the screen while idle. Settings a viewer pushes to the room override `detection` and
- * `tintWhenIdle`, live, until it stops pushing them.
+ * tints the screen while idle; `?allowSelection` shows a mode badge on the running screen, tapped to change mode. Once a
+ * viewer sets the room's settings, they override these three, live. While selection is allowed,
+ * the holder's pick overrides the detection.
  */
 export function Remote({ room }: { room: string }) {
   return (

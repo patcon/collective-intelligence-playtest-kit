@@ -5,7 +5,7 @@ import type { Role, RoomMessage, SettingsMessage } from '../src/room/protocol.ts
 import type { RemoteSettings } from '../src/room/remoteSettings.ts';
 
 interface RoomState {
-  /** What a viewer last pushed for every phone to run with, or null to let each use its own. */
+  /** What a viewer last set for every phone to run with, or null until one does. */
   settings: RemoteSettings | null;
 }
 
@@ -15,7 +15,7 @@ type RoomEnv = object;
 /**
  * One room of phones and viewers. Phones send their valence and activity; the room passes them on to every viewer,
  * stamped with the phone's connection id and the time it arrived, and tells viewers who joins and leaves.
- * A viewer can push settings for every phone to run with; the room keeps them (in its state, so they
+ * Viewers set the settings every phone runs with; the room keeps them (in its state, so they
  * outlast hibernation), passes them on to everyone, and sends them to each connection as it joins.
  */
 export class ValenceRoom extends Agent<RoomEnv, RoomState> {

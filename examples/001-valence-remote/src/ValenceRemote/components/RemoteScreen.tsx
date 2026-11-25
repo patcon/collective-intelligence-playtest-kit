@@ -10,10 +10,17 @@ interface RemoteScreenProps {
   notes: Array<string>;
   /** Badges for the top-left corner, or none. */
   badges?: ReactNode;
+  /** Controls for the top-right corner, or none. Pointers on them don't reach `onPointer`. */
+  controls?: ReactNode;
   onPointer?: (y: number, event: PointerEvent<HTMLDivElement>) => void;
   /** A finger lifted, or the browser took the pointer away. */
   onRelease?: () => void;
   children?: ReactNode;
+}
+
+/** Keeps a pointer on the controls from reading as touch. */
+function stop(event: PointerEvent) {
+  event.stopPropagation();
 }
 
 function share(event: PointerEvent<HTMLDivElement>): number {
@@ -22,7 +29,7 @@ function share(event: PointerEvent<HTMLDivElement>): number {
 }
 
 /**
- * The running remote: the whole screen in the valence's colour, with any badges top left, a readout,
+ * The running remote: the whole screen in the valence's colour, with any badges top left and controls top right, a readout,
  * the instruction on a card, and any notes as banners.
  */
 export function RemoteScreen({
@@ -31,6 +38,7 @@ export function RemoteScreen({
   instruction,
   notes,
   badges,
+  controls,
   onPointer,
   onRelease,
   children,
@@ -52,6 +60,16 @@ export function RemoteScreen({
       {badges && (
         <div className="pointer-events-none absolute top-0 left-0 p-4 pt-[max(1rem,env(safe-area-inset-top))] pl-[max(1rem,env(safe-area-inset-left))]">
           <LayerCard className="flex items-center gap-2 rounded-full px-3 py-1.5">{badges}</LayerCard>
+        </div>
+      )}
+      {controls && (
+        <div
+          className="absolute top-0 right-0 p-4 pt-[max(1rem,env(safe-area-inset-top))] pr-[max(1rem,env(safe-area-inset-right))]"
+          onPointerDown={stop}
+          onPointerMove={stop}
+          onPointerUp={stop}
+        >
+          {controls}
         </div>
       )}
       {/* Centred without a transform: one would isolate the readout's blend from the colour behind. */}

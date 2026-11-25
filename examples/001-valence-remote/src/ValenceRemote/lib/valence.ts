@@ -20,6 +20,11 @@ export function isDetection(value: unknown): value is Detection {
   return DETECTIONS.some((detection) => detection === value);
 }
 
+/** The detection after `detection` in DETECTIONS, back to the first after the last. */
+export function nextDetection(detection: Detection): Detection {
+  return DETECTIONS[(DETECTIONS.indexOf(detection) + 1) % DETECTIONS.length] ?? detection;
+}
+
 /** Which way is up, in the phone's own axes, from a device orientation's beta and gamma (degrees). */
 export function upOf(beta: number | null, gamma: number | null): Vec | null {
   if (beta === null || gamma === null) {

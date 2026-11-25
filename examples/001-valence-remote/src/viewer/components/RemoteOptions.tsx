@@ -1,27 +1,23 @@
 import { Select, Switch } from '@cloudflare/kumo';
 import type { RemoteSettings } from '../../room/remoteSettings.ts';
+import { DETECTION_LABELS } from '../../ValenceRemote/lib/instructions.ts';
 import { isDetection } from '../../ValenceRemote/lib/valence.ts';
-import type { Detection } from '../../ValenceRemote/lib/valence.ts';
 import type { RemoteSettingsControl } from '../hooks/useRemoteSettings.ts';
 
-const DETECTION_LABELS: Record<Detection, string> = {
-  flip: 'Flip (face up / down)',
-  invert: 'Invert (upright / upside down)',
-  spin: 'Spin (steering wheel)',
-  touch: 'Touch (finger height)',
-};
-
 /** The remote's URL with `settings` as query parameters. */
-export function remoteUrl(origin: string, { detection, tintWhenIdle }: RemoteSettings): string {
+export function remoteUrl(origin: string, { detection, tintWhenIdle, allowSelection }: RemoteSettings): string {
   const params = new URLSearchParams({ detection });
   if (tintWhenIdle) {
     params.set('tintWhenIdle', '1');
   }
+  if (allowSelection) {
+    params.set('allowSelection', '1');
+  }
   return `${origin}/remote?${params}`;
 }
 
-/** Pickers for the remote's settings, for the QR code to carry, and a switch to push them to connected phones. */
-export function RemoteOptions({ settings, setSettings, pushed, setPushed }: RemoteSettingsControl) {
+/** Pickers for the settings every phone runs with, which the QR code carries too. */
+export function RemoteOptions({ settings, setSettings }: RemoteSettingsControl) {
   return (
     <div className="flex w-full flex-col gap-3">
       <Select
@@ -36,7 +32,11 @@ export function RemoteOptions({ settings, setSettings, pushed, setPushed }: Remo
         label="Tint when idle"
         onCheckedChange={(tintWhenIdle) => setSettings({ ...settings, tintWhenIdle })}
       />
-      <Switch checked={pushed} label="Apply to connected phones" onCheckedChange={setPushed} />
+      <Switch
+        checked={settings.allowSelection}
+        label="Allow selection on phones"
+        onCheckedChange={(allowSelection) => setSettings({ ...settings, allowSelection })}
+      />
     </div>
   );
 }

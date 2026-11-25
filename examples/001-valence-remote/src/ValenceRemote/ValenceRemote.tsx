@@ -30,6 +30,8 @@ export interface ValenceRemoteProps {
   keepAwake?: boolean;
   /** Badges for the running screen's top-left corner (e.g. the connection), or none. */
   badges?: ReactNode;
+  /** Controls for the running screen's top-right corner (e.g. a mode picker), or none. */
+  controls?: ReactNode;
 }
 
 const START_WARNINGS: Partial<Record<OrientationStatus, string>> = {
@@ -51,6 +53,7 @@ export function ValenceRemote({
   detection = 'flip',
   keepAwake = true,
   badges,
+  controls,
 }: ValenceRemoteProps) {
   const [started, setStarted] = useState(false);
   const [valence, setValence] = useState<Valence>(null);
@@ -107,6 +110,7 @@ export function ValenceRemote({
   return (
     <RemoteScreen
       badges={badges}
+      controls={controls}
       idle={tintWhenIdle && activity === 'idle'}
       instruction={INSTRUCTIONS[detection]}
       notes={notesFor(touch, orientation.status, wakeLockLost)}

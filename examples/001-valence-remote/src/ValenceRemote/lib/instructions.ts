@@ -19,3 +19,11 @@ export const ORIENTATION_NOTES: Record<OrientationStatus, string | null> = {
   unsupported: "This browser can't read tilt. Try ?detection=touch.",
   waiting: 'Waiting for tilt readings…',
 };
+
+/** A short name for each detection, for pickers. */
+export const DETECTION_LABELS: Record<Detection, string> = {
+  flip: 'Flip (face up / down)',
+  invert: 'Invert (upright / upside down)',
+  spin: 'Spin (steering wheel)',
+  touch: 'Touch (finger height)',
+};

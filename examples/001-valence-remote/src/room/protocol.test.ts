@@ -30,20 +30,25 @@ describe('parseRoomMessage', () => {
 });
 
 describe('settings messages', () => {
-  const pushed = '{"type":"settings","settings":{"detection":"touch","tintWhenIdle":true}}';
-  const cleared = '{"type":"settings","settings":null}';
+  const set = '{"type":"settings","settings":{"detection":"touch","tintWhenIdle":true,"allowSelection":false}}';
+  const unset = '{"type":"settings","settings":null}';
 
-  it('reads pushed and cleared settings, from a viewer or from the room', () => {
-    const settings = { detection: 'touch', tintWhenIdle: true };
-    expect(parseViewerMessage(pushed)).toEqual({ settings, type: 'settings' });
-    expect(parseRoomMessage(pushed)).toEqual({ settings, type: 'settings' });
-    expect(parseViewerMessage(cleared)).toEqual({ settings: null, type: 'settings' });
-    expect(parseRoomMessage(cleared)).toEqual({ settings: null, type: 'settings' });
+  it('reads settings from a viewer or from the room', () => {
+    const settings = { allowSelection: false, detection: 'touch', tintWhenIdle: true };
+    expect(parseViewerMessage(set)).toEqual({ settings, type: 'settings' });
+    expect(parseRoomMessage(set)).toEqual({ settings, type: 'settings' });
+  });
+
+  it('reads no settings yet from the room, but not from a viewer', () => {
+    expect(parseRoomMessage(unset)).toEqual({ settings: null, type: 'settings' });
+    expect(parseViewerMessage(unset)).toBeNull();
   });
 
   it('rejects unknown or missing settings', () => {
-    expect(parseViewerMessage('{"type":"settings","settings":{"detection":"shake","tintWhenIdle":true}}')).toBeNull();
-    expect(parseViewerMessage('{"type":"settings","settings":{"detection":"flip"}}')).toBeNull();
+    expect(
+      parseViewerMessage('{"type":"settings","settings":{"detection":"shake","tintWhenIdle":true,"allowSelection":false}}'),
+    ).toBeNull();
+    expect(parseViewerMessage('{"type":"settings","settings":{"detection":"flip","tintWhenIdle":true}}')).toBeNull();
     expect(parseViewerMessage('{"type":"settings"}')).toBeNull();
   });
 
