@@ -4,6 +4,7 @@ import shared from '@playtest-kit/config/vite';
 import basicSsl from '@vitejs/plugin-basic-ssl';
 import { defineConfig, mergeConfig } from 'vite';
 import type { PluginOption } from 'vite';
+import { PORT } from './port.ts';
 
 const lan = process.env.LAN === '1';
 const preview = process.env.PREVIEW === '1';
@@ -40,6 +41,6 @@ export default mergeConfig(
   defineConfig({
     plugins: [lan && basicSsl(), preview && previewWorker()],
     server: lan ? { https } : {},
-    preview: lan ? { https, host: '0.0.0.0' } : {},
+    preview: lan ? { https, host: '0.0.0.0', port: PORT } : { port: PORT },
   }),
 );

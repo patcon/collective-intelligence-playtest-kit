@@ -2,6 +2,7 @@ import { DurableObject, Website, providers, state } from '@alchemy.run/cloudflar
 import { Stack } from 'alchemy';
 import { map } from 'alchemy/Output';
 import { gen } from 'effect/Effect';
+import { PORT } from './port.ts';
 
 const lan = process.env.LAN === '1';
 
@@ -12,7 +13,7 @@ export default Stack(
     const website = yield* Website.Vite('Website', {
       main: 'worker/index.ts',
       assets: { notFoundHandling: 'single-page-application', runWorkerFirst: ['/agents/*'] },
-      dev: { host: lan ? '0.0.0.0' : 'localhost' },
+      dev: { host: lan ? '0.0.0.0' : 'localhost', port: PORT },
       env: { ValenceRoom: DurableObject('ValenceRoom') },
     });
 
