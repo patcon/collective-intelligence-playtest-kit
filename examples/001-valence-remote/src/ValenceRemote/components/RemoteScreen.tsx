@@ -4,6 +4,7 @@ import type { AxisLabels } from '../lib/axisLabels.ts';
 import { formatValence, valenceColor } from '../lib/valenceColor.ts';
 import { inkFor } from './ink.ts';
 import { ValenceBar } from './ValenceBar.tsx';
+import type { BarVariant } from './BarTracks.tsx';
 import type { BarPosition } from './ValenceBar.tsx';
 
 interface RemoteScreenProps {
@@ -14,6 +15,8 @@ interface RemoteScreenProps {
   showNumeric?: boolean;
   /** Which edge the valence bar runs along. */
   barPosition?: BarPosition;
+  /** How the bar shows the raw reading against the level sent. */
+  barVariant?: BarVariant;
   /** Words beside the bar's ends (and middle), or none. */
   axisLabels?: AxisLabels | null;
   /** Fill with the idle colour (see `valenceColor`). */
@@ -67,6 +70,7 @@ export function RemoteScreen({
   snapped = valence,
   showNumeric = false,
   barPosition = 'top',
+  barVariant,
   axisLabels,
   idle = false,
   instruction,
@@ -95,7 +99,12 @@ export function RemoteScreen({
       onPointerUp={onRelease}
       style={{ backgroundColor: valenceColor(valence, idle) }}
     >
-      <ValenceBar idle={idle} labels={axisLabels} position={barPosition} snapped={snapped} valence={valence} />
+      <ValenceBar
+        idle={idle} labels={axisLabels} position={barPosition}
+        snapped={snapped}
+        valence={valence}
+        variant={barVariant}
+      />
       {children}
       {badges && (
         <div className={`pointer-events-none absolute top-0 left-0 p-4 ${BADGES_INSET[clearance]}`}>

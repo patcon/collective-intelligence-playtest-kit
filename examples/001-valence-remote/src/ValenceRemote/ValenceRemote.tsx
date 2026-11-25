@@ -1,5 +1,6 @@
 import type { PointerEvent, ReactNode } from 'react';
 import type { OrientationStatus } from '../hooks/effects/useDeviceOrientation.ts';
+import type { BarVariant } from './components/BarTracks.tsx';
 import type { BarPosition } from './components/ValenceBar.tsx';
 import type { AxisLabels } from './lib/axisLabels.ts';
 import { DetectionBadge } from './components/DetectionBadge.tsx';
@@ -22,6 +23,12 @@ export interface ValenceRemoteProps extends Partial<ValenceRemoteOptions> {
   showNumeric?: boolean;
   /** Which edge the valence bar runs along: `top` (default) or `left`. */
   barPosition?: BarPosition;
+  /**
+   * How the bar shows the raw reading against the level sent: `double` (default) for two bars,
+   * the snapped one outermost; `overlay` for one, the raw reading laid over the snapped; or
+   * `continuous` for the raw reading only.
+   */
+  barVariant?: BarVariant;
   /** Words beside the valence bar's ends (and middle), or none. */
   axisLabels?: AxisLabels | null;
   /** Badges for the running screen's top-left corner (e.g. the connection), or none. */
@@ -65,6 +72,7 @@ export function ValenceRemote({
   tintWhenIdle = false,
   showNumeric = false,
   barPosition,
+  barVariant,
   axisLabels,
   detection = 'flip',
   badges,
@@ -105,6 +113,7 @@ export function ValenceRemote({
       badges={badges}
       axisLabels={axisLabels}
       barPosition={barPosition}
+      barVariant={barVariant}
       controls={onPickDetection && <DetectionBadge onChange={pick} value={detection} />}
       idle={idle}
       illustration={illustrate(`size-40 ${inkFor(idle).picture}`)}

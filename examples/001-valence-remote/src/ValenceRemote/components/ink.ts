@@ -6,9 +6,9 @@ export interface Ink {
   track: string;
   /** A filled bar. */
   fill: string;
-  /** A fainter fill under `fill`, as a bar's raw reading where it runs past what it snaps to. */
+  /** A fainter filled bar, as the raw reading beside or under the snapped one. */
   dimFill: string;
-  /** A shade over the end of `fill`, where a bar's raw reading falls short of what it snaps to. */
+  /** A shade over the end of `fill`, where the raw reading falls short of the snapped one. */
   shortfall: string;
   /** A dashed or secondary line. */
   line: string;
