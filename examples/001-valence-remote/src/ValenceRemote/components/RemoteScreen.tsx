@@ -16,6 +16,8 @@ interface RemoteScreenProps {
   /** Fill with the idle colour (see `valenceColor`). */
   idle?: boolean;
   instruction: string;
+  /** Shown in place of the instruction card: a picture, tinted to sit over the colour behind it. */
+  illustration?: ReactNode;
   notes: Array<string>;
   /** Badges for the top-left corner, or none. */
   badges?: ReactNode;
@@ -55,7 +57,7 @@ function share(event: PointerEvent<HTMLDivElement>): number {
 /**
  * The running remote: the whole screen in the valence's colour, a thin bar along one edge for where
  * it sits from −1 to +1 (with any axis labels), any badges top left and controls top right, an optional readout,
- * the instruction on a card, and any notes as banners.
+ * the instruction on a card (or an illustration in its place), and any notes as banners.
  */
 export function RemoteScreen({
   valence,
@@ -64,6 +66,7 @@ export function RemoteScreen({
   axisLabels,
   idle = false,
   instruction,
+  illustration,
   notes,
   badges,
   controls,
@@ -112,9 +115,11 @@ export function RemoteScreen({
             {formatValence(valence)}
           </output>
         )}
-        <LayerCard className="max-w-sm rounded-lg bg-kumo-base/85 px-4 py-2 backdrop-blur">
-          <Text>{instruction}</Text>
-        </LayerCard>
+        {illustration ?? (
+          <LayerCard className="max-w-sm rounded-lg bg-kumo-base/85 px-4 py-2 backdrop-blur">
+            <Text>{instruction}</Text>
+          </LayerCard>
+        )}
         {notes.map((note) => (
           <Banner className="max-w-sm text-left" description={note} key={note} variant="alert" />
         ))}

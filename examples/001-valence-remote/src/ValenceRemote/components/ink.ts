@@ -11,10 +11,13 @@ export interface Ink {
   /** The line that matters most, as where a finger is. */
   strongLine: string;
   text: string;
+  /** A picture drawn in `currentColor`, faint enough to sit behind the valence. */
+  picture: string;
 }
 
 const LIGHT: Ink = {
   fill: 'bg-white/70',
+  picture: 'text-white/45',
   line: 'border-white/70',
   shadow: 'drop-shadow-[0_1px_1px_rgb(0_0_0/0.3)]',
   strongLine: 'border-white/90',
@@ -24,6 +27,7 @@ const LIGHT: Ink = {
 
 const DARK: Ink = {
   fill: 'bg-black/60',
+  picture: 'text-black/40',
   line: 'border-black/50',
   shadow: '',
   strongLine: 'border-black/70',

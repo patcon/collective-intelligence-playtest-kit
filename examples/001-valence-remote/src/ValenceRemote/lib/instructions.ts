@@ -1,9 +1,16 @@
 import type { OrientationStatus } from '../../hooks/effects/useDeviceOrientation.ts';
+import type { AxisLabels } from './axisLabels.ts';
 import type { Detection } from './valence.ts';
+
+/** Flip mode's instruction, in the axis labels' words when there are some. */
+export function flipInstruction(labels: AxisLabels | null = null): string {
+  const { positive, negative } = labels ?? { negative: '−1', positive: '+1' };
+  return `Face up for ${positive}, face down for ${negative}`;
+}
 
 /** What to do with the phone, for each detection. */
 export const INSTRUCTIONS: Record<Detection, string> = {
-  flip: 'Face up for +1, face down for −1',
+  flip: flipInstruction(),
   invert: 'Upright for +1, upside down for −1',
   spin: 'Screen to you, steer upright for +1, upside down for −1',
   touch: 'Touch higher for +1, lower for −1',

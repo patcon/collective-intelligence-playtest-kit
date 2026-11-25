@@ -3,12 +3,14 @@ import type { OrientationStatus } from '../hooks/effects/useDeviceOrientation.ts
 import type { BarPosition } from './components/ValenceBar.tsx';
 import type { AxisLabels } from './lib/axisLabels.ts';
 import { DetectionBadge } from './components/DetectionBadge.tsx';
+import { FlipIllustration } from './components/FlipIllustration.tsx';
+import { inkFor } from './components/ink.ts';
 import { RemoteScreen } from './components/RemoteScreen.tsx';
 import { StartScreen } from './components/StartScreen.tsx';
 import { TouchGuides } from './components/TouchGuides.tsx';
 import { useValenceRemote } from './hooks/useValenceRemote.ts';
 import type { ValenceRemoteOptions } from './hooks/useValenceRemote.ts';
-import { INSTRUCTIONS, ORIENTATION_NOTES } from './lib/instructions.ts';
+import { flipInstruction, INSTRUCTIONS, ORIENTATION_NOTES } from './lib/instructions.ts';
 import type { Detection } from './lib/valence.ts';
 
 export interface ValenceRemoteProps extends Partial<ValenceRemoteOptions> {
@@ -85,8 +87,17 @@ export function ValenceRemote({
 
   const idle = tintWhenIdle && remote.activity === 'idle';
   const warning = startScreenWarning(remote.started, touch, remote.tilt.status);
+  const illustrate = (className: string) =>
+    detection === 'flip' ? <FlipIllustration className={className} label={flipInstruction(axisLabels)} /> : undefined;
   if (warning !== undefined) {
-    return <StartScreen instruction={INSTRUCTIONS[detection]} onStart={remote.start} warning={warning} />;
+    return (
+      <StartScreen
+        illustration={illustrate('size-32 text-kumo-subtle')}
+        instruction={INSTRUCTIONS[detection]}
+        onStart={remote.start}
+        warning={warning}
+      />
+    );
   }
 
   return (
@@ -96,6 +107,7 @@ export function ValenceRemote({
       barPosition={barPosition}
       controls={onPickDetection && <DetectionBadge onChange={pick} value={detection} />}
       idle={idle}
+      illustration={illustrate(`size-40 ${inkFor(idle).picture}`)}
       instruction={INSTRUCTIONS[detection]}
       notes={notesFor(touch, remote.tilt.status, remote.wakeLockLost)}
       onPointer={touch ? onPointer : undefined}
