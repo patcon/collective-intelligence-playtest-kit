@@ -1,0 +1,23 @@
+{
+  "name": "@playtest-kit/common",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./server": "./src/server.ts"
+  },
+  "scripts": {
+    "typecheck": "tsrs --noEmit --fast",
+    "lint": "pnpm lint:oxlint && pnpm lint:complexity",
+    "lint:oxlint": "oxlint .",
+    "lint:complexity": "../../scripts/cccc.sh src",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@playtest-kit/config": "workspace:*",
+    "oxlint": "1.94.0",
+    "tsrs": "0.25.0-ts7.1.0-beta",
+    "vite": "8.3.8",
+    "vitest": "5.1.0"
+  }
+}

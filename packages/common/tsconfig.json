@@ -1,0 +1,4 @@
+{
+  "extends": "@playtest-kit/config/tsconfig.json",
+  "include": ["src", "oxlint.config.ts"]
+}
