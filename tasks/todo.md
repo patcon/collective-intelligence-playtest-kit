@@ -398,3 +398,25 @@ and add it to the config options.
 - [ ] All 13 success criteria pass (10 on your devices).
 - [ ] `pnpm lint && pnpm typecheck`, all tests, and both examples' builds pass.
 - [ ] Ready for PR (regular merge commit).
+
+---
+
+## Later (not in this plan)
+
+Raised at Checkpoint B (2026-11-25). Not scheduled yet.
+
+- [ ] **No "connected" badge on `/participate` while connected.** Show `RoomStatusBadge` only when
+  the socket isn't open, as `001`'s remote does.
+- [ ] **Late-comers can join a group.** A config option to put someone who's ready mid-round into an
+  existing group (for example the smallest), instead of making them wait for the next round.
+- [ ] **Redirect HTTP to HTTPS** in `000-template` and the examples, so a phone that opens the
+  `http://` LAN address still gets wake lock and sensors. (Changing the template needs your OK.)
+- [ ] **Notice when the room is unreachable.** On `preview:lan`, turning off the laptop's Wi-Fi left a
+  tethered phone (still on mobile data) saying "connected". The socket never closes, so nothing
+  notices. Likely fix: a heartbeat (ping/pong with a timeout) in `createRoomClient`, so `001` gets it too.
+- [ ] **Offline reload on phones.** Reloading `/participate` in airplane mode showed the browser's DNS
+  error, not the cached app. A likely cause is that browsers won't register a service worker on a
+  page whose certificate isn't trusted, like `preview:lan`'s self-signed one. Check that first
+  (with a trusted local cert, or after a deploy).
+- [ ] **"Looking elsewhere" status.** Tell the room when a participant's page is hidden (they switched
+  apps or locked the phone), and show it on the host, so the emcee can see who's distracted.
