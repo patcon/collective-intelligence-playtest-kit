@@ -7,6 +7,15 @@ import { ValenceBar } from './ValenceBar.tsx';
 import type { BarVariant } from './BarTracks.tsx';
 import type { BarPosition } from './ValenceBar.tsx';
 
+/** Whether the screen's colour follows the raw reading (`continuous`) or the level sent (`discrete`). */
+export type BackgroundMode = 'continuous' | 'discrete';
+
+export const BACKGROUND_MODES: ReadonlyArray<BackgroundMode> = ['continuous', 'discrete'];
+
+export function isBackgroundMode(value: unknown): value is BackgroundMode {
+  return BACKGROUND_MODES.some((mode) => mode === value);
+}
+
 interface RemoteScreenProps {
   valence: number | null;
   /** The valence snapped to the levels sent, for the bar's bright fill; `valence` when not given. */
@@ -21,6 +30,8 @@ interface RemoteScreenProps {
   axisLabels?: AxisLabels | null;
   /** Fill with the idle colour (see `valenceColor`). */
   idle?: boolean;
+  /** Colour the screen by the level sent (default) or by the raw reading. */
+  background?: BackgroundMode;
   instruction: string;
   /** Shown in place of the instruction card: a picture, tinted to sit over the colour behind it. */
   illustration?: ReactNode;
@@ -33,6 +44,18 @@ interface RemoteScreenProps {
   /** A finger lifted, or the browser took the pointer away. */
   onRelease?: () => void;
   children?: ReactNode;
+}
+
+/**
+ * Fades into no valence or idle; a discrete colour also eases between levels, at the bar's pace.
+ * Otherwise none: CSS takes the transition from the new state, so the colour still follows a moving
+ * finger or tilt at once.
+ */
+function transitionFor(shown: number | null, idle: boolean, background: BackgroundMode): string {
+  if (shown === null || idle) {
+    return 'transition-colors duration-300';
+  }
+  return background === 'discrete' ? 'transition-colors duration-300 ease-out' : '';
 }
 
 /** Keeps a pointer on the controls from reading as touch. */
@@ -73,6 +96,7 @@ export function RemoteScreen({
   barVariant,
   axisLabels,
   idle = false,
+  background = 'discrete',
   instruction,
   illustration,
   notes,
@@ -84,20 +108,18 @@ export function RemoteScreen({
 }: RemoteScreenProps) {
   const clearance: Clearance = axisLabels ? barPosition : 'none';
   const handle = (event: PointerEvent<HTMLDivElement>) => onPointer?.(share(event), event);
-  // Fades only into no valence or idle: CSS takes the transition from the new state, so the colour
-  // still follows a moving finger or tilt at once.
-  const fade = valence === null || idle ? 'transition-colors duration-300' : '';
+  const shown = background === 'discrete' ? snapped : valence;
 
   return (
     <div
-      className={`fixed inset-0 touch-none text-white select-none ${fade}`}
+      className={`fixed inset-0 touch-none text-white select-none ${transitionFor(shown, idle, background)}`}
       data-testid="valence-remote"
       onContextMenu={(event) => event.preventDefault()}
       onPointerDown={handle}
       onPointerCancel={onRelease}
       onPointerMove={handle}
       onPointerUp={onRelease}
-      style={{ backgroundColor: valenceColor(valence, idle) }}
+      style={{ backgroundColor: valenceColor(shown, idle) }}
     >
       <ValenceBar
         idle={idle} labels={axisLabels} position={barPosition}

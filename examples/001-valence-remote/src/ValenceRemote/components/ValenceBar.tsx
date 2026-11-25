@@ -58,7 +58,7 @@ export function ValenceBar({
   idle = false,
   position = 'top',
   labels,
-  variant = 'double',
+  variant = 'continuous',
 }: ValenceBarProps) {
   const ink = inkFor(idle);
 

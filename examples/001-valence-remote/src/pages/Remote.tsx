@@ -5,6 +5,7 @@ import { RoomProvider, useRoomStatus } from '../room/RoomProvider.tsx';
 import type { RemoteSettings } from '../room/remoteSettings.ts';
 import { RoomStatusBadge } from '../room/RoomStatusBadge.tsx';
 import { isBarVariant } from '../ValenceRemote/components/BarTracks.tsx';
+import { isBackgroundMode } from '../ValenceRemote/components/RemoteScreen.tsx';
 import { isBarPosition } from '../ValenceRemote/components/ValenceBar.tsx';
 import { ValenceRemote } from '../ValenceRemote/ValenceRemote.tsx';
 import { axisLabelsFromList } from '../ValenceRemote/lib/axisLabels.ts';
@@ -56,6 +57,11 @@ function barFromUrl() {
   return isBarPosition(bar) ? bar : undefined;
 }
 
+function backgroundFromUrl() {
+  const background = new URLSearchParams(window.location.search).get('background');
+  return isBackgroundMode(background) ? background : undefined;
+}
+
 function barVariantFromUrl() {
   const variant = new URLSearchParams(window.location.search).get('barVariant');
   return isBarVariant(variant) ? variant : undefined;
@@ -81,6 +87,7 @@ function ConnectedRemote() {
       axisLabels={settings.axisLabels}
       barPosition={barFromUrl()}
       barVariant={barVariantFromUrl()}
+      background={backgroundFromUrl()}
       detection={detection}
       onPickDetection={settings.allowSelection ? setPicked : undefined}
       showNumeric={settings.showNumeric}
@@ -98,11 +105,12 @@ function ConnectedRemote() {
  * `?idleMs=` and `?stillDeg=` override when it counts as idle (see DEFAULT_IDLE); `?tintWhenIdle=0`
  * stops tinting the screen while idle; `?bar=left` runs the valence bar up the left edge rather
  * than along the top; `?barVariant=` picks how the bar shows the raw reading against the level sent
- * (`double`, the default; `overlay`; or `continuous`); `?label=`, given two or three times from low to high, labels the bar's ends
+ * (`continuous`, the default; `discrete`; `double`; or `overlay`); `?background=continuous` colours the screen
+ * by the raw reading rather than the level sent; `?label=`, given two or three times from low to high, labels the bar's ends
  * (and middle); `?levels=` sets how finely valence is sent (a count of evenly spaced values from
  * −1 to +1, such as 3 for −1, 0 and +1, or `full` for full precision; steps of 0.01 by default); `?showNumeric` shows the valence as a number; `?allowSelection` shows a badge on
  * the running screen that cycles through the modes. Once a viewer sets the room's settings, they
- * override all but `bar`, `barVariant` and the idle timings, live. While selection is allowed, the holder's pick
+ * override all but `bar`, `barVariant`, `background` and the idle timings, live. While selection is allowed, the holder's pick
  * overrides the detection.
  */
 export function Remote({ room }: { room: string }) {

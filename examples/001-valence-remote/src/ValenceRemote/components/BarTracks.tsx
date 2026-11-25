@@ -5,14 +5,15 @@ import type { BarPosition } from './ValenceBar.tsx';
 /**
  * How the bar shows the raw reading against the level sent:
  * - `continuous`: one fill, the raw reading only.
+ * - `discrete`: one fill, the level sent only, easing between levels.
  * - `overlay`: one track, a bright fill snapped to the level, the raw reading as a fainter fill past
  *   it or a shade over its end where it falls short.
  * - `double`: two tracks, the snapped one on the outer edge (easing between levels) and the raw
  *   one just inside it.
  */
-export type BarVariant = 'continuous' | 'overlay' | 'double';
+export type BarVariant = 'continuous' | 'discrete' | 'overlay' | 'double';
 
-export const BAR_VARIANTS: ReadonlyArray<BarVariant> = ['continuous', 'overlay', 'double'];
+export const BAR_VARIANTS: ReadonlyArray<BarVariant> = ['continuous', 'discrete', 'overlay', 'double'];
 
 export function isBarVariant(value: unknown): value is BarVariant {
   return BAR_VARIANTS.some((variant) => variant === value);
@@ -103,6 +104,14 @@ function ContinuousTracks({ valence, position, ink }: BarTracksProps) {
   );
 }
 
+function DiscreteTracks({ snapped, position, ink }: BarTracksProps) {
+  return (
+    <div className={`${ink.track} ${TRACK[position]}`}>
+      <Fill className={ink.fill} eased position={position} valence={snapped} />
+    </div>
+  );
+}
+
 function OverlayTracks({ valence, snapped, position, ink }: BarTracksProps) {
   const shortfall = valence !== null && snapped !== null && valence < snapped;
   return (
@@ -129,6 +138,7 @@ function DoubleTracks({ valence, snapped, position, ink }: BarTracksProps) {
 
 const TRACKS: Record<BarVariant, (props: BarTracksProps) => ReactNode> = {
   continuous: ContinuousTracks,
+  discrete: DiscreteTracks,
   double: DoubleTracks,
   overlay: OverlayTracks,
 };
