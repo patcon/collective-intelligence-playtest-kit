@@ -31,10 +31,10 @@ export function valenceColor(v: number | null, idle = false): string {
   return `rgb(${r} ${g} ${b})`;
 }
 
-/** A valence as a signed number with two decimals, or a dot when it can't tell. */
+/** A valence as a signed number with two decimals, or a dash when it can't tell. */
 export function formatValence(v: number | null): string {
   if (v === null) {
-    return '·';
+    return '—';
   }
   return `${v >= 0 ? '+' : '−'}${Math.abs(v).toFixed(2)}`;
 }
