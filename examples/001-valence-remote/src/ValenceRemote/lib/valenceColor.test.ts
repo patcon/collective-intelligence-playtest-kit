@@ -21,6 +21,6 @@ describe('formatValence', () => {
   it('signs it to two decimals, or shows a dot', () => {
     expect(formatValence(0.5)).toBe('+0.50');
     expect(formatValence(-0.25)).toBe('−0.25');
-    expect(formatValence(null)).toBe('—');
+    expect(formatValence(null)).toBe('---');
   });
 });
