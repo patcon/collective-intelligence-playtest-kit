@@ -83,6 +83,7 @@ export function ValenceRemote({
     }
   };
 
+  const idle = tintWhenIdle && remote.activity === 'idle';
   const warning = startScreenWarning(remote.started, touch, remote.tilt.status);
   if (warning !== undefined) {
     return <StartScreen instruction={INSTRUCTIONS[detection]} onStart={remote.start} warning={warning} />;
@@ -94,7 +95,7 @@ export function ValenceRemote({
       axisLabels={axisLabels}
       barPosition={barPosition}
       controls={onPickDetection && <DetectionBadge onChange={pick} value={detection} />}
-      idle={tintWhenIdle && remote.activity === 'idle'}
+      idle={idle}
       instruction={INSTRUCTIONS[detection]}
       notes={notesFor(touch, remote.tilt.status, remote.wakeLockLost)}
       onPointer={touch ? onPointer : undefined}
@@ -102,7 +103,7 @@ export function ValenceRemote({
       showNumeric={showNumeric}
       valence={remote.valence}
     >
-      {touch && <TouchGuides fingerY={remote.touch.y} showLabels={showNumeric} />}
+      {touch && <TouchGuides fingerY={remote.touch.y} idle={idle} showLabels={showNumeric} />}
     </RemoteScreen>
   );
 }
