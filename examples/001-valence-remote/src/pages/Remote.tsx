@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useSendOnOpen } from '../hooks/effects/useSendOnOpen.ts';
-import { RoomProvider, useRoomSend } from '../room/RoomProvider.tsx';
+import { RoomProvider, useRoomSend, useRoomStatus } from '../room/RoomProvider.tsx';
+import { RoomStatusBadge } from '../room/RoomStatusBadge.tsx';
 import { ValenceRemote } from '../ValenceRemote/ValenceRemote.tsx';
 import type { Activity, IdleSettings } from '../ValenceRemote/lib/activity.ts';
 import { isDetection } from '../ValenceRemote/lib/valence.ts';
@@ -31,11 +32,14 @@ function idleFromUrl(): Partial<IdleSettings> {
 
 function ConnectedRemote() {
   const send = useRoomSend();
+  // Holders can take the connection for granted, so the badge only shows when it isn't open.
+  const connected = useRoomStatus() === 'open';
   const [activity, setActivity] = useState<Activity | null>(null);
   useSendOnOpen(activity && { activity, type: 'activity' });
 
   return (
     <ValenceRemote
+      badges={connected ? null : <RoomStatusBadge />}
       detection={detectionFromUrl()}
       tintWhenIdle={new URLSearchParams(window.location.search).has('tintWhenIdle')}
       idle={idleFromUrl()}

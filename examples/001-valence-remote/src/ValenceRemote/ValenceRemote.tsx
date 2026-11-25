@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { PointerEvent } from 'react';
+import type { PointerEvent, ReactNode } from 'react';
 import { useDeviceOrientation } from '../hooks/effects/useDeviceOrientation.ts';
 import type { OrientationStatus } from '../hooks/effects/useDeviceOrientation.ts';
 import { useInterval } from '../hooks/effects/useInterval.ts';
@@ -28,6 +28,8 @@ export interface ValenceRemoteProps {
   detection?: Detection;
   /** Keep the screen awake while running, via the Wake Lock API. */
   keepAwake?: boolean;
+  /** Badges for the running screen's top-left corner (e.g. the connection), or none. */
+  badges?: ReactNode;
 }
 
 const START_WARNINGS: Partial<Record<OrientationStatus, string>> = {
@@ -48,6 +50,7 @@ export function ValenceRemote({
   tintWhenIdle = false,
   detection = 'flip',
   keepAwake = true,
+  badges,
 }: ValenceRemoteProps) {
   const [started, setStarted] = useState(false);
   const [valence, setValence] = useState<Valence>(null);
@@ -103,6 +106,7 @@ export function ValenceRemote({
   const wakeLockLost = keepAwake && !wakeLock.acquired;
   return (
     <RemoteScreen
+      badges={badges}
       idle={tintWhenIdle && activity === 'idle'}
       instruction={INSTRUCTIONS[detection]}
       notes={notesFor(touch, orientation.status, wakeLockLost)}

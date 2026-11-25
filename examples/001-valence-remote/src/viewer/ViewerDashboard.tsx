@@ -1,9 +1,8 @@
-import { Badge, Surface } from '@cloudflare/kumo';
+import { Surface } from '@cloudflare/kumo';
 import { useState } from 'react';
 import { useInterval } from '../hooks/effects/useInterval.ts';
 import { useRoomMessages } from '../hooks/effects/useRoomMessages.ts';
-import { useRoomStatus } from '../room/RoomProvider.tsx';
-import type { RoomStatus } from '../room/RoomProvider.tsx';
+import { RoomStatusBadge } from '../room/RoomStatusBadge.tsx';
 import { CopyButton } from './components/CopyButton.tsx';
 import { JoinQrCode } from './components/JoinQrCode.tsx';
 import { RemoteOptions, remoteUrl } from './components/RemoteOptions.tsx';
@@ -16,15 +15,8 @@ import type { Phones } from './lib/phones.ts';
 const LOG_LENGTH = 50;
 const CLOCK_MS = 250;
 
-const STATUS_BADGE: Record<RoomStatus, { label: string; variant: 'success' | 'warning' | 'error' }> = {
-  closed: { label: 'reconnecting', variant: 'error' },
-  connecting: { label: 'connecting', variant: 'warning' },
-  open: { label: 'connected', variant: 'success' },
-};
-
 /** What phones in the room are sending: a row per phone, the raw message log, and a QR code to join. */
 export function ViewerDashboard({ room }: { room: string }) {
-  const status = STATUS_BADGE[useRoomStatus()];
   const [phones, setPhones] = useState<Phones>({});
   const [log, setLog] = useState<Array<string>>([]);
   const [now, setNow] = useState(() => Date.now());
@@ -43,7 +35,7 @@ export function ViewerDashboard({ room }: { room: string }) {
       <header className="flex items-center gap-3">
         <h1 className="text-xl font-semibold">Valence remote</h1>
         <span className="text-kumo-subtle">room “{room}”</span>
-        <Badge variant={status.variant}>{status.label}</Badge>
+        <RoomStatusBadge />
       </header>
       <div className="grid gap-4 md:grid-cols-[1fr_auto]">
         <Surface className="rounded-lg p-4">
