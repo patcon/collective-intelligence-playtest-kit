@@ -332,7 +332,8 @@ shows:
 
 ### ✅ Checkpoint C: 20-sim round
 - [x] Criteria 1–9 pass in `agent-browser`, using 20 sims plus 1 participant tab, grouped by size 2, size 3 and count 4.
-- [x] All tests pass, and lint, typecheck and build pass. Commit, and your review.
+- [x] All tests pass, and lint, typecheck and build pass. Committed.
+- [ ] **Your review.**
 
 ---
 
