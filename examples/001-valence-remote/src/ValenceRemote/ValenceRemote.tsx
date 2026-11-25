@@ -1,5 +1,6 @@
 import type { PointerEvent, ReactNode } from 'react';
 import type { OrientationStatus } from '../hooks/effects/useDeviceOrientation.ts';
+import type { BarPosition } from './components/ValenceBar.tsx';
 import { DetectionBadge } from './components/DetectionBadge.tsx';
 import { RemoteScreen } from './components/RemoteScreen.tsx';
 import { StartScreen } from './components/StartScreen.tsx';
@@ -16,6 +17,8 @@ export interface ValenceRemoteProps extends Partial<ValenceRemoteOptions> {
   tintWhenIdle?: boolean;
   /** Show the valence as a number, and touch mode's ends as +1 and −1. */
   showNumeric?: boolean;
+  /** Which edge the valence bar runs along: `top` (default) or `left`. */
+  barPosition?: BarPosition;
   /** Badges for the running screen's top-left corner (e.g. the connection), or none. */
   badges?: ReactNode;
   /**
@@ -56,6 +59,7 @@ function startScreenWarning(started: boolean, touch: boolean, status: Orientatio
 export function ValenceRemote({
   tintWhenIdle = false,
   showNumeric = false,
+  barPosition,
   detection = 'flip',
   badges,
   onPickDetection,
@@ -83,6 +87,7 @@ export function ValenceRemote({
   return (
     <RemoteScreen
       badges={badges}
+      barPosition={barPosition}
       controls={onPickDetection && <DetectionBadge onChange={pick} value={detection} />}
       idle={tintWhenIdle && remote.activity === 'idle'}
       instruction={INSTRUCTIONS[detection]}

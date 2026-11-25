@@ -1,11 +1,15 @@
 import { Banner, LayerCard, Text } from '@cloudflare/kumo';
 import type { PointerEvent, ReactNode } from 'react';
 import { formatValence, valenceColor } from '../lib/valenceColor.ts';
+import { ValenceBar } from './ValenceBar.tsx';
+import type { BarPosition } from './ValenceBar.tsx';
 
 interface RemoteScreenProps {
   valence: number | null;
   /** Show the valence as a number in the middle. */
   showNumeric?: boolean;
+  /** Which edge the valence bar runs along. */
+  barPosition?: BarPosition;
   /** Fill with the idle colour (see `valenceColor`). */
   idle?: boolean;
   instruction: string;
@@ -31,12 +35,14 @@ function share(event: PointerEvent<HTMLDivElement>): number {
 }
 
 /**
- * The running remote: the whole screen in the valence's colour, with any badges top left and controls top right, an optional readout,
+ * The running remote: the whole screen in the valence's colour, a thin bar along one edge for where
+ * it sits from −1 to +1, any badges top left and controls top right, an optional readout,
  * the instruction on a card, and any notes as banners.
  */
 export function RemoteScreen({
   valence,
   showNumeric = false,
+  barPosition = 'top',
   idle = false,
   instruction,
   notes,
@@ -62,6 +68,7 @@ export function RemoteScreen({
       onPointerUp={onRelease}
       style={{ backgroundColor: valenceColor(valence, idle) }}
     >
+      <ValenceBar position={barPosition} valence={valence} />
       {children}
       {badges && (
         <div className="pointer-events-none absolute top-0 left-0 p-4 pt-[max(1rem,env(safe-area-inset-top))] pl-[max(1rem,env(safe-area-inset-left))]">

@@ -4,6 +4,7 @@ import { useSendOnOpen } from '../hooks/effects/useSendOnOpen.ts';
 import { RoomProvider, useRoomSend, useRoomStatus } from '../room/RoomProvider.tsx';
 import type { RemoteSettings } from '../room/remoteSettings.ts';
 import { RoomStatusBadge } from '../room/RoomStatusBadge.tsx';
+import { isBarPosition } from '../ValenceRemote/components/ValenceBar.tsx';
 import { ValenceRemote } from '../ValenceRemote/ValenceRemote.tsx';
 import type { Activity, IdleSettings } from '../ValenceRemote/lib/activity.ts';
 import { isDetection } from '../ValenceRemote/lib/valence.ts';
@@ -44,6 +45,11 @@ function idleFromUrl(): Partial<IdleSettings> {
   return settings;
 }
 
+function barFromUrl() {
+  const bar = new URLSearchParams(window.location.search).get('bar');
+  return isBarPosition(bar) ? bar : undefined;
+}
+
 function ConnectedRemote() {
   const send = useRoomSend();
   // Holders can take the connection for granted, so the badge only shows when it isn't open.
@@ -59,6 +65,7 @@ function ConnectedRemote() {
   return (
     <ValenceRemote
       badges={connected ? null : <RoomStatusBadge />}
+      barPosition={barFromUrl()}
       detection={detection}
       onPickDetection={settings.allowSelection ? setPicked : undefined}
       showNumeric={settings.showNumeric}
@@ -73,7 +80,8 @@ function ConnectedRemote() {
 /**
  * `/remote`: this device as a phone in the room. `?detection=` picks the mode (default `flip`);
  * `?idleMs=` and `?stillDeg=` override when it counts as idle (see DEFAULT_IDLE); `?tintWhenIdle=0`
- * stops tinting the screen while idle; `?showNumeric` shows the valence as a number; `?allowSelection` shows a badge on the running screen that cycles through
+ * stops tinting the screen while idle; `?bar=left` runs the
+ * valence bar up the left edge rather than along the top; `?showNumeric` shows the valence as a number; `?allowSelection` shows a badge on the running screen that cycles through
  * the modes. Once a viewer sets the room's settings, they override these four, live. While selection is allowed,
  * the holder's pick overrides the detection.
  */
