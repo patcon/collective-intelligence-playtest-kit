@@ -1,0 +1,115 @@
+import { isCue } from '../cues/cueTypes.ts';
+import type { Cue } from '../cues/cueTypes.ts';
+import { isMatchConfig } from './matchConfig.ts';
+import type { MatchConfig } from './matchConfig.ts';
+
+export type Phase = 'lobby' | 'round';
+
+/**
+ * Where a participant is: `joined` (connected, still on the start screen), `waiting` (ready for the
+ * next round), `late` (ready, but joined after this round's groups were made), `matched` (in a group,
+ * looking for it) or `found` (in a group, and tapped "found them").
+ */
+export type ParticipantStatus = 'joined' | 'waiting' | 'late' | 'matched' | 'found';
+
+/** How many are in a group now, and how many of them have tapped "found them". */
+export interface GroupProgress {
+  size: number;
+  found: number;
+}
+
+/** What one participant's screen shows. */
+export type ParticipantView =
+  | { status: 'joined' | 'waiting' | 'late' }
+  | { status: 'matched' | 'found'; cue: Cue; group: GroupProgress };
+
+export interface ParticipantSummary {
+  id: string;
+  status: ParticipantStatus;
+  /** Index into `groups`, or null when not in one. */
+  group: number | null;
+}
+
+export interface GroupSummary extends GroupProgress {
+  cue: Cue;
+}
+
+/** Everything the host sees: the whole room, as it is now. */
+export interface RoomSnapshot {
+  phase: Phase;
+  /** Rounds started since the last reset. */
+  round: number;
+  config: MatchConfig;
+  participants: Array<ParticipantSummary>;
+  groups: Array<GroupSummary>;
+}
+
+function isObject(value: unknown): value is object {
+  return typeof value === 'object' && value !== null;
+}
+
+function isCount(value: unknown): value is number {
+  return typeof value === 'number' && Number.isInteger(value) && value >= 0;
+}
+
+function isGroupProgress(value: unknown): value is GroupProgress {
+  return isObject(value) && 'size' in value && isCount(value.size) && 'found' in value && isCount(value.found);
+}
+
+function isGroupSummary(value: unknown): value is GroupSummary {
+  return isGroupProgress(value) && 'cue' in value && isCue(value.cue);
+}
+
+const STATUSES: ReadonlySet<unknown> = new Set(['joined', 'waiting', 'late', 'matched', 'found']);
+
+function isStatus(value: unknown): value is ParticipantStatus {
+  return STATUSES.has(value);
+}
+
+export function isParticipantView(value: unknown): value is ParticipantView {
+  if (!isObject(value) || !('status' in value) || !isStatus(value.status)) {
+    return false;
+  }
+  if (value.status !== 'matched' && value.status !== 'found') {
+    return true;
+  }
+  return 'cue' in value && isCue(value.cue) && 'group' in value && isGroupProgress(value.group);
+}
+
+function isParticipantSummary(value: unknown): value is ParticipantSummary {
+  return (
+    isObject(value) &&
+    'id' in value &&
+    typeof value.id === 'string' &&
+    'status' in value &&
+    isStatus(value.status) &&
+    'group' in value &&
+    (value.group === null || isCount(value.group))
+  );
+}
+
+function isListOf<T>(value: unknown, isItem: (item: unknown) => item is T): value is Array<T> {
+  return Array.isArray(value) && value.every((item) => isItem(item));
+}
+
+function hasRoomHeader(value: unknown): value is Pick<RoomSnapshot, 'phase' | 'round' | 'config'> {
+  return (
+    isObject(value) &&
+    'phase' in value &&
+    (value.phase === 'lobby' || value.phase === 'round') &&
+    'round' in value &&
+    isCount(value.round) &&
+    'config' in value &&
+    isMatchConfig(value.config)
+  );
+}
+
+export function isRoomSnapshot(value: unknown): value is RoomSnapshot {
+  return (
+    hasRoomHeader(value) &&
+    'participants' in value &&
+    isListOf(value.participants, isParticipantSummary) &&
+    'groups' in value &&
+    isListOf(value.groups, isGroupSummary)
+  );
+}

@@ -1,0 +1,69 @@
+// From `/server`, which has nothing that needs a browser, since the Worker reads messages with this too.
+import { parseJsonObject } from '@playtest-kit/common/server';
+import { isMatchConfig } from './matchConfig.ts';
+import type { MatchConfig } from './matchConfig.ts';
+import { isParticipantView, isRoomSnapshot } from './roomViews.ts';
+import type { ParticipantView, RoomSnapshot } from './roomViews.ts';
+
+export type { MatchConfig } from './matchConfig.ts';
+export type { ParticipantView, RoomSnapshot } from './roomViews.ts';
+
+/** Who a connection is: someone being matched (a phone, or a simulated one), or the demo page running the room. */
+export type Role = 'participant' | 'host';
+
+/** A participant → the room: past the start screen, so match me; or, I've found my group. */
+export type ParticipantMessage = { type: 'ready' } | { type: 'found' };
+
+/** The host → the room. */
+export type HostMessage = { type: 'config'; config: MatchConfig } | { type: 'start' } | { type: 'moveOn' } | { type: 'reset' };
+
+/** The room → one participant, on joining and after every change: what their screen shows. */
+export interface ToParticipant {
+  type: 'view';
+  view: ParticipantView;
+}
+
+/** The room → the host, on joining and after every change. */
+export interface ToHost {
+  type: 'snapshot';
+  snapshot: RoomSnapshot;
+}
+
+export function isRole(value: unknown): value is Role {
+  return value === 'participant' || value === 'host';
+}
+
+/** The fields any message might carry, before they're checked. */
+interface RawMessage {
+  type?: unknown;
+  config?: unknown;
+  view?: unknown;
+  snapshot?: unknown;
+}
+
+/** A participant's message from raw socket text, or null if it isn't one. */
+export function parseParticipantMessage(raw: string): ParticipantMessage | null {
+  const { type }: RawMessage = parseJsonObject(raw) ?? {};
+  return type === 'ready' || type === 'found' ? { type } : null;
+}
+
+/** The host's message from raw socket text, or null if it isn't one. */
+export function parseHostMessage(raw: string): HostMessage | null {
+  const msg: RawMessage = parseJsonObject(raw) ?? {};
+  if (msg.type === 'start' || msg.type === 'moveOn' || msg.type === 'reset') {
+    return { type: msg.type };
+  }
+  return msg.type === 'config' && isMatchConfig(msg.config) ? { config: msg.config, type: 'config' } : null;
+}
+
+/** The room's message to a participant, from raw socket text, or null if it isn't one. */
+export function parseToParticipant(raw: string): ToParticipant | null {
+  const msg: RawMessage = parseJsonObject(raw) ?? {};
+  return msg.type === 'view' && isParticipantView(msg.view) ? { type: 'view', view: msg.view } : null;
+}
+
+/** The room's message to the host, from raw socket text, or null if it isn't one. */
+export function parseToHost(raw: string): ToHost | null {
+  const msg: RawMessage = parseJsonObject(raw) ?? {};
+  return msg.type === 'snapshot' && isRoomSnapshot(msg.snapshot) ? { snapshot: msg.snapshot, type: 'snapshot' } : null;
+}

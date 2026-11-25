@@ -1,0 +1,128 @@
+import type { Cue, CueTypeId } from '../cues/cueTypes.ts';
+import { match } from '../matching/match.ts';
+import type { Rng } from '../matching/rng.ts';
+import { DEFAULT_CONFIG } from './matchConfig.ts';
+import type { MatchConfig } from './matchConfig.ts';
+import type { Phase } from './roomViews.ts';
+
+export interface Participant {
+  /** The connection id, which `/participate` keeps per tab, so a reload comes back as the same person. */
+  id: string;
+  connected: boolean;
+  /** Past the start screen. Only ready participants are matched. */
+  ready: boolean;
+  /** Index into `RoomState.groups` this round, or null. */
+  group: number | null;
+  found: boolean;
+}
+
+/** The whole room. Plain data, so the Agent can keep it with `setState` and it outlasts hibernation. */
+export interface RoomState {
+  phase: Phase;
+  round: number;
+  config: MatchConfig;
+  participants: Array<Participant>;
+  /** This round's groups, by their cue. Who's in each is on `participants`. */
+  groups: Array<Cue>;
+}
+
+export type RoomEvent =
+  | { type: 'join' | 'leave' | 'ready' | 'found'; id: string }
+  | { type: 'config'; config: MatchConfig }
+  | { type: 'start' | 'moveOn' | 'reset' };
+
+/** What the reducer needs from outside: randomness, and how to cue each group. */
+export interface RoomDeps {
+  rng: Rng;
+  assignCues: (type: CueTypeId, groupCount: number, rng: Rng) => Array<Cue>;
+}
+
+export const INITIAL_ROOM_STATE: RoomState = { config: DEFAULT_CONFIG, groups: [], participants: [], phase: 'lobby', round: 0 };
+
+function withParticipant(state: RoomState, id: string, change: (p: Participant) => Participant): RoomState {
+  if (!state.participants.some((p) => p.id === id)) {
+    return state;
+  }
+  return { ...state, participants: state.participants.map((p) => (p.id === id ? change(p) : p)) };
+}
+
+/** A known id coming back keeps its place; a new one starts on the start screen. */
+function join(state: RoomState, id: string): RoomState {
+  if (state.participants.some((p) => p.id === id)) {
+    return withParticipant(state, id, (p) => ({ ...p, connected: true }));
+  }
+  const joined: Participant = { connected: true, found: false, group: null, id, ready: false };
+  return { ...state, participants: [...state.participants, joined] };
+}
+
+/** Someone in this round's groups is kept, out of the counts, in case they come back; anyone else is forgotten. */
+function leave(state: RoomState, id: string): RoomState {
+  const leaving = state.participants.find((p) => p.id === id);
+  if (!leaving) {
+    return state;
+  }
+  if (state.phase === 'round' && leaving.group !== null) {
+    return withParticipant(state, id, (p) => ({ ...p, connected: false }));
+  }
+  return { ...state, participants: state.participants.filter((p) => p.id !== id) };
+}
+
+function found(state: RoomState, id: string): RoomState {
+  const finder = state.participants.find((p) => p.id === id);
+  return state.phase === 'round' && finder && finder.group !== null && !finder.found
+    ? withParticipant(state, id, (p) => ({ ...p, found: true }))
+    : state;
+}
+
+/** Matches everyone connected and ready. Does nothing mid-round, or with no one to match. */
+function start(state: RoomState, { assignCues, rng }: RoomDeps): RoomState {
+  const ids = state.participants.filter((p) => p.connected && p.ready).map((p) => p.id);
+  if (state.phase === 'round' || ids.length === 0) {
+    return state;
+  }
+  const groups = match(ids, state.config, rng);
+  const groupOf = new Map(groups.flatMap((members, g) => members.map((id) => [id, g] as const)));
+  return {
+    ...state,
+    groups: assignCues(state.config.cue, groups.length, rng),
+    participants: state.participants.map((p) => ({ ...p, found: false, group: groupOf.get(p.id) ?? null })),
+    phase: 'round',
+    round: state.round + 1,
+  };
+}
+
+/** Back to the lobby: groups gone, everyone still here waiting, anyone gone forgotten. */
+function toLobby(state: RoomState, round: number): RoomState {
+  return {
+    ...state,
+    groups: [],
+    participants: state.participants.filter((p) => p.connected).map((p) => ({ ...p, found: false, group: null })),
+    phase: 'lobby',
+    round,
+  };
+}
+
+/**
+ * The room's next state after `event`. Pure: the same state, event and deps always give the same
+ * result, and an event that doesn't apply returns `state` itself.
+ */
+export function reduce(state: RoomState, event: RoomEvent, deps: RoomDeps): RoomState {
+  switch (event.type) {
+    case 'join':
+      return join(state, event.id);
+    case 'leave':
+      return leave(state, event.id);
+    case 'ready':
+      return withParticipant(state, event.id, (p) => ({ ...p, ready: true }));
+    case 'found':
+      return found(state, event.id);
+    case 'config':
+      return { ...state, config: event.config };
+    case 'start':
+      return start(state, deps);
+    case 'moveOn':
+      return state.phase === 'round' ? toLobby(state, state.round) : state;
+    case 'reset':
+      return toLobby(state, 0);
+  }
+}
