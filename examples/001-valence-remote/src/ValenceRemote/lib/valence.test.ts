@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { detected, nextDetection, touchValence, upOf } from './valence.ts';
+import { detected, nextDetection, tiltReadings, touchValence, upOf } from './valence.ts';
 import type { Vec } from './valence.ts';
 
 function up(beta: number, gamma: number): Vec {
@@ -36,6 +36,21 @@ describe('spin', () => {
 
   it('is null near flat', () => {
     expect(detected('spin', up(5, 0))).toBeNull();
+  });
+});
+
+describe('tiltReadings', () => {
+  it('reads every tilt detection from one reading', () => {
+    const readings = tiltReadings(up(90, 0));
+    expect(readings.flip).toBeCloseTo(0);
+    expect(readings.invert).toBeCloseTo(1);
+    expect(readings.spin).toBeCloseTo(1);
+  });
+
+  it('leaves spin null near flat, while flip still reads', () => {
+    const readings = tiltReadings(up(0, 0));
+    expect(readings.flip).toBeCloseTo(1);
+    expect(readings.spin).toBeNull();
   });
 });
 

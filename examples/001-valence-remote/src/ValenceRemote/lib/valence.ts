@@ -8,6 +8,9 @@ export const DETECTIONS: ReadonlyArray<Detection> = ['flip', 'invert', 'spin', '
 
 export type TiltDetection = Exclude<Detection, 'touch'>;
 
+/** Every tilt detection's valence from one reading, null where it can't tell. */
+export type TiltReadings = Record<TiltDetection, number | null>;
+
 const RAD = Math.PI / 180;
 
 /** Below this, the screen's plane is too near level to read spin from. */
@@ -51,6 +54,11 @@ export function detected(detection: TiltDetection, [x, y, z]: Vec): number | nul
     return null;
   }
   return 1 - Math.abs(Math.atan2(-x, y)) / (Math.PI / 2);
+}
+
+/** Every tilt detection's valence from which way is up. */
+export function tiltReadings(up: Vec): TiltReadings {
+  return { flip: detected('flip', up), invert: detected('invert', up), spin: detected('spin', up) };
 }
 
 /** Valence with a finger at `y` (0 top, 1 bottom): +1 near the top, −1 near the bottom, held past either. */

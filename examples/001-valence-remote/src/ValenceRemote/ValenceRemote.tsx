@@ -1,37 +1,21 @@
-import { useState } from 'react';
 import type { PointerEvent, ReactNode } from 'react';
-import { useDeviceOrientation } from '../hooks/effects/useDeviceOrientation.ts';
 import type { OrientationStatus } from '../hooks/effects/useDeviceOrientation.ts';
-import { useInterval } from '../hooks/effects/useInterval.ts';
-import { useWakeLock } from '../hooks/effects/useWakeLock.ts';
 import { DetectionBadge } from './components/DetectionBadge.tsx';
 import { RemoteScreen } from './components/RemoteScreen.tsx';
 import { StartScreen } from './components/StartScreen.tsx';
 import { TouchGuides } from './components/TouchGuides.tsx';
-import { useActivity } from './hooks/useActivity.ts';
-import { unlockAudio } from './lib/audio.ts';
-import type { Activity, IdleSettings } from './lib/activity.ts';
+import { useValenceRemote } from './hooks/useValenceRemote.ts';
+import type { ValenceRemoteOptions } from './hooks/useValenceRemote.ts';
 import { INSTRUCTIONS, ORIENTATION_NOTES } from './lib/instructions.ts';
-import { createSender, SEND_MS } from './lib/sender.ts';
-import type { Valence } from './lib/sender.ts';
-import { detected, touchValence, upOf } from './lib/valence.ts';
 import type { Detection } from './lib/valence.ts';
 
-export interface ValenceRemoteProps {
+export interface ValenceRemoteProps extends Partial<ValenceRemoteOptions> {
   /** Throttled (~50 ms, epsilon 0.004) with a 1 s keepalive; null when it can't tell. */
   onValence: (valence: number | null) => void;
-  /** On mount and whenever it changes: `arrived`, then `active` or `idle` (see `Activity`). */
-  onActivity?: (activity: Activity) => void;
-  /** When a tilt remote counts as idle, over DEFAULT_IDLE; read once on mount. */
-  idle?: Partial<IdleSettings>;
   /** Turn the screen the idle badge's yellow while idle, so it shows on the phone too. */
   tintWhenIdle?: boolean;
   /** Show the valence as a number, and touch mode's ends as +1 and −1. */
   showNumeric?: boolean;
-  /** How the phone reads as valence. Touch also works on desktop. */
-  detection?: Detection;
-  /** Keep the screen awake while running, via the Wake Lock API. */
-  keepAwake?: boolean;
   /** Badges for the running screen's top-left corner (e.g. the connection), or none. */
   badges?: ReactNode;
   /**
@@ -65,111 +49,50 @@ function startScreenWarning(started: boolean, touch: boolean, status: Orientatio
   return START_WARNINGS[status] ?? null;
 }
 
-/** Turns a phone into a remote: its orientation (or a finger's height) as a valence from −1 to +1. */
+/**
+ * Turns a phone into a remote: its orientation (or a finger's height) as a valence from −1 to +1.
+ * The screens for `useValenceRemote`, which does the reading without them.
+ */
 export function ValenceRemote({
-  onValence,
-  onActivity,
-  idle,
   tintWhenIdle = false,
   showNumeric = false,
   detection = 'flip',
-  keepAwake = true,
   badges,
   onPickDetection,
+  ...options
 }: ValenceRemoteProps) {
-  const [started, setStarted] = useState(false);
-  const [valence, setValence] = useState<Valence>(null);
-  const [fingerY, setFingerY] = useState<number | null>(null);
-  const [sender] = useState(createSender);
+  const remote = useValenceRemote({ ...options, detection });
   const touch = detection === 'touch';
-  const wakeLock = useWakeLock(started && keepAwake);
-  const { activity, tracker } = useActivity(started, onActivity, idle);
 
-  const emit = (out: Valence | undefined) => {
-    if (out !== undefined) {
-      onValence(out);
-    }
-  };
-
-  const report = (v: Valence) => {
-    setValence(v);
-    emit(sender.update(v, performance.now()));
-  };
-
-  const orientation = useDeviceOrientation(started && !touch, (beta, gamma) => {
-    const up = upOf(beta, gamma);
-    tracker.tilt(up, performance.now());
-    if (detection !== 'touch') {
-      report(up && detected(detection, up));
-    }
-  });
-
-  useInterval(() => emit(sender.flush(performance.now())), SEND_MS, started);
-
-  /** Starts reading afresh in a mode; tilt counts as active for a moment while readings arrive. */
-  const begin = (next: Detection) => {
-    if (next !== 'touch') {
-      tracker.poke(performance.now());
-    }
-    setFingerY(null);
-    report(null);
-  };
-
-  /**
-   * The start tap is the one gesture every mode gets, so it asks for everything the remote may need
-   * later, whatever the mode: motion access (so a switch to tilt needn't come back here) and audio.
-   * iOS only allows either from a tap.
-   */
-  const start = () => {
-    void orientation.requestPermission();
-    unlockAudio();
-    begin(detection);
-    setStarted(true);
-  };
-
-  /** A tap on the mode badge. Asking again for motion access is a no-op once granted. */
   const pick = (next: Detection) => {
-    if (next !== 'touch') {
-      void orientation.requestPermission();
-    }
-    begin(next);
+    remote.prepare(next);
     onPickDetection?.(next);
   };
 
   const onPointer = (y: number, event: PointerEvent<HTMLDivElement>) => {
     if (event.type === 'pointerdown' || event.buttons > 0) {
-      tracker.touch(true);
-      setFingerY(y);
-      report(touchValence(y));
+      remote.touch.press(y);
     }
   };
 
-  /** A lifted finger leaves no valence and no finger line. */
-  const onRelease = () => {
-    tracker.touch(false);
-    setFingerY(null);
-    report(null);
-  };
-
-  const warning = startScreenWarning(started, touch, orientation.status);
+  const warning = startScreenWarning(remote.started, touch, remote.tilt.status);
   if (warning !== undefined) {
-    return <StartScreen instruction={INSTRUCTIONS[detection]} onStart={start} warning={warning} />;
+    return <StartScreen instruction={INSTRUCTIONS[detection]} onStart={remote.start} warning={warning} />;
   }
 
-  const wakeLockLost = keepAwake && !wakeLock.acquired;
   return (
     <RemoteScreen
       badges={badges}
       controls={onPickDetection && <DetectionBadge onChange={pick} value={detection} />}
-      idle={tintWhenIdle && activity === 'idle'}
+      idle={tintWhenIdle && remote.activity === 'idle'}
       instruction={INSTRUCTIONS[detection]}
-      notes={notesFor(touch, orientation.status, wakeLockLost)}
+      notes={notesFor(touch, remote.tilt.status, remote.wakeLockLost)}
       onPointer={touch ? onPointer : undefined}
-      onRelease={touch ? onRelease : undefined}
+      onRelease={touch ? remote.touch.release : undefined}
       showNumeric={showNumeric}
-      valence={valence}
+      valence={remote.valence}
     >
-      {touch && <TouchGuides fingerY={fingerY} showLabels={showNumeric} />}
+      {touch && <TouchGuides fingerY={remote.touch.y} showLabels={showNumeric} />}
     </RemoteScreen>
   );
 }
