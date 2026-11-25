@@ -3,6 +3,8 @@ import { useInterval } from '../../hooks/effects/useInterval.ts';
 import { useWakeLock } from '../../hooks/effects/useWakeLock.ts';
 import { unlockAudio } from '../lib/audio.ts';
 import type { Activity, IdleSettings } from '../lib/activity.ts';
+import { createQuantizer, DEFAULT_LEVELS } from '../lib/levels.ts';
+import type { Levels } from '../lib/levels.ts';
 import { createSender, SEND_MS } from '../lib/sender.ts';
 import type { Valence } from '../lib/sender.ts';
 import { touchValence } from '../lib/valence.ts';
@@ -14,7 +16,9 @@ import { useTilt } from './useTilt.ts';
 export interface ValenceRemoteOptions {
   /** How the phone reads as valence. Touch also works on desktop. */
   detection: Detection;
-  /** Throttled (~50 ms, epsilon 0.004) with a 1 s keepalive; null when it can't tell. */
+  /** How finely valence is sent (see `Levels`); DEFAULT_LEVELS (steps of 0.01) unless given. */
+  levels?: Levels;
+  /** Snapped to `levels`, sent only when it changes and at most every ~50 ms; null when it can't tell. */
   onValence?: (valence: Valence) => void;
   /** On mount and whenever it changes: `arrived`, then `active` or `idle` (see `Activity`). */
   onActivity?: (activity: Activity) => void;
@@ -31,7 +35,7 @@ export interface ValenceRemoteState {
   start: () => void;
   /** Readies the remote for `next` (from a tap, for motion access); pass `next` back in as `detection` to switch. */
   prepare: (next: Detection) => void;
-  /** The current detection's valence, unthrottled; null when it can't tell. */
+  /** The current detection's valence, unthrottled and unsnapped, so what shows it moves smoothly; null when it can't tell. */
   valence: Valence;
   activity: Activity;
   /** Every tilt detection at once, read whenever started and not in touch mode. */
@@ -45,6 +49,7 @@ export interface ValenceRemoteState {
 /** A phone as a valence remote, with no UI: reads it in the chosen detection, throttles what's sent, and tracks activity. */
 export function useValenceRemote({
   detection,
+  levels = DEFAULT_LEVELS,
   onValence,
   onActivity,
   idle,
@@ -54,6 +59,10 @@ export function useValenceRemote({
   const [valence, setValence] = useState<Valence>(null);
   const [touchY, setTouchY] = useState<number | null>(null);
   const [sender] = useState(createSender);
+  const [quantizer, setQuantizer] = useState(() => ({ levels, quantize: createQuantizer(levels) }));
+  if (quantizer.levels !== levels) {
+    setQuantizer({ levels, quantize: createQuantizer(levels) });
+  }
   const isTouch = detection === 'touch';
   const wakeLock = useWakeLock(started && keepAwake);
   const { activity, tracker } = useActivity(started, onActivity, idle);
@@ -66,7 +75,7 @@ export function useValenceRemote({
 
   const report = (v: Valence) => {
     setValence(v);
-    emit(sender.update(v, performance.now()));
+    emit(sender.update(quantizer.quantize(v), performance.now()));
   };
 
   const tilt = useTilt(started && !isTouch, (up, readings) => {

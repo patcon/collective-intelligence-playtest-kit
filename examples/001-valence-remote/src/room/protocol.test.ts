@@ -31,7 +31,7 @@ describe('parseRoomMessage', () => {
 
 describe('settings messages', () => {
   const set =
-    '{"type":"settings","settings":{"detection":"touch","tintWhenIdle":true,"showNumeric":false,"allowSelection":false,"axisLabels":{"negative":"neg","positive":"pos"}}}';
+    '{"type":"settings","settings":{"detection":"touch","tintWhenIdle":true,"showNumeric":false,"allowSelection":false,"axisLabels":{"negative":"neg","positive":"pos"},"levels":3}}';
   const unset = '{"type":"settings","settings":null}';
 
   it('reads settings from a viewer or from the room', () => {
@@ -39,6 +39,7 @@ describe('settings messages', () => {
       allowSelection: false,
       axisLabels: { negative: 'neg', positive: 'pos' },
       detection: 'touch',
+      levels: 3,
       showNumeric: false,
       tintWhenIdle: true,
     };
@@ -54,17 +55,22 @@ describe('settings messages', () => {
   it('rejects unknown or missing settings', () => {
     expect(
       parseViewerMessage(
-        '{"type":"settings","settings":{"detection":"shake","tintWhenIdle":true,"showNumeric":false,"allowSelection":false,"axisLabels":null}}',
+        '{"type":"settings","settings":{"detection":"shake","tintWhenIdle":true,"showNumeric":false,"allowSelection":false,"axisLabels":null,"levels":3}}',
       ),
     ).toBeNull();
     expect(
       parseViewerMessage(
-        '{"type":"settings","settings":{"detection":"flip","tintWhenIdle":true,"showNumeric":false,"allowSelection":false,"axisLabels":{"positive":"pos"}}}',
+        '{"type":"settings","settings":{"detection":"flip","tintWhenIdle":true,"showNumeric":false,"allowSelection":false,"axisLabels":{"positive":"pos"},"levels":3}}',
       ),
     ).toBeNull();
     expect(parseViewerMessage('{"type":"settings","settings":{"detection":"flip","tintWhenIdle":true}}')).toBeNull();
     expect(
       parseViewerMessage('{"type":"settings","settings":{"detection":"flip","tintWhenIdle":true,"allowSelection":false}}'),
+    ).toBeNull();
+    expect(
+      parseViewerMessage(
+        '{"type":"settings","settings":{"detection":"flip","tintWhenIdle":true,"showNumeric":false,"allowSelection":false,"axisLabels":null,"levels":1}}',
+      ),
     ).toBeNull();
     expect(parseViewerMessage('{"type":"settings"}')).toBeNull();
   });

@@ -1,5 +1,7 @@
 import { isAxisLabels } from '../ValenceRemote/lib/axisLabels.ts';
 import type { AxisLabels } from '../ValenceRemote/lib/axisLabels.ts';
+import { DEFAULT_LEVELS, isLevels } from '../ValenceRemote/lib/levels.ts';
+import type { Levels } from '../ValenceRemote/lib/levels.ts';
 import { isDetection } from '../ValenceRemote/lib/valence.ts';
 import type { Detection } from '../ValenceRemote/lib/valence.ts';
 
@@ -13,29 +15,41 @@ export interface RemoteSettings {
   allowSelection: boolean;
   /** Words along the valence bar's ends (and middle), or none. */
   axisLabels: AxisLabels | null;
+  /** How finely phones send valence (see `Levels`). */
+  levels: Levels;
 }
 
 export const DEFAULT_REMOTE_SETTINGS: RemoteSettings = {
   allowSelection: false,
   axisLabels: null,
   detection: 'flip',
+  levels: DEFAULT_LEVELS,
   showNumeric: false,
   tintWhenIdle: true,
 };
 
-export function isRemoteSettings(value: unknown): value is RemoteSettings {
+/** An object with the on/off settings, each a boolean. */
+function hasFlags(value: unknown): value is Pick<RemoteSettings, 'tintWhenIdle' | 'showNumeric' | 'allowSelection'> {
   return (
     typeof value === 'object' &&
     value !== null &&
-    'detection' in value &&
-    isDetection(value.detection) &&
     'tintWhenIdle' in value &&
     typeof value.tintWhenIdle === 'boolean' &&
     'showNumeric' in value &&
     typeof value.showNumeric === 'boolean' &&
     'allowSelection' in value &&
-    typeof value.allowSelection === 'boolean' &&
+    typeof value.allowSelection === 'boolean'
+  );
+}
+
+export function isRemoteSettings(value: unknown): value is RemoteSettings {
+  return (
+    hasFlags(value) &&
+    'detection' in value &&
+    isDetection(value.detection) &&
     'axisLabels' in value &&
-    (value.axisLabels === null || isAxisLabels(value.axisLabels))
+    (value.axisLabels === null || isAxisLabels(value.axisLabels)) &&
+    'levels' in value &&
+    isLevels(value.levels)
   );
 }

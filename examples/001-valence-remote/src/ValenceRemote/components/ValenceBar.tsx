@@ -17,8 +17,14 @@ const STRIP: Record<BarPosition, string> = {
 };
 
 const TRACK: Record<BarPosition, string> = {
-  left: 'flex w-1 flex-col-reverse',
-  top: 'h-1',
+  left: 'relative flex w-1 flex-col-reverse',
+  top: 'relative h-1',
+};
+
+/** A tick across the bar, centred on its value and standing a little past the track. */
+const TICK: Record<BarPosition, string> = {
+  left: 'absolute left-0 h-px w-2 translate-y-1/2',
+  top: 'absolute top-0 h-2 w-px -translate-x-1/2',
 };
 
 const FILL: Record<BarPosition, string> = {
@@ -49,15 +55,21 @@ interface ValenceBarProps {
   position?: BarPosition;
   /** Words beside the bar's ends (and middle), or none. */
   labels?: AxisLabels | null;
+  /** Valences to mark with a tick, as the levels a coarse remote sends. */
+  ticks?: ReadonlyArray<number>;
+}
+
+function shareOf(valence: number): string {
+  return `${((valence + 1) / 2) * 100}%`;
 }
 
 /**
  * A thin line along one edge, like an article's reading progress: filled as far as the valence
- * goes, empty at −1 and full at +1, with any labels beside it. Empty with no valence.
+ * goes, empty at −1 and full at +1, with any ticks across it and labels beside it. Empty with no valence.
  */
-export function ValenceBar({ valence, idle = false, position = 'top', labels }: ValenceBarProps) {
+export function ValenceBar({ valence, idle = false, position = 'top', labels, ticks = [] }: ValenceBarProps) {
   const ink = inkFor(idle);
-  const share = `${(valence === null ? 0 : (valence + 1) / 2) * 100}%`;
+  const share = shareOf(valence ?? -1);
   // Fades only into no valence, as the screen does, so it otherwise keeps up with the reading.
   const fade = valence === null ? 'duration-300' : 'duration-0';
 
@@ -68,6 +80,13 @@ export function ValenceBar({ valence, idle = false, position = 'top', labels }: 
           className={`${ink.fill} ${FILL[position]} ${fade}`}
           style={position === 'top' ? { width: share } : { height: share }}
         />
+        {ticks.map((tick) => (
+          <div
+            className={`${ink.fill} ${TICK[position]}`}
+            key={tick}
+            style={position === 'top' ? { left: shareOf(tick) } : { bottom: shareOf(tick) }}
+          />
+        ))}
       </div>
       {labels && (
         <div className={`text-xs/4 font-medium ${ink.text} ${LABELS[position]}`}>

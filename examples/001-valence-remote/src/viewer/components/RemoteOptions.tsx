@@ -8,13 +8,14 @@ import {
   isAxisLabelsPreset,
 } from '../../ValenceRemote/lib/axisLabels.ts';
 import { DETECTION_LABELS } from '../../ValenceRemote/lib/instructions.ts';
+import { levelsFromParam, levelsToParam } from '../../ValenceRemote/lib/levels.ts';
 import { isDetection } from '../../ValenceRemote/lib/valence.ts';
 import type { RemoteSettingsControl } from '../hooks/useRemoteSettings.ts';
 
 /** The remote's URL with `settings` as query parameters. */
 export function remoteUrl(origin: string, settings: RemoteSettings): string {
-  const { detection, tintWhenIdle, showNumeric, allowSelection, axisLabels } = settings;
-  const params = new URLSearchParams({ detection });
+  const { detection, tintWhenIdle, showNumeric, allowSelection, axisLabels, levels } = settings;
+  const params = new URLSearchParams({ detection, levels: levelsToParam(levels) });
   for (const label of axisLabels ? axisLabelsToList(axisLabels) : []) {
     params.append('label', label);
   }
@@ -31,6 +32,16 @@ export function remoteUrl(origin: string, settings: RemoteSettings): string {
 }
 
 const NO_LABELS = 'none';
+
+/** The resolutions on offer, keyed by their URL parameter. */
+const LEVEL_ITEMS = {
+  '2': '−1 or +1',
+  '3': '−1, 0 or +1',
+  '5': 'Steps of 0.5',
+  '21': 'Steps of 0.1',
+  '201': 'Steps of 0.01',
+  full: 'Full precision',
+};
 
 /** Each preset, shown high to low, and none. */
 const AXIS_LABEL_ITEMS = {
@@ -59,6 +70,18 @@ export function RemoteOptions({ settings, setSettings }: RemoteSettingsControl) 
           setSettings({ ...settings, axisLabels: isAxisLabelsPreset(id) ? AXIS_LABEL_PRESETS[id] : null })
         }
         value={axisLabelsPresetOf(settings.axisLabels) ?? NO_LABELS}
+      />
+      <Select
+        className="w-full"
+        items={LEVEL_ITEMS}
+        label="Resolution"
+        onValueChange={(param) => {
+          const levels = levelsFromParam(param);
+          if (levels !== undefined) {
+            setSettings({ ...settings, levels });
+          }
+        }}
+        value={levelsToParam(settings.levels)}
       />
       <Switch
         checked={settings.tintWhenIdle}

@@ -14,6 +14,8 @@ interface RemoteScreenProps {
   barPosition?: BarPosition;
   /** Words beside the bar's ends (and middle), or none. */
   axisLabels?: AxisLabels | null;
+  /** Valences to mark on the bar (see `tickValues`). */
+  ticks?: ReadonlyArray<number>;
   /** Fill with the idle colour (see `valenceColor`). */
   idle?: boolean;
   instruction: string;
@@ -65,6 +67,7 @@ export function RemoteScreen({
   showNumeric = false,
   barPosition = 'top',
   axisLabels,
+  ticks,
   idle = false,
   instruction,
   illustration,
@@ -92,7 +95,7 @@ export function RemoteScreen({
       onPointerUp={onRelease}
       style={{ backgroundColor: valenceColor(valence, idle) }}
     >
-      <ValenceBar idle={idle} labels={axisLabels} position={barPosition} valence={valence} />
+      <ValenceBar idle={idle} labels={axisLabels} position={barPosition} ticks={ticks} valence={valence} />
       {children}
       {badges && (
         <div className={`pointer-events-none absolute top-0 left-0 p-4 ${BADGES_INSET[clearance]}`}>

@@ -11,10 +11,11 @@ import { TouchGuides } from './components/TouchGuides.tsx';
 import { useValenceRemote } from './hooks/useValenceRemote.ts';
 import type { ValenceRemoteOptions } from './hooks/useValenceRemote.ts';
 import { flipInstruction, INSTRUCTIONS, ORIENTATION_NOTES } from './lib/instructions.ts';
+import { DEFAULT_LEVELS, tickValues } from './lib/levels.ts';
 import type { Detection } from './lib/valence.ts';
 
 export interface ValenceRemoteProps extends Partial<ValenceRemoteOptions> {
-  /** Throttled (~50 ms, epsilon 0.004) with a 1 s keepalive; null when it can't tell. */
+  /** Snapped to `levels`, sent only when it changes and at most every ~50 ms; null when it can't tell. */
   onValence: (valence: number | null) => void;
   /** Turn the screen the idle badge's yellow while idle, so it shows on the phone too. */
   tintWhenIdle?: boolean;
@@ -109,6 +110,7 @@ export function ValenceRemote({
       idle={idle}
       illustration={illustrate(`size-40 ${inkFor(idle).picture}`)}
       instruction={INSTRUCTIONS[detection]}
+      ticks={tickValues(options.levels === undefined ? DEFAULT_LEVELS : options.levels)}
       notes={notesFor(touch, remote.tilt.status, remote.wakeLockLost)}
       onPointer={touch ? onPointer : undefined}
       onRelease={touch ? remote.touch.release : undefined}

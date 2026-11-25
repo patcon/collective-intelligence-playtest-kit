@@ -14,3 +14,7 @@ Not yet worth doing: the remote will grow, and the examples should keep the full
 
 - **Turn the notes' fixes into buttons.** Notes ask the holder to edit the URL ("Try ?detection=touch") or reload. Give their banners an action instead: "Use touch instead" switches mode in place, and "Try again" asks for motion access again (or reloads where the browser won't ask twice).
 - **The start screen as a Kumo card.** A first try is in `git stash` ("remote start screen as Kumo card"): a `LayerCard` with the title and a mode `Badge` in the header, a gesture icon, the instruction, a full-width start button, and the warning as a banner, plus the connection badge in the corner via a shared `CornerBadges`. Not kept: it didn't look right yet.
+
+## Ideas: feeling the resolution
+
+- **Vibrate when the sent level changes** (`navigator.vibrate`, Android only; iOS Safari has no vibration API). At coarse resolutions (`?levels=3`) the holder would feel each step crossed, with nothing added to the screen. Skip it at fine resolutions, where it would buzz constantly.

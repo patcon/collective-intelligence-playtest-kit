@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createSender, KEEPALIVE_MS, SEND_MS } from './sender.ts';
+import { createSender, SEND_MS } from './sender.ts';
 
 describe('createSender', () => {
   it('sends the first reading at once', () => {
@@ -13,11 +13,11 @@ describe('createSender', () => {
     expect(sender.flush(SEND_MS)).toBe(0.5);
   });
 
-  it('skips changes smaller than epsilon until the keepalive', () => {
+  it('never repeats a value that holds', () => {
     const sender = createSender();
     sender.update(0.5, 0);
-    expect(sender.update(0.501, SEND_MS * 2)).toBeUndefined();
-    expect(sender.flush(KEEPALIVE_MS)).toBe(0.501);
+    expect(sender.update(0.5, SEND_MS * 2)).toBeUndefined();
+    expect(sender.flush(SEND_MS * 100)).toBeUndefined();
   });
 
   it('treats a move to or from null as a change', () => {
@@ -28,6 +28,6 @@ describe('createSender', () => {
   });
 
   it('sends nothing on flush before any reading', () => {
-    expect(createSender().flush(KEEPALIVE_MS * 5)).toBeUndefined();
+    expect(createSender().flush(SEND_MS * 5)).toBeUndefined();
   });
 });
