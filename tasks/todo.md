@@ -282,9 +282,9 @@ Add a temporary set of host buttons (Start, Move on, Reset) on `/demo-ui` so a r
 - Lay out the three columns on `/demo-ui`.
 
 **Acceptance criteria:**
-- [ ] A config change shows up in `EmceePane` and in the next round's groups.
+- [x] A config change shows up in `EmceePane` and in the next round's groups.
 - [ ] The repeat warning appears before Start (criterion 4).
-- [ ] The QR code opens `/participate`.
+- [x] The QR code opens `/participate`.
 
 **Verification:** Unit test for `expectedGroupCount(n, grouping)` (reusing the engine). Manual check with `agent-browser`.
 **Dependencies:** 11

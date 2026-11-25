@@ -1,15 +1,28 @@
 import { Loader } from '@cloudflare/kumo';
 import { RoomStatusBadge } from '@playtest-kit/ui';
 import { useState } from 'react';
+import { ConfigPanels } from '../demo/ConfigPanels.tsx';
 import { EmceePane } from '../demo/EmceePane.tsx';
+import { JoinPanel } from '../demo/JoinPanel.tsx';
+import { repeatWarning } from '../demo/repeatWarning.ts';
 import { hostRoom } from '../room/client.ts';
 import type { RoomSnapshot } from '../room/protocol.ts';
 
 const { RoomProvider, useRoomMessages, useRoomSend, useRoomStatus } = hostRoom;
 
+function Columns({ snapshot }: { snapshot: RoomSnapshot }) {
+  const send = useRoomSend();
+  return (
+    <div className="grid items-start gap-4 lg:grid-cols-3">
+      <ConfigPanels config={snapshot.config} onConfig={(config) => send({ config, type: 'config' })} warning={repeatWarning(snapshot)} />
+      <EmceePane onCommand={send} snapshot={snapshot} />
+      <JoinPanel />
+    </div>
+  );
+}
+
 function HostView() {
   const status = useRoomStatus();
-  const send = useRoomSend();
   const [snapshot, setSnapshot] = useState<RoomSnapshot | null>(null);
   useRoomMessages((msg) => setSnapshot(msg.snapshot));
 
@@ -19,15 +32,15 @@ function HostView() {
         <h1 className="text-xl font-semibold">Matchmaking</h1>
         <RoomStatusBadge status={status} />
       </header>
-      {snapshot ? <EmceePane onCommand={send} snapshot={snapshot} /> : <Loader />}
-      <a className="text-sm text-kumo-link underline" href="/participate" rel="noreferrer" target="_blank">
-        Open /participate
-      </a>
+      {snapshot ? <Columns snapshot={snapshot} /> : <Loader />}
     </main>
   );
 }
 
-/** `/demo-ui`: the room, as the host running it. */
+/**
+ * `/demo-ui`: the room, as the host running it. Config on the left, the emcee's pane in the middle,
+ * and the QR code to join on the right.
+ */
 export function DemoUi({ room }: { room: string }) {
   return (
     <RoomProvider role="host" room={room}>

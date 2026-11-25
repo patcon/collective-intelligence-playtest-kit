@@ -11,13 +11,13 @@ interface EmceePaneProps {
   onCommand: (command: RoundCommand) => void;
 }
 
-function describeConfig({ grouping, cue }: MatchConfig): string {
-  const groups = grouping.by === 'size' ? `groups of ${grouping.size}` : `${grouping.count} groups`;
-  return `Random · ${groups} · ${cue} cue`;
-}
-
 function plural(n: number, one: string, many: string): string {
   return `${n} ${n === 1 ? one : many}`;
+}
+
+function describeConfig({ grouping, cue }: MatchConfig): string {
+  const groups = grouping.by === 'size' ? `groups of ${grouping.size}` : plural(grouping.count, 'group', 'groups');
+  return `Random · ${groups} · ${cue} cue`;
 }
 
 function LobbyStatus({ progress }: { progress: RoomProgress }) {
