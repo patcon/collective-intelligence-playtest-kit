@@ -4,6 +4,7 @@ import type { ReactNode } from 'react';
 import { usePageVisibility } from '../hooks/effects/usePageVisibility.ts';
 import { useSendWhenOpen } from '../hooks/effects/useSendWhenOpen.ts';
 import { useSubscriber } from '../hooks/effects/useSubscriber.ts';
+import { socketProtocol } from './socketProtocol.ts';
 
 export type RoomStatus = 'connecting' | 'open' | 'closed';
 
@@ -30,14 +31,6 @@ interface RoomClientOptions<In> {
   agent: string;
   /** A message from the room, from raw socket text, or null to drop it. */
   parse: (raw: string) => In | null;
-}
-
-/**
- * The socket's scheme, matching the page's. PartySocket otherwise picks `ws` for private-network
- * hosts (192.168.*, 10.*), which an HTTPS page on the LAN blocks as mixed content.
- */
-function socketProtocol(): 'ws' | 'wss' {
-  return window.location.protocol === 'https:' ? 'wss' : 'ws';
 }
 
 /**

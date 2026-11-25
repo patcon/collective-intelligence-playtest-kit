@@ -7,3 +7,4 @@ export { parseJsonObject } from './parseJsonObject.ts';
 export { createRoomClient } from './room/createRoomClient.tsx';
 export type { RoomProviderProps, RoomStatus } from './room/createRoomClient.tsx';
 export { sessionId } from './room/sessionId.ts';
+export { socketProtocol } from './room/socketProtocol.ts';

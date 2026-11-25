@@ -8,6 +8,9 @@ import type { ParticipantView, RoomSnapshot } from './roomViews.ts';
 export type { MatchConfig } from './matchConfig.ts';
 export type { ParticipantView, RoomSnapshot } from './roomViews.ts';
 
+/** The room's Agent class, as the Worker exports it and clients name it. */
+export const AGENT = 'MatchRoom';
+
 /** Who a connection is: someone being matched (a phone, or a simulated one), or the demo page running the room. */
 export type Role = 'participant' | 'host';
 
