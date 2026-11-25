@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { useInterval, useWakeLock } from '@playtest-kit/common';
-import { unlockAudio } from '../lib/audio.ts';
+import { unlockAudio, useInterval, useWakeLock } from '@playtest-kit/common';
 import type { Activity, IdleSettings } from '../lib/activity.ts';
 import { createQuantizer, DEFAULT_LEVELS } from '../lib/levels.ts';
 import type { Levels } from '../lib/levels.ts';

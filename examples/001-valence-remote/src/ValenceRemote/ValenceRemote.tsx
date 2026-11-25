@@ -1,3 +1,4 @@
+import { StartScreen } from '@playtest-kit/ui';
 import type { PointerEvent, ReactNode } from 'react';
 import type { OrientationStatus } from '../hooks/effects/useDeviceOrientation.ts';
 import type { BarVariant } from './components/BarTracks.tsx';
@@ -8,7 +9,6 @@ import { DetectionBadge } from './components/DetectionBadge.tsx';
 import { FlipIllustration } from './components/FlipIllustration.tsx';
 import { inkFor } from './components/ink.ts';
 import { RemoteScreen } from './components/RemoteScreen.tsx';
-import { StartScreen } from './components/StartScreen.tsx';
 import { TouchGuides } from './components/TouchGuides.tsx';
 import { useValenceRemote } from './hooks/useValenceRemote.ts';
 import type { ValenceRemoteOptions } from './hooks/useValenceRemote.ts';
@@ -104,6 +104,7 @@ export function ValenceRemote({
   if (warning !== undefined) {
     return (
       <StartScreen
+        title="Valence remote"
         illustration={illustrate('size-32 text-kumo-subtle')}
         instruction={INSTRUCTIONS[detection]}
         onStart={remote.start}

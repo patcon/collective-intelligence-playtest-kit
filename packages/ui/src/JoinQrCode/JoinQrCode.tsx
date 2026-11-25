@@ -2,7 +2,7 @@ import { Link } from '@cloudflare/kumo';
 import type { ReactNode } from 'react';
 import { renderSVG } from 'uqr';
 
-/** A QR code and link to the remote, for phones to join from, under any options for it (`children`). */
+/** A QR code and link for phones to join from, under any options for it (`children`). */
 export function JoinQrCode({ url, children }: { url: string; children?: ReactNode }) {
   const src = `data:image/svg+xml;utf8,${encodeURIComponent(renderSVG(url))}`;
 

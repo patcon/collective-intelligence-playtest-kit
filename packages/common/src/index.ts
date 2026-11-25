@@ -1,3 +1,4 @@
+export { unlockAudio, unlockedAudio } from './audio/unlockAudio.ts';
 export { useInterval } from './hooks/effects/useInterval.ts';
 export { useOnChange } from './hooks/effects/useOnChange.ts';
 export { usePageVisibility } from './hooks/effects/usePageVisibility.ts';

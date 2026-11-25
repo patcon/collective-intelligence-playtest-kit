@@ -83,6 +83,9 @@ importers:
       '@playtest-kit/common':
         specifier: workspace:*
         version: link:../../packages/common
+      '@playtest-kit/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
       agents:
         specifier: 0.34.0
         version: 0.34.0(@babel/core@7.29.13)(@babel/runtime@8.1.3)(@modelcontextprotocol/client@2.4.0)(react@19.3.1)(rolldown@1.2.16)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.4)(yaml@2.9.1))(zod@4.6.7)
@@ -92,9 +95,6 @@ importers:
       react-dom:
         specifier: 19.3.1
         version: 19.3.1(react@19.3.1)
-      uqr:
-        specifier: 0.1.3
-        version: 0.1.3
     devDependencies:
       '@alchemy.run/cloudflare':
         specifier: 2.0.0-beta.87
@@ -196,6 +196,9 @@ importers:
       '@playtest-kit/common':
         specifier: workspace:*
         version: link:../common
+      uqr:
+        specifier: 0.1.3
+        version: 0.1.3
     devDependencies:
       '@cloudflare/kumo':
         specifier: 2.19.0

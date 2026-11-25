@@ -1,10 +1,9 @@
 import { Surface } from '@cloudflare/kumo';
+import { JoinQrCode, RoomStatusBadge } from '@playtest-kit/ui';
 import { useState } from 'react';
 import { useInterval } from '@playtest-kit/common';
-import { useRoomMessages } from '../room/client.ts';
-import { RoomStatusBadge } from '../room/RoomStatusBadge.tsx';
+import { useRoomMessages, useRoomStatus } from '../room/client.ts';
 import { CopyButton } from './components/CopyButton.tsx';
-import { JoinQrCode } from './components/JoinQrCode.tsx';
 import { RemoteOptions, remoteUrl } from './components/RemoteOptions.tsx';
 import { MessageLog } from './components/MessageLog.tsx';
 import { PhoneTable } from './components/PhoneTable.tsx';
@@ -21,6 +20,7 @@ export function ViewerDashboard({ room }: { room: string }) {
   const [log, setLog] = useState<Array<string>>([]);
   const [now, setNow] = useState(() => Date.now());
   const remote = useRemoteSettings();
+  const status = useRoomStatus();
 
   useInterval(() => setNow(Date.now()), CLOCK_MS);
 
@@ -35,7 +35,7 @@ export function ViewerDashboard({ room }: { room: string }) {
       <header className="flex items-center gap-3">
         <h1 className="text-xl font-semibold">Valence remote</h1>
         <span className="text-kumo-subtle">room “{room}”</span>
-        <RoomStatusBadge />
+        <RoomStatusBadge status={status} />
       </header>
       <div className="grid gap-4 md:grid-cols-[1fr_auto]">
         <Surface className="rounded-lg p-4">
