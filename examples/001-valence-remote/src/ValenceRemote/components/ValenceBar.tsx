@@ -17,19 +17,20 @@ const STRIP: Record<BarPosition, string> = {
 };
 
 const TRACK: Record<BarPosition, string> = {
-  left: 'relative flex w-1 flex-col-reverse',
+  left: 'relative w-1',
   top: 'relative h-1',
 };
 
-/** A tick across the bar, centred on its value and standing a little past the track. */
-const TICK: Record<BarPosition, string> = {
-  left: 'absolute left-0 h-px w-2 translate-y-1/2',
-  top: 'absolute top-0 h-2 w-px -translate-x-1/2',
+/** Both fills, stacked in the track from its negative end. */
+const FILL: Record<BarPosition, string> = {
+  left: 'absolute inset-x-0 bottom-0 transition-[height]',
+  top: 'absolute inset-y-0 left-0 transition-[width]',
 };
 
-const FILL: Record<BarPosition, string> = {
-  left: 'w-full transition-[height]',
-  top: 'h-full transition-[width]',
+/** A stretch of the track between two valences. */
+const SPAN: Record<BarPosition, string> = {
+  left: 'absolute inset-x-0',
+  top: 'absolute inset-y-0',
 };
 
 /**
@@ -55,38 +56,45 @@ interface ValenceBarProps {
   position?: BarPosition;
   /** Words beside the bar's ends (and middle), or none. */
   labels?: AxisLabels | null;
-  /** Valences to mark with a tick, as the levels a coarse remote sends. */
-  ticks?: ReadonlyArray<number>;
+  /** The valence snapped to the levels sent, for the bright fill; `valence` when not given. */
+  snapped?: number | null;
 }
 
-function shareOf(valence: number): string {
-  return `${((valence + 1) / 2) * 100}%`;
+/** How far along the track a valence reaches, as a percentage; none with no valence. */
+function shareOf(valence: number | null): number {
+  return valence === null ? 0 : ((valence + 1) / 2) * 100;
+}
+
+function extent(position: BarPosition, valence: number | null) {
+  const share = `${shareOf(valence)}%`;
+  return position === 'top' ? { width: share } : { height: share };
+}
+
+/** The stretch of the track from `from` up to `to`. */
+function span(position: BarPosition, from: number, to: number) {
+  const start = `${shareOf(from)}%`;
+  const length = `${shareOf(to) - shareOf(from)}%`;
+  return position === 'top' ? { left: start, width: length } : { bottom: start, height: length };
 }
 
 /**
  * A thin line along one edge, like an article's reading progress: filled as far as the valence
- * goes, empty at −1 and full at +1, with any ticks across it and labels beside it. Empty with no valence.
+ * goes, empty at −1 and full at +1, with any labels beside it. Empty with no valence. The bright
+ * fill snaps to the level sent; the raw reading shows as a fainter fill past it, or as a shade
+ * over its end where the reading falls short of it.
  */
-export function ValenceBar({ valence, idle = false, position = 'top', labels, ticks = [] }: ValenceBarProps) {
+export function ValenceBar({ valence, snapped = valence, idle = false, position = 'top', labels }: ValenceBarProps) {
   const ink = inkFor(idle);
-  const share = shareOf(valence ?? -1);
   // Fades only into no valence, as the screen does, so it otherwise keeps up with the reading.
   const fade = valence === null ? 'duration-300' : 'duration-0';
+  const shortfall = valence !== null && snapped !== null && valence < snapped;
 
   return (
     <div aria-hidden className={`pointer-events-none absolute ${ink.shadow} ${STRIP[position]}`}>
       <div className={`${ink.track} ${TRACK[position]}`}>
-        <div
-          className={`${ink.fill} ${FILL[position]} ${fade}`}
-          style={position === 'top' ? { width: share } : { height: share }}
-        />
-        {ticks.map((tick) => (
-          <div
-            className={`${ink.fill} ${TICK[position]}`}
-            key={tick}
-            style={position === 'top' ? { left: shareOf(tick) } : { bottom: shareOf(tick) }}
-          />
-        ))}
+        <div className={`${ink.dimFill} ${FILL[position]} ${fade}`} style={extent(position, valence)} />
+        <div className={`${ink.fill} ${FILL[position]} ${fade}`} style={extent(position, snapped)} />
+        {shortfall && <div className={`${ink.shortfall} ${SPAN[position]}`} style={span(position, valence, snapped)} />}
       </div>
       {labels && (
         <div className={`text-xs/4 font-medium ${ink.text} ${LABELS[position]}`}>

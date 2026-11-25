@@ -7,9 +7,6 @@ export type Levels = number | null;
 /** Steps of 0.01: as fine as a bar or a readout can show. */
 export const DEFAULT_LEVELS = 201;
 
-/** At most this many levels get tick marks on the bar; finer ones would only blur it. */
-export const MAX_TICKED_LEVELS = 11;
-
 /** How far past the edge between two levels a reading must go to move to the next, as a share of a step. */
 export const HYSTERESIS = 0.25;
 
@@ -37,11 +34,6 @@ export function levelsToParam(levels: Levels): string {
 /** Each level's value, low to high. */
 export function levelValues(levels: number): Array<number> {
   return Array.from({ length: levels }, (_, i) => clean(-1 + (2 * i) / (levels - 1)));
-}
-
-/** Where the bar gets tick marks: each level between the ends, when there are few enough to mark. */
-export function tickValues(levels: Levels): Array<number> {
-  return levels !== null && levels <= MAX_TICKED_LEVELS ? levelValues(levels).slice(1, -1) : [];
 }
 
 /** Strips float noise (−0.7000000000000001), so only the digits a level needs go on the wire. */

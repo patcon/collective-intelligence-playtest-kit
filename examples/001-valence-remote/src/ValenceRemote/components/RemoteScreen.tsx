@@ -8,14 +8,14 @@ import type { BarPosition } from './ValenceBar.tsx';
 
 interface RemoteScreenProps {
   valence: number | null;
+  /** The valence snapped to the levels sent, for the bar's bright fill; `valence` when not given. */
+  snapped?: number | null;
   /** Show the valence as a number in the middle. */
   showNumeric?: boolean;
   /** Which edge the valence bar runs along. */
   barPosition?: BarPosition;
   /** Words beside the bar's ends (and middle), or none. */
   axisLabels?: AxisLabels | null;
-  /** Valences to mark on the bar (see `tickValues`). */
-  ticks?: ReadonlyArray<number>;
   /** Fill with the idle colour (see `valenceColor`). */
   idle?: boolean;
   instruction: string;
@@ -64,10 +64,10 @@ function share(event: PointerEvent<HTMLDivElement>): number {
  */
 export function RemoteScreen({
   valence,
+  snapped = valence,
   showNumeric = false,
   barPosition = 'top',
   axisLabels,
-  ticks,
   idle = false,
   instruction,
   illustration,
@@ -95,7 +95,7 @@ export function RemoteScreen({
       onPointerUp={onRelease}
       style={{ backgroundColor: valenceColor(valence, idle) }}
     >
-      <ValenceBar idle={idle} labels={axisLabels} position={barPosition} ticks={ticks} valence={valence} />
+      <ValenceBar idle={idle} labels={axisLabels} position={barPosition} snapped={snapped} valence={valence} />
       {children}
       {badges && (
         <div className={`pointer-events-none absolute top-0 left-0 p-4 ${BADGES_INSET[clearance]}`}>

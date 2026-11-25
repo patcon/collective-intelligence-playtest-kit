@@ -6,6 +6,10 @@ export interface Ink {
   track: string;
   /** A filled bar. */
   fill: string;
+  /** A fainter fill under `fill`, as a bar's raw reading where it runs past what it snaps to. */
+  dimFill: string;
+  /** A shade over the end of `fill`, where a bar's raw reading falls short of what it snaps to. */
+  shortfall: string;
   /** A dashed or secondary line. */
   line: string;
   /** The line that matters most, as where a finger is. */
@@ -16,7 +20,9 @@ export interface Ink {
 }
 
 const LIGHT: Ink = {
-  fill: 'bg-white/70',
+  dimFill: 'bg-white/35',
+  fill: 'bg-white/90',
+  shortfall: 'bg-black/30',
   picture: 'text-white/45',
   line: 'border-white/70',
   shadow: 'drop-shadow-[0_1px_1px_rgb(0_0_0/0.3)]',
@@ -26,7 +32,9 @@ const LIGHT: Ink = {
 };
 
 const DARK: Ink = {
-  fill: 'bg-black/60',
+  dimFill: 'bg-black/25',
+  fill: 'bg-black/70',
+  shortfall: 'bg-white/35',
   picture: 'text-black/40',
   line: 'border-black/50',
   shadow: '',

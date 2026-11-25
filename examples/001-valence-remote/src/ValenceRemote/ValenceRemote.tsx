@@ -11,7 +11,6 @@ import { TouchGuides } from './components/TouchGuides.tsx';
 import { useValenceRemote } from './hooks/useValenceRemote.ts';
 import type { ValenceRemoteOptions } from './hooks/useValenceRemote.ts';
 import { flipInstruction, INSTRUCTIONS, ORIENTATION_NOTES } from './lib/instructions.ts';
-import { DEFAULT_LEVELS, tickValues } from './lib/levels.ts';
 import type { Detection } from './lib/valence.ts';
 
 export interface ValenceRemoteProps extends Partial<ValenceRemoteOptions> {
@@ -110,7 +109,7 @@ export function ValenceRemote({
       idle={idle}
       illustration={illustrate(`size-40 ${inkFor(idle).picture}`)}
       instruction={INSTRUCTIONS[detection]}
-      ticks={tickValues(options.levels === undefined ? DEFAULT_LEVELS : options.levels)}
+      snapped={remote.snapped}
       notes={notesFor(touch, remote.tilt.status, remote.wakeLockLost)}
       onPointer={touch ? onPointer : undefined}
       onRelease={touch ? remote.touch.release : undefined}

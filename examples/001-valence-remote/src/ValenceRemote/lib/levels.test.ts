@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createQuantizer, levelsFromParam, levelValues, tickValues } from './levels.ts';
+import { createQuantizer, levelsFromParam, levelValues } from './levels.ts';
 
 describe('createQuantizer', () => {
   it('snaps to {−1, 0, +1} with 3 levels', () => {
@@ -53,14 +53,5 @@ describe('levelsFromParam', () => {
     expect(levelsFromParam('1')).toBeUndefined();
     expect(levelsFromParam('2.5')).toBeUndefined();
     expect(levelsFromParam(null)).toBeUndefined();
-  });
-});
-
-describe('tickValues', () => {
-  it('marks the levels between the ends, only when coarse', () => {
-    expect(tickValues(3)).toEqual([0]);
-    expect(tickValues(2)).toEqual([]);
-    expect(tickValues(201)).toEqual([]);
-    expect(tickValues(null)).toEqual([]);
   });
 });

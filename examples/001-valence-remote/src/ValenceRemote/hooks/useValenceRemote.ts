@@ -37,6 +37,8 @@ export interface ValenceRemoteState {
   prepare: (next: Detection) => void;
   /** The current detection's valence, unthrottled and unsnapped, so what shows it moves smoothly; null when it can't tell. */
   valence: Valence;
+  /** `valence` snapped to `levels`, as it's sent (unthrottled). */
+  snapped: Valence;
   activity: Activity;
   /** Every tilt detection at once, read whenever started and not in touch mode. */
   tilt: Tilt;
@@ -57,6 +59,7 @@ export function useValenceRemote({
 }: ValenceRemoteOptions): ValenceRemoteState {
   const [started, setStarted] = useState(false);
   const [valence, setValence] = useState<Valence>(null);
+  const [snapped, setSnapped] = useState<Valence>(null);
   const [touchY, setTouchY] = useState<number | null>(null);
   const [sender] = useState(createSender);
   const [quantizer, setQuantizer] = useState(() => ({ levels, quantize: createQuantizer(levels) }));
@@ -74,8 +77,10 @@ export function useValenceRemote({
   };
 
   const report = (v: Valence) => {
+    const out = quantizer.quantize(v);
     setValence(v);
-    emit(sender.update(quantizer.quantize(v), performance.now()));
+    setSnapped(out);
+    emit(sender.update(out, performance.now()));
   };
 
   const tilt = useTilt(started && !isTouch, (up, readings) => {
@@ -131,6 +136,7 @@ export function useValenceRemote({
   return {
     activity,
     prepare,
+    snapped,
     start,
     started,
     tilt,
