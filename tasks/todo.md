@@ -25,12 +25,12 @@ Move `001`'s private `readMessage` into `common` as `parseJsonObject` (with a te
 Worker bundle all have to resolve the package.
 
 **Acceptance criteria:**
-- [ ] `parseJsonObject` returns an object, or `null` for invalid JSON and non-objects (tested).
-- [ ] `001`'s protocol and its Worker both use it. `001` has no `readMessage` left.
+- [x] `parseJsonObject` returns an object, or `null` for invalid JSON and non-objects (tested).
+- [x] `001`'s protocol and its Worker both use it. `001` has no `readMessage` left.
 
 **Verification:**
-- [ ] `pnpm --filter @playtest-kit/common test`, then `pnpm --filter 001-valence-remote test build typecheck`.
-- [ ] `pnpm --filter 001-valence-remote preview`: a phone tab streams valence to the viewer.
+- [x] `pnpm --filter @playtest-kit/common test`, then `pnpm --filter 001-valence-remote test build typecheck`.
+- [x] `pnpm --filter 001-valence-remote preview`: a phone tab streams valence to the viewer.
 
 **Dependencies:** None
 **Files:** `packages/common/{package.json,tsconfig.json,oxlint.config.ts,README.md,src/index.ts,src/server.ts,src/parseJsonObject.ts,src/parseJsonObject.test.ts}`, `examples/001-valence-remote/{package.json,src/room/protocol.ts}`
@@ -42,12 +42,12 @@ Worker bundle all have to resolve the package.
 `toViewers` loop.
 
 **Acceptance criteria:**
-- [ ] Both helpers are typed over a role union and tested with fake connections.
-- [ ] `ValenceRoom` behaves the same: viewers still get joined, left, valence and settings messages.
+- [x] Both helpers are typed over a role union and tested with fake connections.
+- [x] `ValenceRoom` behaves the same: viewers still get joined, left, valence and settings messages.
 
 **Verification:**
-- [ ] `pnpm --filter @playtest-kit/common test`. `001` builds.
-- [ ] Manual check with `preview`: a viewer that opens after a phone sees that phone (catch-up).
+- [x] `pnpm --filter @playtest-kit/common test`. `001` builds.
+- [x] Manual check with `preview`: a viewer that opens after a phone sees that phone (catch-up).
 
 **Dependencies:** 1
 **Files:** `packages/common/src/server/connections.ts` (+test), `common/src/server.ts`, `001/worker/ValenceRoom.ts`
@@ -63,11 +63,11 @@ Worker bundle all have to resolve the package.
 - `useLatestRef` and `useThreeScene` stay in `ui`, because only `ui` uses them.
 
 **Acceptance criteria:**
-- [ ] There is one copy of each hook in the repo.
-- [ ] EmbeddingViewer and `001` import them from `@playtest-kit/common`.
+- [x] There is one copy of each hook in the repo.
+- [x] EmbeddingViewer and `001` import them from `@playtest-kit/common`.
 
 **Verification:**
-- [ ] `pnpm --filter @playtest-kit/ui test:unit test:stories`. `001` test and build pass. `pnpm lint` passes, including the effects-folder rule in `common`.
+- [x] `pnpm --filter @playtest-kit/ui test:unit test:stories`. `001` test and build pass. `pnpm lint` passes, including the effects-folder rule in `common`.
 
 **Dependencies:** 1
 **Files:** `common/src/hooks/effects/*` (4), `common/src/index.ts`, `ui/{package.json,src/EmbeddingViewer/EmbeddingViewer.tsx,src/hooks/effects/*}`, `001/src/**` imports
@@ -84,14 +84,14 @@ Worker bundle all have to resolve the package.
 and deletes `RoomProvider.tsx` and the two hooks.
 
 **Acceptance criteria:**
-- [ ] `001` keeps the same connection behaviour: reconnects with the same id after the tab is hidden, and
+- [x] `001` keeps the same connection behaviour: reconnects with the same id after the tab is hidden, and
   uses `wss` on HTTPS LAN.
-- [ ] Hooks are fully typed. A wrong message type is a type error in `001`.
-- [ ] `sessionId` is stable across calls and falls back when storage throws (tested).
+- [x] Hooks are fully typed. A wrong message type is a type error in `001`.
+- [x] `sessionId` is stable across calls and falls back when storage throws (tested).
 
 **Verification:**
-- [ ] `common` and `001` tests pass, and the build passes.
-- [ ] Manual check with `preview`: hide and show a phone tab, and it leaves then rejoins on the viewer.
+- [x] `common` and `001` tests pass, and the build passes.
+- [x] Manual check with `preview`: hide and show a phone tab, and it leaves then rejoins on the viewer.
 
 **Dependencies:** 3
 **Files:** `common/src/room/{createRoomClient.tsx,sessionId.ts,sessionId.test.ts}`, `common/src/hooks/effects/{useRoomMessages,useSendOnOpen}.ts` (or kept inside the factory file if lint allows), `001/src/room/client.ts`, `001` pages and dashboard imports
@@ -107,26 +107,26 @@ and deletes `RoomProvider.tsx` and the two hooks.
 Move `unlockAudio` and `unlockedAudio` into `common/src/audio/`. Export them all, and have `001` use them.
 
 **Acceptance criteria:**
-- [ ] `001`'s start screen, QR panel and badge look and behave as before. Its title is passed in as a prop.
-- [ ] Each component has a story that passes `test:stories`.
+- [x] `001`'s start screen, QR panel and badge look and behave as before. Its title is passed in as a prop.
+- [x] Each component has a story that passes `test:stories`.
 
 **Verification:**
-- [ ] `ui` `test:stories` passes. `001` build passes.
-- [ ] Visual check with `agent-browser` on `001`'s `/` and `/remote`: screenshots match before and after.
+- [x] `ui` `test:stories` passes. `001` build passes.
+- [x] Visual check with `agent-browser` on `001`'s `/` and `/remote`: screenshots match before and after.
 
 **Dependencies:** 4
 **Files:** `ui/src/{StartScreen,JoinQrCode,RoomStatusBadge}/*` (component + story each), `ui/src/index.ts`, `ui/package.json`, `common/src/audio/unlockAudio.ts`, `001` imports and deletions
 **Scope:** M–L. If it runs long, split it into 5a (StartScreen + audio) and 5b (QR + badge).
 
 ### ✅ Checkpoint A: `001` on the shared framework
-- [ ] `pnpm lint && pnpm typecheck`. All tests in `common`, `ui` and `001` pass. `001` builds.
+- [x] `pnpm lint && pnpm typecheck`. All tests in `common`, `ui` and `001` pass. `001` builds.
 - [ ] `001` manual regression with `preview` (+ `preview:lan` on a real phone):
   - a phone joins
   - valence streams to the viewer
   - viewer settings apply live
   - hidden/shown reconnect works
   - the QR code opens `/remote`
-- [ ] No duplicated copies left (`grep` for the old file names).
+- [x] No duplicated copies left (`grep` for the old file names).
 - [ ] **Your review before Phase 2.** Commit at this point.
 
 ---
