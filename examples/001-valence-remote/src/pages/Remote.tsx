@@ -4,7 +4,6 @@ import { useSendOnOpen } from '../hooks/effects/useSendOnOpen.ts';
 import { RoomProvider, useRoomSend, useRoomStatus } from '../room/RoomProvider.tsx';
 import type { RemoteSettings } from '../room/remoteSettings.ts';
 import { RoomStatusBadge } from '../room/RoomStatusBadge.tsx';
-import { DetectionBadge } from '../ValenceRemote/components/DetectionBadge.tsx';
 import { ValenceRemote } from '../ValenceRemote/ValenceRemote.tsx';
 import type { Activity, IdleSettings } from '../ValenceRemote/lib/activity.ts';
 import { isDetection } from '../ValenceRemote/lib/valence.ts';
@@ -59,10 +58,8 @@ function ConnectedRemote() {
   return (
     <ValenceRemote
       badges={connected ? null : <RoomStatusBadge />}
-      controls={settings.allowSelection && <DetectionBadge onChange={setPicked} value={detection} />}
       detection={detection}
-      // Switching to or from touch starts over at the start screen, whose tap tilt needs to ask for motion access.
-      key={detection === 'touch' ? 'touch' : 'tilt'}
+      onPickDetection={settings.allowSelection ? setPicked : undefined}
       tintWhenIdle={settings.tintWhenIdle}
       idle={idleFromUrl()}
       onActivity={setActivity}
@@ -74,8 +71,8 @@ function ConnectedRemote() {
 /**
  * `/remote`: this device as a phone in the room. `?detection=` picks the mode (default `flip`);
  * `?idleMs=` and `?stillDeg=` override when it counts as idle (see DEFAULT_IDLE); `?tintWhenIdle`
- * tints the screen while idle; `?allowSelection` shows a mode badge on the running screen, tapped to change mode. Once a
- * viewer sets the room's settings, they override these three, live. While selection is allowed,
+ * tints the screen while idle; `?allowSelection` shows a badge on the running screen that cycles through
+ * the modes. Once a viewer sets the room's settings, they override these three, live. While selection is allowed,
  * the holder's pick overrides the detection.
  */
 export function Remote({ room }: { room: string }) {

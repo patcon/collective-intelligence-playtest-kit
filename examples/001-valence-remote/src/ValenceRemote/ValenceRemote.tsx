@@ -4,6 +4,7 @@ import { useDeviceOrientation } from '../hooks/effects/useDeviceOrientation.ts';
 import type { OrientationStatus } from '../hooks/effects/useDeviceOrientation.ts';
 import { useInterval } from '../hooks/effects/useInterval.ts';
 import { useWakeLock } from '../hooks/effects/useWakeLock.ts';
+import { DetectionBadge } from './components/DetectionBadge.tsx';
 import { RemoteScreen } from './components/RemoteScreen.tsx';
 import { StartScreen } from './components/StartScreen.tsx';
 import { TouchGuides } from './components/TouchGuides.tsx';
@@ -30,8 +31,11 @@ export interface ValenceRemoteProps {
   keepAwake?: boolean;
   /** Badges for the running screen's top-left corner (e.g. the connection), or none. */
   badges?: ReactNode;
-  /** Controls for the running screen's top-right corner (e.g. a mode picker), or none. */
-  controls?: ReactNode;
+  /**
+   * Called with the next detection when the holder taps the mode badge, top right of the running
+   * screen. Without it there's no badge. The new detection takes effect once passed back in.
+   */
+  onPickDetection?: (detection: Detection) => void;
 }
 
 const START_WARNINGS: Partial<Record<OrientationStatus, string>> = {
@@ -53,7 +57,7 @@ export function ValenceRemote({
   detection = 'flip',
   keepAwake = true,
   badges,
-  controls,
+  onPickDetection,
 }: ValenceRemoteProps) {
   const [started, setStarted] = useState(false);
   const [valence, setValence] = useState<Valence>(null);
@@ -84,13 +88,24 @@ export function ValenceRemote({
 
   useInterval(() => emit(sender.flush(performance.now())), SEND_MS, started);
 
-  const start = () => {
-    if (!touch) {
+  /** Starts reading in a mode, from a tap: tilt asks for motion access, which iOS only allows from one. */
+  const begin = (next: Detection) => {
+    if (next !== 'touch') {
       void orientation.requestPermission();
       tracker.poke(performance.now());
     }
-    setStarted(true);
+    setFingerY(null);
     report(null);
+  };
+
+  const start = () => {
+    begin(detection);
+    setStarted(true);
+  };
+
+  const pick = (next: Detection) => {
+    begin(next);
+    onPickDetection?.(next);
   };
 
   const onPointer = (y: number, event: PointerEvent<HTMLDivElement>) => {
@@ -101,7 +116,8 @@ export function ValenceRemote({
     }
   };
 
-  if (!started) {
+  // Also back to the start screen when switched to tilt (by a prop) before motion access was asked for.
+  if (!started || (!touch && orientation.status === 'needs-permission')) {
     const warning = touch ? null : (START_WARNINGS[orientation.status] ?? null);
     return <StartScreen instruction={INSTRUCTIONS[detection]} onStart={start} warning={warning} />;
   }
@@ -110,7 +126,7 @@ export function ValenceRemote({
   return (
     <RemoteScreen
       badges={badges}
-      controls={controls}
+      controls={onPickDetection && <DetectionBadge onChange={pick} value={detection} />}
       idle={tintWhenIdle && activity === 'idle'}
       instruction={INSTRUCTIONS[detection]}
       notes={notesFor(touch, orientation.status, wakeLockLost)}
