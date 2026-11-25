@@ -47,10 +47,13 @@ export function RemoteScreen({
   children,
 }: RemoteScreenProps) {
   const handle = (event: PointerEvent<HTMLDivElement>) => onPointer?.(share(event), event);
+  // Fades only into no valence or idle: CSS takes the transition from the new state, so the colour
+  // still follows a moving finger or tilt at once.
+  const fade = valence === null || idle ? 'transition-colors duration-300' : '';
 
   return (
     <div
-      className="fixed inset-0 touch-none text-white select-none"
+      className={`fixed inset-0 touch-none text-white select-none ${fade}`}
       data-testid="valence-remote"
       onContextMenu={(event) => event.preventDefault()}
       onPointerDown={handle}
