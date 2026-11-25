@@ -1,7 +1,7 @@
 import { Surface } from '@cloudflare/kumo';
 import { useState } from 'react';
 import { useInterval } from '@playtest-kit/common';
-import { useRoomMessages } from '../hooks/effects/useRoomMessages.ts';
+import { useRoomMessages } from '../room/client.ts';
 import { RoomStatusBadge } from '../room/RoomStatusBadge.tsx';
 import { CopyButton } from './components/CopyButton.tsx';
 import { JoinQrCode } from './components/JoinQrCode.tsx';

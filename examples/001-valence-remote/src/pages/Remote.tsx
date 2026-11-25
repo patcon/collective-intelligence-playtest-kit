@@ -1,7 +1,5 @@
 import { useState } from 'react';
-import { useRoomMessages } from '../hooks/effects/useRoomMessages.ts';
-import { useSendOnOpen } from '../hooks/effects/useSendOnOpen.ts';
-import { RoomProvider, useRoomStatus } from '../room/RoomProvider.tsx';
+import { RoomProvider, useRoomMessages, useRoomStatus, useSendOnOpen } from '../room/client.ts';
 import type { RemoteSettings } from '../room/remoteSettings.ts';
 import { RoomStatusBadge } from '../room/RoomStatusBadge.tsx';
 import { isBarVariant } from '../ValenceRemote/components/BarTracks.tsx';
@@ -115,7 +113,7 @@ function ConnectedRemote() {
  */
 export function Remote({ room }: { room: string }) {
   return (
-    <RoomProvider role="phone" room={room}>
+    <RoomProvider closeWhenHidden role="phone" room={room}>
       <ConnectedRemote />
     </RoomProvider>
   );

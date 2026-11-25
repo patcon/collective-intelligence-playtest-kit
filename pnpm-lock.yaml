@@ -147,6 +147,9 @@ importers:
       '@types/react':
         specifier: 19.3.0
         version: 19.3.0
+      agents:
+        specifier: 0.34.0
+        version: 0.34.0(@babel/core@7.29.13)(@babel/runtime@8.1.3)(@modelcontextprotocol/client@2.4.0)(react@19.3.1)(rolldown@1.2.19)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.4)(yaml@2.9.1))(zod@4.6.7)
       oxlint:
         specifier: 1.94.0
         version: 1.94.0
@@ -7149,6 +7152,15 @@ snapshots:
       '@babel/runtime': 8.1.3
       vite: 8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.4)(yaml@2.9.1)
 
+  '@rolldown/plugin-babel@0.2.4(@babel/core@7.29.13)(@babel/runtime@8.1.3)(rolldown@1.2.19)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.4)(yaml@2.9.1))':
+    dependencies:
+      '@babel/core': 7.29.13
+      picomatch: 4.0.7
+      rolldown: 1.2.19
+    optionalDependencies:
+      '@babel/runtime': 8.1.3
+      vite: 8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.4)(yaml@2.9.1)
+
   '@rolldown/plugin-babel@0.3.1(@babel/core@7.29.13)(@babel/runtime@8.1.3)(rolldown@1.2.19)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.4)(yaml@2.9.1))':
     dependencies:
       '@babel/core': 7.29.13
@@ -7863,6 +7875,30 @@ snapshots:
       '@modelcontextprotocol/client': 2.4.0
       '@opentelemetry/api': 1.10.0
       '@rolldown/plugin-babel': 0.2.4(@babel/core@7.29.13)(@babel/runtime@8.1.3)(rolldown@1.2.16)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.4)(yaml@2.9.1))
+      capnweb: 0.12.0
+      cron-schedule: 6.0.0
+      mimetext: 3.0.28
+      nanoid: 5.1.16
+      partysocket: 1.3.0(react@19.3.1)
+      postal-mime: 2.7.6
+      yaml: 2.9.1
+      zod: 4.6.7
+    optionalDependencies:
+      react: 19.3.1
+      vite: 8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.4)(yaml@2.9.1)
+    transitivePeerDependencies:
+      - '@babel/core'
+      - '@babel/plugin-transform-runtime'
+      - '@babel/runtime'
+      - rolldown
+
+  agents@0.34.0(@babel/core@7.29.13)(@babel/runtime@8.1.3)(@modelcontextprotocol/client@2.4.0)(react@19.3.1)(rolldown@1.2.19)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.4)(yaml@2.9.1))(zod@4.6.7):
+    dependencies:
+      '@babel/plugin-proposal-decorators': 8.0.2(@babel/core@7.29.13)
+      '@cfworker/json-schema': 4.1.6
+      '@modelcontextprotocol/client': 2.4.0
+      '@opentelemetry/api': 1.10.0
+      '@rolldown/plugin-babel': 0.2.4(@babel/core@7.29.13)(@babel/runtime@8.1.3)(rolldown@1.2.19)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.4)(yaml@2.9.1))
       capnweb: 0.12.0
       cron-schedule: 6.0.0
       mimetext: 3.0.28

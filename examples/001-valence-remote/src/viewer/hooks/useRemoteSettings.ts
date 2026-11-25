@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { useRoomMessages } from '../../hooks/effects/useRoomMessages.ts';
-import { useRoomSend } from '../../room/RoomProvider.tsx';
+import { useRoomMessages, useRoomSend } from '../../room/client.ts';
 import { DEFAULT_REMOTE_SETTINGS } from '../../room/remoteSettings.ts';
 import type { RemoteSettings } from '../../room/remoteSettings.ts';
 

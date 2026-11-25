@@ -1,6 +1,6 @@
 import { Badge } from '@cloudflare/kumo';
-import { useRoomStatus } from './RoomProvider.tsx';
-import type { RoomStatus } from './RoomProvider.tsx';
+import type { RoomStatus } from '@playtest-kit/common';
+import { useRoomStatus } from './client.ts';
 
 const STATUS_BADGE: Record<RoomStatus, { label: string; variant: 'success' | 'warning' | 'error' }> = {
   closed: { label: 'reconnecting', variant: 'error' },

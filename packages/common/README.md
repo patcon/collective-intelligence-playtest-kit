@@ -16,6 +16,8 @@ Published as TypeScript source (no build step), like `ui`.
 | Name | What it does |
 | --- | --- |
 | `parseJsonObject(raw)` | Socket text as a JSON object, or `null`. Assign it to an interface of `unknown` fields, then validate them. |
+| `createRoomClient<In, Out>({ agent, parse })` | A typed `RoomProvider` (room, role, optional fixed `id`, `closeWhenHidden`) and `useRoomMessages`, `useRoomSend`, `useRoomStatus`, `useSendOnOpen` for one Agent and protocol. Call it once per example, at module level. |
+| `sessionId(key)` | A per-tab id kept in `sessionStorage`, so a reload rejoins as the same connection. |
 | `useInterval`, `useOnChange`, `usePageVisibility`, `useWakeLock` | Effect hooks, each in `src/hooks/effects/` (the only place lint allows effects). |
 | `roleFromUrl`, `roleOf`, `sendToRole` (`/server`) | Read a connection's role from `?role=` and its tags; send JSON to every connection with a role. |
 

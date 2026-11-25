@@ -16,6 +16,7 @@
   "devDependencies": {
     "@playtest-kit/config": "workspace:*",
     "@types/react": "19.3.0",
+    "agents": "0.34.0",
     "oxlint": "1.94.0",
     "react": "19.3.1",
     "tsrs": "0.25.0-ts7.1.0-beta",
@@ -23,6 +24,7 @@
     "vitest": "5.1.0"
   },
   "peerDependencies": {
+    "agents": "0.34.0",
     "react": "19.3.1"
   }
 }

@@ -1,4 +1,4 @@
-import { RoomProvider } from '../room/RoomProvider.tsx';
+import { RoomProvider } from '../room/client.ts';
 import { ViewerDashboard } from '../viewer/ViewerDashboard.tsx';
 
 /** `/`: watches what every phone in the room sends. */
