@@ -301,9 +301,9 @@ Add a temporary set of host buttons (Start, Move on, Reset) on `/demo-ui` so a r
 - Nothing outside `src/simulation/` is imported except `room/protocol.ts` and `room/client.ts` types.
 
 **Acceptance criteria:**
-- [ ] With 20 sims, a round makes the right groups (criterion 3, now live).
-- [ ] Removing sims mid-round updates the counts (criterion 9).
-- [ ] The Worker and `MatchRoom` contain no simulation code (`grep`).
+- [x] With 20 sims, a round makes the right groups (criterion 3, now live).
+- [x] Removing sims mid-round updates the counts (criterion 9).
+- [x] The Worker and `MatchRoom` contain no simulation code (`grep`).
 
 **Verification:** Unit test the auto-confirm delay logic with fake timers. Run `agent-browser` with 20 sims, by size 3.
 **Dependencies:** 12
@@ -322,8 +322,8 @@ shows:
 - the simulation controls (count stepper, auto-confirm) above the cards
 
 **Acceptance criteria:**
-- [ ] Real and simulated participants appear the same way, apart from the badge and button.
-- [ ] Manual "found them" on a sim card updates every view.
+- [x] Real and simulated participants appear the same way, apart from the badge and button.
+- [x] Manual "found them" on a sim card updates every view.
 
 **Verification:** `agent-browser`: 12 sims and 1 real tab. Screenshot.
 **Dependencies:** 13
@@ -331,8 +331,8 @@ shows:
 **Scope:** S–M
 
 ### ✅ Checkpoint C: 20-sim round
-- [ ] Criteria 1–9 pass in `agent-browser`, using 20 sims plus 1 participant tab, grouped by size 2, size 3 and count 4.
-- [ ] All tests pass, and lint, typecheck and build pass. Commit, and your review.
+- [x] Criteria 1–9 pass in `agent-browser`, using 20 sims plus 1 participant tab, grouped by size 2, size 3 and count 4.
+- [x] All tests pass, and lint, typecheck and build pass. Commit, and your review.
 
 ---
 

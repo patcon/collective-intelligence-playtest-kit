@@ -210,7 +210,8 @@ Ship order inside this module: `colour` → `avatar` → `birdsong`.
   - Each `SimulatedParticipant` is a headless `AgentClient` with `role=participant`. It sends `ready`
     straight away and, if auto-confirm is on, sends `found` 2–8 s after it is matched.
   - The cards show a short name ("Sim 3"), their status badge, a small preview of their cue, and a
-    "found them" button.
+    "found them" button. They're drawn from the host snapshot by `demo/ParticipantCards.tsx`, not in
+    `src/simulation/`, since they render cues and show real phones too.
   - Real participants also appear in the host snapshot, so they get cards too, with a "phone" badge and
     no button.
 
