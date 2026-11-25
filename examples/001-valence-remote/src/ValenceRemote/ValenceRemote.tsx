@@ -9,6 +9,7 @@ import { RemoteScreen } from './components/RemoteScreen.tsx';
 import { StartScreen } from './components/StartScreen.tsx';
 import { TouchGuides } from './components/TouchGuides.tsx';
 import { useActivity } from './hooks/useActivity.ts';
+import { unlockAudio } from './lib/audio.ts';
 import type { Activity, IdleSettings } from './lib/activity.ts';
 import { INSTRUCTIONS, ORIENTATION_NOTES } from './lib/instructions.ts';
 import { createSender, SEND_MS } from './lib/sender.ts';
@@ -105,22 +106,32 @@ export function ValenceRemote({
 
   useInterval(() => emit(sender.flush(performance.now())), SEND_MS, started);
 
-  /** Starts reading in a mode, from a tap: tilt asks for motion access, which iOS only allows from one. */
+  /** Starts reading afresh in a mode; tilt counts as active for a moment while readings arrive. */
   const begin = (next: Detection) => {
     if (next !== 'touch') {
-      void orientation.requestPermission();
       tracker.poke(performance.now());
     }
     setFingerY(null);
     report(null);
   };
 
+  /**
+   * The start tap is the one gesture every mode gets, so it asks for everything the remote may need
+   * later, whatever the mode: motion access (so a switch to tilt needn't come back here) and audio.
+   * iOS only allows either from a tap.
+   */
   const start = () => {
+    void orientation.requestPermission();
+    unlockAudio();
     begin(detection);
     setStarted(true);
   };
 
+  /** A tap on the mode badge. Asking again for motion access is a no-op once granted. */
   const pick = (next: Detection) => {
+    if (next !== 'touch') {
+      void orientation.requestPermission();
+    }
     begin(next);
     onPickDetection?.(next);
   };
