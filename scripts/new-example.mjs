@@ -39,7 +39,7 @@ cpSync(templateDir, targetDir, {
   recursive: true,
 });
 
-for (const file of ['package.json', 'index.html', 'src/App.tsx', 'alchemy.run.ts']) {
+for (const file of ['package.json', 'index.html', 'src/App.tsx', 'src/counter/SharedCounter.tsx', 'alchemy.run.ts', 'vite.config.ts']) {
   const path = join(targetDir, file);
   if (existsSync(path)) {
     writeFileSync(path, readFileSync(path, 'utf8').replaceAll(templateName, name));

@@ -4,6 +4,7 @@
     "src",
     "vite.config.ts",
     "oxlint.config.ts",
-    "alchemy.run.ts"
+    "alchemy.run.ts",
+    "port.ts"
   ]
 }
