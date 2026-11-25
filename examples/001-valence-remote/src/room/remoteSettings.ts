@@ -9,7 +9,7 @@ export interface RemoteSettings {
   allowSelection: boolean;
 }
 
-export const DEFAULT_REMOTE_SETTINGS: RemoteSettings = { allowSelection: false, detection: 'flip', tintWhenIdle: false };
+export const DEFAULT_REMOTE_SETTINGS: RemoteSettings = { allowSelection: false, detection: 'flip', tintWhenIdle: true };
 
 export function isRemoteSettings(value: unknown): value is RemoteSettings {
   return (

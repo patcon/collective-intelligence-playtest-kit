@@ -7,8 +7,8 @@ import type { RemoteSettingsControl } from '../hooks/useRemoteSettings.ts';
 /** The remote's URL with `settings` as query parameters. */
 export function remoteUrl(origin: string, { detection, tintWhenIdle, allowSelection }: RemoteSettings): string {
   const params = new URLSearchParams({ detection });
-  if (tintWhenIdle) {
-    params.set('tintWhenIdle', '1');
+  if (!tintWhenIdle) {
+    params.set('tintWhenIdle', '0');
   }
   if (allowSelection) {
     params.set('allowSelection', '1');
