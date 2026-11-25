@@ -1,15 +1,19 @@
 import { TOUCH_ENDS } from '../lib/valence.ts';
 
-/** Touch mode's +1 and −1 marks, and where the finger is (or last was). */
+const ENDS = [
+  { at: TOUCH_ENDS.high, label: '+1' },
+  { at: TOUCH_ENDS.low, label: '−1' },
+];
+
+/** Touch mode's +1 and −1 marks, labelled, and where the finger is (or last was). */
 export function TouchGuides({ fingerY }: { fingerY: number | null }) {
   return (
     <>
-      {[TOUCH_ENDS.high, TOUCH_ENDS.low].map((at) => (
-        <div
-          className="pointer-events-none absolute inset-x-6 border-t-2 border-dashed border-white mix-blend-difference"
-          key={at}
-          style={{ top: `${at * 100}%` }}
-        />
+      {ENDS.map(({ at, label }) => (
+        <div className="pointer-events-none absolute inset-x-6 mix-blend-difference" key={label} style={{ top: `${at * 100}%` }}>
+          <div className="border-t-2 border-dashed border-white" />
+          <span className="absolute right-0 bottom-1 font-mono text-lg">{label}</span>
+        </div>
       ))}
       {fingerY !== null && (
         <div
