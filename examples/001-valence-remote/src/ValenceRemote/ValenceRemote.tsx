@@ -133,6 +133,13 @@ export function ValenceRemote({
     }
   };
 
+  /** A lifted finger leaves no valence and no finger line. */
+  const onRelease = () => {
+    tracker.touch(false);
+    setFingerY(null);
+    report(null);
+  };
+
   const warning = startScreenWarning(started, touch, orientation.status);
   if (warning !== undefined) {
     return <StartScreen instruction={INSTRUCTIONS[detection]} onStart={start} warning={warning} />;
@@ -147,7 +154,7 @@ export function ValenceRemote({
       instruction={INSTRUCTIONS[detection]}
       notes={notesFor(touch, orientation.status, wakeLockLost)}
       onPointer={touch ? onPointer : undefined}
-      onRelease={() => tracker.touch(false)}
+      onRelease={touch ? onRelease : undefined}
       showNumeric={showNumeric}
       valence={valence}
     >

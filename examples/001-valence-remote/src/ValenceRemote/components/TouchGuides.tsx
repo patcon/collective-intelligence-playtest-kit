@@ -5,7 +5,7 @@ const ENDS = [
   { at: TOUCH_ENDS.low, label: '−1' },
 ];
 
-/** Touch mode's +1 and −1 marks, labelled if `showLabels`, and where the finger is (or last was). */
+/** Touch mode's +1 and −1 marks, labelled if `showLabels`, and where the finger is while touching. */
 export function TouchGuides({ fingerY, showLabels }: { fingerY: number | null; showLabels: boolean }) {
   return (
     <>
