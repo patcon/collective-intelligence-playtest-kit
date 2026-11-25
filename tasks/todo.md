@@ -241,9 +241,9 @@ Add a temporary set of host buttons (Start, Move on, Reset) on `/demo-ui` so a r
 
 ### ✅ Checkpoint B: one round, end to end
 - [x] All tests pass, and lint, typecheck and build pass.
-- [ ] `dev:lan` on a real phone plus a desktop tab, both as participants, complete a colour round with
+- [x] `dev:lan` on a real phone plus a desktop tab, both as participants, complete a colour round with
   "x of N found" updating live.
-- [ ] **Your review** of the reducer, the protocol and how the participant screens feel. Commit.
+- [x] **Your review** of the reducer, the protocol and how the participant screens feel. Commit.
 
 ---
 
@@ -260,9 +260,9 @@ Add a temporary set of host buttons (Start, Move on, Reset) on `/demo-ui` so a r
 - the current config, read-only
 
 **Acceptance criteria:**
-- [ ] Criteria 2 and 6.
-- [ ] Progress updates within ~1 s of a `found` (criterion 5).
-- [ ] Usable at 375 px wide.
+- [x] Criteria 2 and 6.
+- [x] Progress updates within ~1 s of a `found` (criterion 5).
+- [x] Usable at 375 px wide.
 
 **Verification:** One story or a manual check at 375 px with `agent-browser`. Run a round with 3 tabs.
 **Dependencies:** Checkpoint B
