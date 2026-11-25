@@ -1,3 +1,4 @@
+import { roleFromUrl, roleOf, sendToRole } from '@playtest-kit/common/server';
 import { Agent } from 'agents';
 import type { Connection, ConnectionContext, WSMessage } from 'agents';
 import { isRole, parsePhoneMessage, parseViewerMessage } from '../src/room/protocol.ts';
@@ -25,8 +26,7 @@ export class ValenceRoom extends Agent<RoomEnv, RoomState> {
   initialState: RoomState = { settings: null };
 
   getConnectionTags(_connection: Connection, ctx: ConnectionContext): Array<string> {
-    const role = new URL(ctx.request.url).searchParams.get('role');
-    return [isRole(role) ? role : 'viewer'];
+    return [roleFromUrl(ctx.request.url, isRole, 'viewer')];
   }
 
   /** Also keeps `setState` from broadcasting the state: the room sends its settings itself, as a `settings` message. */
@@ -35,9 +35,9 @@ export class ValenceRoom extends Agent<RoomEnv, RoomState> {
   }
 
   onConnect(connection: Connection): void {
-    this.toViewers({ id: connection.id, role: roleOf(connection), type: 'joined' });
+    this.toViewers({ id: connection.id, role: roleOfConnection(connection), type: 'joined' });
     connection.send(JSON.stringify(this.settingsMessage()));
-    if (roleOf(connection) === 'viewer') {
+    if (roleOfConnection(connection) === 'viewer') {
       this.catchUp(connection);
     }
   }
@@ -50,7 +50,7 @@ export class ValenceRoom extends Agent<RoomEnv, RoomState> {
     if (typeof message !== 'string') {
       return;
     }
-    if (roleOf(connection) === 'phone') {
+    if (roleOfConnection(connection) === 'phone') {
       this.onPhoneMessage(connection, message);
     } else {
       this.onViewerMessage(message);
@@ -93,13 +93,10 @@ export class ValenceRoom extends Agent<RoomEnv, RoomState> {
   }
 
   private toViewers(msg: RoomMessage): void {
-    const text = JSON.stringify(msg);
-    for (const viewer of this.getConnections('viewer')) {
-      viewer.send(text);
-    }
+    sendToRole(this, 'viewer', msg);
   }
 }
 
-function roleOf(connection: Connection): Role {
-  return connection.tags.includes('phone') ? 'phone' : 'viewer';
+function roleOfConnection(connection: Connection): Role {
+  return roleOf(connection, isRole, 'viewer');
 }

@@ -16,5 +16,6 @@ Published as TypeScript source (no build step), like `ui`.
 | Name | What it does |
 | --- | --- |
 | `parseJsonObject(raw)` | Socket text as a JSON object, or `null`. Assign it to an interface of `unknown` fields, then validate them. |
+| `roleFromUrl`, `roleOf`, `sendToRole` (`/server`) | Read a connection's role from `?role=` and its tags; send JSON to every connection with a role. |
 
 Only move something here once a second example needs it.
