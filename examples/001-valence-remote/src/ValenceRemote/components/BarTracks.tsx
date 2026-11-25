@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import type { ReactNode } from 'react';
 import type { Ink } from './ink.ts';
 import type { BarPosition } from './ValenceBar.tsx';
@@ -41,8 +42,8 @@ const TRACK: Record<BarPosition, string> = {
 
 /** A track's fill, from its negative end. */
 const FILL: Record<BarPosition, string> = {
-  left: 'absolute inset-x-0 bottom-0 transition-[height]',
-  top: 'absolute inset-y-0 left-0 transition-[width]',
+  left: 'absolute inset-x-0 bottom-0 transition-[height,opacity]',
+  top: 'absolute inset-y-0 left-0 transition-[width,opacity]',
 };
 
 /** A stretch of a track between two valences. */
@@ -80,7 +81,7 @@ interface FillProps {
 const EASE = 'duration-300 ease-out';
 
 /**
- * Fades into no valence, as the screen does. Otherwise keeps up with the reading at once, unless
+ * Fades out into no valence, as the screen does. Otherwise keeps up with the reading at once, unless
  * eased, which suits a value that jumps between levels.
  */
 function durationFor(valence: number | null, eased: boolean): string {
@@ -90,9 +91,22 @@ function durationFor(valence: number | null, eased: boolean): string {
   return eased ? EASE : 'duration-0';
 }
 
+/**
+ * With no valence (a lifted finger, a lost reading) the fill fades out where the last one left it,
+ * rather than emptying, which would look like a move to −1.
+ */
 function Fill({ className, position, valence, eased = false }: FillProps) {
+  const [last, setLast] = useState(valence);
+  if (valence !== null && valence !== last) {
+    setLast(valence);
+  }
+  const hidden = valence === null ? 'opacity-0' : '';
+
   return (
-    <div className={`${className} ${FILL[position]} ${durationFor(valence, eased)}`} style={extent(position, valence)} />
+    <div
+      className={`${className} ${FILL[position]} ${durationFor(valence, eased)} ${hidden}`}
+      style={extent(position, valence ?? last)}
+    />
   );
 }
 
