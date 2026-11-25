@@ -88,7 +88,7 @@ export function RemoteScreen({
       onPointerUp={onRelease}
       style={{ backgroundColor: valenceColor(valence, idle) }}
     >
-      <ValenceBar labels={axisLabels} position={barPosition} valence={valence} />
+      <ValenceBar idle={idle} labels={axisLabels} position={barPosition} valence={valence} />
       {children}
       {badges && (
         <div className={`pointer-events-none absolute top-0 left-0 p-4 ${BADGES_INSET[clearance]}`}>

@@ -1,4 +1,5 @@
 import type { AxisLabels } from '../lib/axisLabels.ts';
+import { inkFor } from './ink.ts';
 
 /** Which edge the bar runs along: `top` fills left to right, `left` bottom to top (as touch reads). */
 export type BarPosition = 'top' | 'left';
@@ -43,6 +44,8 @@ const MIDDLE: Record<BarPosition, string> = { left: 'row-start-2', top: 'col-sta
 
 interface ValenceBarProps {
   valence: number | null;
+  /** On the idle colour (see `valenceColor`). */
+  idle?: boolean;
   position?: BarPosition;
   /** Words beside the bar's ends (and middle), or none. */
   labels?: AxisLabels | null;
@@ -52,21 +55,22 @@ interface ValenceBarProps {
  * A thin line along one edge, like an article's reading progress: filled as far as the valence
  * goes, empty at −1 and full at +1, with any labels beside it. Empty with no valence.
  */
-export function ValenceBar({ valence, position = 'top', labels }: ValenceBarProps) {
+export function ValenceBar({ valence, idle = false, position = 'top', labels }: ValenceBarProps) {
+  const ink = inkFor(idle);
   const share = `${(valence === null ? 0 : (valence + 1) / 2) * 100}%`;
   // Fades only into no valence, as the screen does, so it otherwise keeps up with the reading.
   const fade = valence === null ? 'duration-300' : 'duration-0';
 
   return (
-    <div aria-hidden className={`pointer-events-none absolute mix-blend-difference ${STRIP[position]}`}>
-      <div className={`bg-white/20 ${TRACK[position]}`}>
+    <div aria-hidden className={`pointer-events-none absolute ${ink.shadow} ${STRIP[position]}`}>
+      <div className={`${ink.track} ${TRACK[position]}`}>
         <div
-          className={`bg-white/70 ${FILL[position]} ${fade}`}
+          className={`${ink.fill} ${FILL[position]} ${fade}`}
           style={position === 'top' ? { width: share } : { height: share }}
         />
       </div>
       {labels && (
-        <div className={`text-xs/4 font-medium text-white/80 ${LABELS[position]}`}>
+        <div className={`text-xs/4 font-medium ${ink.text} ${LABELS[position]}`}>
           <span className={ENDS[position].negative}>{labels.negative}</span>
           {labels.neutral && <span className={MIDDLE[position]}>{labels.neutral}</span>}
           <span className={ENDS[position].positive}>{labels.positive}</span>
