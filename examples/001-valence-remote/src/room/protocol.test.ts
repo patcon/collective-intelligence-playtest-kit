@@ -31,11 +31,17 @@ describe('parseRoomMessage', () => {
 
 describe('settings messages', () => {
   const set =
-    '{"type":"settings","settings":{"detection":"touch","tintWhenIdle":true,"showNumeric":false,"allowSelection":false}}';
+    '{"type":"settings","settings":{"detection":"touch","tintWhenIdle":true,"showNumeric":false,"allowSelection":false,"axisLabels":{"negative":"neg","positive":"pos"}}}';
   const unset = '{"type":"settings","settings":null}';
 
   it('reads settings from a viewer or from the room', () => {
-    const settings = { allowSelection: false, detection: 'touch', showNumeric: false, tintWhenIdle: true };
+    const settings = {
+      allowSelection: false,
+      axisLabels: { negative: 'neg', positive: 'pos' },
+      detection: 'touch',
+      showNumeric: false,
+      tintWhenIdle: true,
+    };
     expect(parseViewerMessage(set)).toEqual({ settings, type: 'settings' });
     expect(parseRoomMessage(set)).toEqual({ settings, type: 'settings' });
   });
@@ -48,7 +54,12 @@ describe('settings messages', () => {
   it('rejects unknown or missing settings', () => {
     expect(
       parseViewerMessage(
-        '{"type":"settings","settings":{"detection":"shake","tintWhenIdle":true,"showNumeric":false,"allowSelection":false}}',
+        '{"type":"settings","settings":{"detection":"shake","tintWhenIdle":true,"showNumeric":false,"allowSelection":false,"axisLabels":null}}',
+      ),
+    ).toBeNull();
+    expect(
+      parseViewerMessage(
+        '{"type":"settings","settings":{"detection":"flip","tintWhenIdle":true,"showNumeric":false,"allowSelection":false,"axisLabels":{"positive":"pos"}}}',
       ),
     ).toBeNull();
     expect(parseViewerMessage('{"type":"settings","settings":{"detection":"flip","tintWhenIdle":true}}')).toBeNull();

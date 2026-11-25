@@ -1,12 +1,23 @@
 import { Select, Switch } from '@cloudflare/kumo';
 import type { RemoteSettings } from '../../room/remoteSettings.ts';
+import {
+  AXIS_LABEL_PRESET_IDS,
+  AXIS_LABEL_PRESETS,
+  axisLabelsPresetOf,
+  axisLabelsToList,
+  isAxisLabelsPreset,
+} from '../../ValenceRemote/lib/axisLabels.ts';
 import { DETECTION_LABELS } from '../../ValenceRemote/lib/instructions.ts';
 import { isDetection } from '../../ValenceRemote/lib/valence.ts';
 import type { RemoteSettingsControl } from '../hooks/useRemoteSettings.ts';
 
 /** The remote's URL with `settings` as query parameters. */
-export function remoteUrl(origin: string, { detection, tintWhenIdle, showNumeric, allowSelection }: RemoteSettings): string {
+export function remoteUrl(origin: string, settings: RemoteSettings): string {
+  const { detection, tintWhenIdle, showNumeric, allowSelection, axisLabels } = settings;
   const params = new URLSearchParams({ detection });
+  for (const label of axisLabels ? axisLabelsToList(axisLabels) : []) {
+    params.append('label', label);
+  }
   if (!tintWhenIdle) {
     params.set('tintWhenIdle', '0');
   }
@@ -19,6 +30,16 @@ export function remoteUrl(origin: string, { detection, tintWhenIdle, showNumeric
   return `${origin}/remote?${params}`;
 }
 
+const NO_LABELS = 'none';
+
+/** Each preset, shown high to low, and none. */
+const AXIS_LABEL_ITEMS = {
+  [NO_LABELS]: 'None',
+  ...Object.fromEntries(
+    AXIS_LABEL_PRESET_IDS.map((id) => [id, axisLabelsToList(AXIS_LABEL_PRESETS[id]).toReversed().join(' / ')]),
+  ),
+};
+
 /** Pickers for the settings every phone runs with, which the QR code carries too. */
 export function RemoteOptions({ settings, setSettings }: RemoteSettingsControl) {
   return (
@@ -29,6 +50,15 @@ export function RemoteOptions({ settings, setSettings }: RemoteSettingsControl) 
         label="Detection"
         onValueChange={(detection) => isDetection(detection) && setSettings({ ...settings, detection })}
         value={settings.detection}
+      />
+      <Select
+        className="w-full"
+        items={AXIS_LABEL_ITEMS}
+        label="Axis labels"
+        onValueChange={(id) =>
+          setSettings({ ...settings, axisLabels: isAxisLabelsPreset(id) ? AXIS_LABEL_PRESETS[id] : null })
+        }
+        value={axisLabelsPresetOf(settings.axisLabels) ?? NO_LABELS}
       />
       <Switch
         checked={settings.tintWhenIdle}

@@ -1,5 +1,6 @@
 import { Banner, LayerCard, Text } from '@cloudflare/kumo';
 import type { PointerEvent, ReactNode } from 'react';
+import type { AxisLabels } from '../lib/axisLabels.ts';
 import { formatValence, valenceColor } from '../lib/valenceColor.ts';
 import { ValenceBar } from './ValenceBar.tsx';
 import type { BarPosition } from './ValenceBar.tsx';
@@ -10,6 +11,8 @@ interface RemoteScreenProps {
   showNumeric?: boolean;
   /** Which edge the valence bar runs along. */
   barPosition?: BarPosition;
+  /** Words beside the bar's ends (and middle), or none. */
+  axisLabels?: AxisLabels | null;
   /** Fill with the idle colour (see `valenceColor`). */
   idle?: boolean;
   instruction: string;
@@ -29,6 +32,21 @@ function stop(event: PointerEvent) {
   event.stopPropagation();
 }
 
+/** Where the corners sit, clear of the bar's labels when they run along that corner's edge. */
+type Clearance = 'none' | BarPosition;
+
+const BADGES_INSET: Record<Clearance, string> = {
+  left: 'pt-[max(1rem,env(safe-area-inset-top))] pl-[calc(max(1rem,env(safe-area-inset-left))+1.25rem)]',
+  none: 'pt-[max(1rem,env(safe-area-inset-top))] pl-[max(1rem,env(safe-area-inset-left))]',
+  top: 'pt-[calc(max(1rem,env(safe-area-inset-top))+1.25rem)] pl-[max(1rem,env(safe-area-inset-left))]',
+};
+
+const CONTROLS_INSET: Record<Clearance, string> = {
+  left: 'pt-[max(1rem,env(safe-area-inset-top))]',
+  none: 'pt-[max(1rem,env(safe-area-inset-top))]',
+  top: 'pt-[calc(max(1rem,env(safe-area-inset-top))+1.25rem)]',
+};
+
 function share(event: PointerEvent<HTMLDivElement>): number {
   const rect = event.currentTarget.getBoundingClientRect();
   return Math.max(0, Math.min(1, (event.clientY - rect.top) / rect.height));
@@ -36,13 +54,14 @@ function share(event: PointerEvent<HTMLDivElement>): number {
 
 /**
  * The running remote: the whole screen in the valence's colour, a thin bar along one edge for where
- * it sits from −1 to +1, any badges top left and controls top right, an optional readout,
+ * it sits from −1 to +1 (with any axis labels), any badges top left and controls top right, an optional readout,
  * the instruction on a card, and any notes as banners.
  */
 export function RemoteScreen({
   valence,
   showNumeric = false,
   barPosition = 'top',
+  axisLabels,
   idle = false,
   instruction,
   notes,
@@ -52,6 +71,7 @@ export function RemoteScreen({
   onRelease,
   children,
 }: RemoteScreenProps) {
+  const clearance: Clearance = axisLabels ? barPosition : 'none';
   const handle = (event: PointerEvent<HTMLDivElement>) => onPointer?.(share(event), event);
   // Fades only into no valence or idle: CSS takes the transition from the new state, so the colour
   // still follows a moving finger or tilt at once.
@@ -68,16 +88,16 @@ export function RemoteScreen({
       onPointerUp={onRelease}
       style={{ backgroundColor: valenceColor(valence, idle) }}
     >
-      <ValenceBar position={barPosition} valence={valence} />
+      <ValenceBar labels={axisLabels} position={barPosition} valence={valence} />
       {children}
       {badges && (
-        <div className="pointer-events-none absolute top-0 left-0 p-4 pt-[max(1rem,env(safe-area-inset-top))] pl-[max(1rem,env(safe-area-inset-left))]">
+        <div className={`pointer-events-none absolute top-0 left-0 p-4 ${BADGES_INSET[clearance]}`}>
           <LayerCard className="flex items-center gap-2 rounded-full px-3 py-1.5">{badges}</LayerCard>
         </div>
       )}
       {controls && (
         <div
-          className="absolute top-0 right-0 p-4 pt-[max(1rem,env(safe-area-inset-top))] pr-[max(1rem,env(safe-area-inset-right))]"
+          className={`absolute top-0 right-0 p-4 pr-[max(1rem,env(safe-area-inset-right))] ${CONTROLS_INSET[clearance]}`}
           onPointerDown={stop}
           onPointerMove={stop}
           onPointerUp={stop}

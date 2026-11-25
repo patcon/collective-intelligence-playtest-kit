@@ -1,3 +1,5 @@
+import { isAxisLabels } from '../ValenceRemote/lib/axisLabels.ts';
+import type { AxisLabels } from '../ValenceRemote/lib/axisLabels.ts';
 import { isDetection } from '../ValenceRemote/lib/valence.ts';
 import type { Detection } from '../ValenceRemote/lib/valence.ts';
 
@@ -9,10 +11,13 @@ export interface RemoteSettings {
   showNumeric: boolean;
   /** Let each phone's holder pick their own detection, over `detection`. */
   allowSelection: boolean;
+  /** Words along the valence bar's ends (and middle), or none. */
+  axisLabels: AxisLabels | null;
 }
 
 export const DEFAULT_REMOTE_SETTINGS: RemoteSettings = {
   allowSelection: false,
+  axisLabels: null,
   detection: 'flip',
   showNumeric: false,
   tintWhenIdle: true,
@@ -29,6 +34,8 @@ export function isRemoteSettings(value: unknown): value is RemoteSettings {
     'showNumeric' in value &&
     typeof value.showNumeric === 'boolean' &&
     'allowSelection' in value &&
-    typeof value.allowSelection === 'boolean'
+    typeof value.allowSelection === 'boolean' &&
+    'axisLabels' in value &&
+    (value.axisLabels === null || isAxisLabels(value.axisLabels))
   );
 }
