@@ -48,6 +48,20 @@ function notesFor(touch: boolean, status: OrientationStatus, wakeLockLost: boole
   return [orientationNote, wakeLockLost ? 'The screen may sleep.' : null].filter((note) => note !== null);
 }
 
+/**
+ * The start screen's warning, or null to show the start screen without one, or undefined once running.
+ * It also comes back when switched to tilt (by a prop) before motion access was asked for.
+ */
+function startScreenWarning(started: boolean, touch: boolean, status: OrientationStatus): string | null | undefined {
+  if (touch) {
+    return started ? undefined : null;
+  }
+  if (started && status !== 'needs-permission') {
+    return undefined;
+  }
+  return START_WARNINGS[status] ?? null;
+}
+
 /** Turns a phone into a remote: its orientation (or a finger's height) as a valence from −1 to +1. */
 export function ValenceRemote({
   onValence,
@@ -116,9 +130,8 @@ export function ValenceRemote({
     }
   };
 
-  // Also back to the start screen when switched to tilt (by a prop) before motion access was asked for.
-  if (!started || (!touch && orientation.status === 'needs-permission')) {
-    const warning = touch ? null : (START_WARNINGS[orientation.status] ?? null);
+  const warning = startScreenWarning(started, touch, orientation.status);
+  if (warning !== undefined) {
     return <StartScreen instruction={INSTRUCTIONS[detection]} onStart={start} warning={warning} />;
   }
 
