@@ -8,6 +8,8 @@ export const RATE_WINDOW_MS = 1000;
 export interface PhoneRow {
   id: string;
   v: number | null;
+  /** The last valence that wasn't null, until the phone goes back to the start screen. */
+  lastV: number | null;
   /** Null until the phone says. */
   activity: Activity | null;
   recent: Array<number>;
@@ -17,11 +19,11 @@ export type Phones = Record<string, PhoneRow>;
 
 function withMessage(row: PhoneRow, v: number | null, now: number): PhoneRow {
   const recent = row.recent.filter((t) => t > now - RATE_WINDOW_MS);
-  return { ...row, recent: [...recent, now], v };
+  return { ...row, lastV: v ?? row.lastV, recent: [...recent, now], v };
 }
 
 function emptyRow(id: string): PhoneRow {
-  return { activity: null, id, recent: [], v: null };
+  return { activity: null, id, lastV: null, recent: [], v: null };
 }
 
 /** The phones after a room message arrives at `now`. */
@@ -39,8 +41,10 @@ export function applyMessage(phones: Phones, msg: RoomMessage, now: number) {
   const row = phones[msg.id] ?? emptyRow(msg.id);
   if (msg.type === 'activity') {
     // A phone back at the start screen has no valence, whatever it last sent.
-    const v = msg.activity === 'arrived' ? null : row.v;
-    return { ...phones, [msg.id]: { ...row, activity: msg.activity, v } };
+    const arrived = msg.activity === 'arrived';
+    const v = arrived ? null : row.v;
+    const lastV = arrived ? null : row.lastV;
+    return { ...phones, [msg.id]: { ...row, activity: msg.activity, lastV, v } };
   }
   return { ...phones, [msg.id]: withMessage(row, msg.v, now) };
 }

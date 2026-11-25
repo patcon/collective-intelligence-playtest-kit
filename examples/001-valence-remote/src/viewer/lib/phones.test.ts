@@ -32,7 +32,13 @@ describe('applyMessage', () => {
   it('clears the valence of a phone that arrives at the start screen', () => {
     let phones = applyMessage({}, valence('a', 0.4), 100);
     phones = applyMessage(phones, { activity: 'arrived', id: 'a', type: 'activity' }, 200);
-    expect(phones.a).toMatchObject({ activity: 'arrived', v: null });
+    expect(phones.a).toMatchObject({ activity: 'arrived', lastV: null, v: null });
+  });
+
+  it('remembers the last valence through a null one', () => {
+    let phones = applyMessage({}, valence('a', 0.4), 100);
+    phones = applyMessage(phones, valence('a', null), 200);
+    expect(phones.a).toMatchObject({ lastV: 0.4, v: null });
   });
 
   it('ignores a valence from a phone without an id', () => {
