@@ -2,6 +2,7 @@ import { Banner, LayerCard, Text } from '@cloudflare/kumo';
 import type { PointerEvent, ReactNode } from 'react';
 import type { AxisLabels } from '../lib/axisLabels.ts';
 import { formatValence, valenceColor } from '../lib/valenceColor.ts';
+import { inkFor } from './ink.ts';
 import { ValenceBar } from './ValenceBar.tsx';
 import type { BarPosition } from './ValenceBar.tsx';
 
@@ -108,18 +109,23 @@ export function RemoteScreen({
           {controls}
         </div>
       )}
-      {/* Centred without a transform: one would isolate the readout's blend from the colour behind. */}
       <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-3 px-6 text-center">
-        {showNumeric && (
-          <output aria-label="Valence" className="font-mono text-5xl tabular-nums mix-blend-difference">
-            {formatValence(valence)}
-          </output>
-        )}
-        {illustration ?? (
-          <LayerCard className="max-w-sm rounded-lg bg-kumo-base/85 px-4 py-2 backdrop-blur">
-            <Text>{instruction}</Text>
-          </LayerCard>
-        )}
+        {/* The readout hangs above the instruction, so showing it doesn't move the instruction. */}
+        <div className="relative">
+          {showNumeric && (
+            <output
+              aria-label="Valence"
+              className={`absolute bottom-full left-1/2 mb-3 -translate-x-1/2 font-mono text-5xl whitespace-nowrap tabular-nums ${inkFor(idle).picture}`}
+            >
+              {formatValence(valence)}
+            </output>
+          )}
+          {illustration ?? (
+            <LayerCard className="max-w-sm rounded-lg bg-kumo-base/85 px-4 py-2 backdrop-blur">
+              <Text>{instruction}</Text>
+            </LayerCard>
+          )}
+        </div>
         {notes.map((note) => (
           <Banner className="max-w-sm text-left" description={note} key={note} variant="alert" />
         ))}
