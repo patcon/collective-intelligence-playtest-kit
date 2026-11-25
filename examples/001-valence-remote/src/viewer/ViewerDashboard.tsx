@@ -6,9 +6,9 @@ import { RoomStatusBadge } from '../room/RoomStatusBadge.tsx';
 import { CopyButton } from './components/CopyButton.tsx';
 import { JoinQrCode } from './components/JoinQrCode.tsx';
 import { RemoteOptions, remoteUrl } from './components/RemoteOptions.tsx';
-import type { RemoteSettings } from './components/RemoteOptions.tsx';
 import { MessageLog } from './components/MessageLog.tsx';
 import { PhoneTable } from './components/PhoneTable.tsx';
+import { useRemoteSettings } from './hooks/useRemoteSettings.ts';
 import { applyMessage } from './lib/phones.ts';
 import type { Phones } from './lib/phones.ts';
 
@@ -20,7 +20,7 @@ export function ViewerDashboard({ room }: { room: string }) {
   const [phones, setPhones] = useState<Phones>({});
   const [log, setLog] = useState<Array<string>>([]);
   const [now, setNow] = useState(() => Date.now());
-  const [remote, setRemote] = useState<RemoteSettings>({ detection: 'flip', tintWhenIdle: false });
+  const remote = useRemoteSettings();
 
   useInterval(() => setNow(Date.now()), CLOCK_MS);
 
@@ -42,8 +42,8 @@ export function ViewerDashboard({ room }: { room: string }) {
           <PhoneTable now={now} phones={Object.values(phones)} />
         </Surface>
         <Surface className="rounded-lg p-4">
-          <JoinQrCode url={remoteUrl(window.location.origin, remote)}>
-            <RemoteOptions onChange={setRemote} value={remote} />
+          <JoinQrCode url={remoteUrl(window.location.origin, remote.settings)}>
+            <RemoteOptions {...remote} />
           </JoinQrCode>
         </Surface>
       </div>

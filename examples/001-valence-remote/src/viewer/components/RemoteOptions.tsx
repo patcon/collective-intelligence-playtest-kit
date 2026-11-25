@@ -1,6 +1,8 @@
 import { Select, Switch } from '@cloudflare/kumo';
+import type { RemoteSettings } from '../../room/remoteSettings.ts';
 import { isDetection } from '../../ValenceRemote/lib/valence.ts';
 import type { Detection } from '../../ValenceRemote/lib/valence.ts';
+import type { RemoteSettingsControl } from '../hooks/useRemoteSettings.ts';
 
 const DETECTION_LABELS: Record<Detection, string> = {
   flip: 'Flip (face up / down)',
@@ -8,12 +10,6 @@ const DETECTION_LABELS: Record<Detection, string> = {
   spin: 'Spin (steering wheel)',
   touch: 'Touch (finger height)',
 };
-
-/** How phones joining from the QR code will run the remote. */
-export interface RemoteSettings {
-  detection: Detection;
-  tintWhenIdle: boolean;
-}
 
 /** The remote's URL with `settings` as query parameters. */
 export function remoteUrl(origin: string, { detection, tintWhenIdle }: RemoteSettings): string {
@@ -24,27 +20,23 @@ export function remoteUrl(origin: string, { detection, tintWhenIdle }: RemoteSet
   return `${origin}/remote?${params}`;
 }
 
-interface RemoteOptionsProps {
-  value: RemoteSettings;
-  onChange: (value: RemoteSettings) => void;
-}
-
-/** Pickers for the remote's settings, for the QR code to carry. */
-export function RemoteOptions({ value, onChange }: RemoteOptionsProps) {
+/** Pickers for the remote's settings, for the QR code to carry, and a switch to push them to connected phones. */
+export function RemoteOptions({ settings, setSettings, pushed, setPushed }: RemoteSettingsControl) {
   return (
     <div className="flex w-full flex-col gap-3">
       <Select
         className="w-full"
         items={DETECTION_LABELS}
         label="Detection"
-        onValueChange={(detection) => isDetection(detection) && onChange({ ...value, detection })}
-        value={value.detection}
+        onValueChange={(detection) => isDetection(detection) && setSettings({ ...settings, detection })}
+        value={settings.detection}
       />
       <Switch
-        checked={value.tintWhenIdle}
+        checked={settings.tintWhenIdle}
         label="Tint when idle"
-        onCheckedChange={(tintWhenIdle) => onChange({ ...value, tintWhenIdle })}
+        onCheckedChange={(tintWhenIdle) => setSettings({ ...settings, tintWhenIdle })}
       />
+      <Switch checked={pushed} label="Apply to connected phones" onCheckedChange={setPushed} />
     </div>
   );
 }
