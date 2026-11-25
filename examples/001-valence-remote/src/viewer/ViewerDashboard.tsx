@@ -1,6 +1,6 @@
 import { Surface } from '@cloudflare/kumo';
 import { useState } from 'react';
-import { useInterval } from '../hooks/effects/useInterval.ts';
+import { useInterval } from '@playtest-kit/common';
 import { useRoomMessages } from '../hooks/effects/useRoomMessages.ts';
 import { RoomStatusBadge } from '../room/RoomStatusBadge.tsx';
 import { CopyButton } from './components/CopyButton.tsx';

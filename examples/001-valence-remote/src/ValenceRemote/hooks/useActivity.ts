@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { useInterval } from '../../hooks/effects/useInterval.ts';
-import { useOnChange } from '../../hooks/effects/useOnChange.ts';
+import { useInterval, useOnChange } from '@playtest-kit/common';
 import { createActivityTracker, DEFAULT_IDLE } from '../lib/activity.ts';
 import type { Activity, ActivityTracker, IdleSettings } from '../lib/activity.ts';
 

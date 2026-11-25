@@ -1,7 +1,7 @@
 import { useAgent } from 'agents/react';
 import { createContext, use, useState } from 'react';
 import type { ReactNode } from 'react';
-import { usePageVisibility } from '../hooks/effects/usePageVisibility.ts';
+import { usePageVisibility } from '@playtest-kit/common';
 import { parseRoomMessage } from './protocol.ts';
 import type { Role, RoomMessage } from './protocol.ts';
 

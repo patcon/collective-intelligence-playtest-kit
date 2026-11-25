@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useMemo, useState } from 'react';
-import useInterval from '../../hooks/effects/useInterval.ts';
+import { useInterval } from '@playtest-kit/common';
 import EmbeddingViewer from '../EmbeddingViewer.tsx';
 import type { EmbeddingViewerProps, ViewerPoint, ViewerTrack } from '../types.ts';
 
