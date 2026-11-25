@@ -9,6 +9,7 @@ Starting point for new examples. Copy it with `pnpm new-example <name>` from the
 - React Compiler (Oxc, via `@vitejs/plugin-react`), so no manual `useMemo`/`useCallback`
 - Vite, oxlint and TypeScript config come from [`@playtest-kit/config`](../../packages/config)
 - A Cloudflare Worker (`worker/`) answering `/api/*`, with a `Counter` Durable Object behind the page's shared count. Everything else is served as static assets. The Worker typechecks against `@cloudflare/workers-types` through its own `worker/tsconfig.json`, so it can't use browser globals by mistake (and the page can't use Worker ones)
+- Works offline once loaded: a service worker (`offline.ts`, via [vite-plugin-pwa](https://vite-pwa-org.netlify.app/)) caches the built app, so a refresh with no network still loads the page; `/api/*` isn't cached. It's only in builds, so try it with `pnpm preview`, and the dev server removes one a preview left behind on the same port
 - Vitest for unit tests (`*.test.ts` next to the code)
 
 ## Adding a Durable Object or binding

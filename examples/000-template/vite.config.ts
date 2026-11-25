@@ -4,6 +4,7 @@ import shared from '@playtest-kit/config/vite';
 import basicSsl from '@vitejs/plugin-basic-ssl';
 import { defineConfig, mergeConfig } from 'vite';
 import type { PluginOption } from 'vite';
+import { offline } from './offline.ts';
 import { PORT } from './port.ts';
 
 const lan = process.env.LAN === '1';
@@ -39,7 +40,7 @@ const https = { ALPNCallback: () => 'http/1.1' };
 export default mergeConfig(
   shared,
   defineConfig({
-    plugins: [lan && basicSsl(), preview && previewWorker()],
+    plugins: [offline(), lan && basicSsl(), preview && previewWorker()],
     server: lan ? { https } : {},
     preview: lan ? { https, host: '0.0.0.0', port: PORT } : { port: PORT },
   }),
