@@ -100,13 +100,14 @@ packages/ui/                          # existing
 - Moves between phases:
   - **Start** (from `lobby`) goes to `round`.
   - **Move on** goes back to `lobby`, and the next Start makes new groups.
-  - **Reset** clears groups and sends everyone back to waiting.
+  - **Reset** clears groups and sends everyone back to waiting, from either phase, and starts the round count again.
 - What each participant sees:
-  - `start`: on the device only, before they tap Start.
+  - `start`: on the device only, before they tap Start. The room calls this status `joined`: connected, not yet ready, so not matched.
   - `waiting`
   - `matched`: shows their cue, and how many in their group have marked found ("1 of 3 found").
   - `found`: shows the same count, live.
   - `late`: joined during a round. Their screen says they'll be matched next round.
+- Someone who leaves mid-round is kept, out of the counts, so they come back to the same group and cue. Anyone who leaves the lobby, and anyone still gone at Move on or Reset, is forgotten.
 
 ### Pattern: pure room reducer, thin Agent
 
@@ -174,7 +175,7 @@ The engine is laid out so that adding an algorithm means adding a single file, b
 Each cue type has the same shape:
 
 - `assign(groupCount, rng) → Array<CuePayload>`: one distinct, serializable payload per group.
-- A React component that renders the payload.
+- A React component that renders the payload. It lives apart from `assign` and `maxDistinct` (`cues/CueView.tsx`, not `cues/cueTypes.ts`), so the Worker can import the cue types without React.
 - `maxDistinct`: how many groups it can tell apart.
 
 If there are more groups than `maxDistinct`, cues repeat and the demo page shows a warning.

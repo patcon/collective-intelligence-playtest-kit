@@ -145,13 +145,13 @@ Move `unlockAudio` and `unlockedAudio` into `common/src/audio/`. Export them all
   connected via `createRoomClient` with its role and showing a `RoomStatusBadge`.
 
 **Acceptance criteria:**
-- [ ] `/` lands on `/demo-ui` (criterion 1).
-- [ ] Both pages show "connected".
-- [ ] `000-template` is untouched.
+- [x] `/` lands on `/demo-ui` (criterion 1).
+- [x] Both pages show "connected".
+- [x] `000-template` is untouched.
 
 **Verification:**
-- [ ] `pnpm --filter 002-matchmaking build`.
-- [ ] `dev` and `preview`: check both routes with `agent-browser`.
+- [x] `pnpm --filter 002-matchmaking build`.
+- [x] `dev` and `preview`: check both routes with `agent-browser`.
 
 **Dependencies:** Checkpoint A
 **Files:** `002/{package.json,alchemy.run.ts,vite.config.ts,offline.ts,port.ts,src/App.tsx,src/pages/DemoUi.tsx,src/pages/Participate.tsx,src/room/client.ts,worker/index.ts,worker/MatchRoom.ts}`. Mostly edits to copied template files.
@@ -162,10 +162,10 @@ Move `unlockAudio` and `unlockedAudio` into `common/src/audio/`. Export them all
 a seeded `Rng` helper. Everything here is pure.
 
 **Acceptance criteria:**
-- [ ] By size: `floor(n/k)` groups, leftovers spread one per group, and `n<k` gives one group.
-- [ ] By count: `min(c,n)` groups, with sizes differing by at most 1.
-- [ ] `n=0` gives `[]`. `n=1` gives `[[id]]`. The same seed always gives the same groups.
-- [ ] With n=20: k=2 gives 10×2, k=3 gives 4×3 + 2×4, and c=4 gives 4×5 (criterion 3), all as tests.
+- [x] By size: `floor(n/k)` groups, leftovers spread one per group, and `n<k` gives one group.
+- [x] By count: `min(c,n)` groups, with sizes differing by at most 1.
+- [x] `n=0` gives `[]`. `n=1` gives `[[id]]`. The same seed always gives the same groups.
+- [x] With n=20: k=2 gives 10×2, k=3 gives 4×3 + 2×4, and c=4 gives 4×5 (criterion 3), all as tests.
 
 **Verification:** `pnpm --filter 002-matchmaking test`
 **Dependencies:** None (it's pure, so it can start alongside 6)
@@ -182,7 +182,7 @@ a seeded `Rng` helper. Everything here is pure.
 - Selectors `viewFor(state, id)` and `snapshotOf(state)`.
 
 **Acceptance criteria:**
-- [ ] Every phase move is covered by tests:
+- [x] Every phase move is covered by tests:
   - start with 0 ready is rejected
   - join during a round gives `late`
   - a rejoin during a round with a known id keeps its group and cue
@@ -190,7 +190,7 @@ a seeded `Rng` helper. Everything here is pure.
   - `moveOn` and `reset` return everyone to `waiting`
   - a config change mid-round applies next round
   - a leaver is dropped from counts
-- [ ] Parsers reject malformed input (tested).
+- [x] Parsers reject malformed input (tested).
 
 **Verification:** `pnpm --filter 002-matchmaking test`
 **Dependencies:** 7
@@ -209,9 +209,9 @@ a seeded `Rng` helper. Everything here is pure.
   - turns off protocol messages, as in `001`
 
 **Acceptance criteria:**
-- [ ] Two tabs connected as participants get their views.
-- [ ] A host tab gets snapshots after every change.
-- [ ] State survives a Worker restart in `dev`.
+- [x] Two tabs connected as participants get their views.
+- [x] A host tab gets snapshots after every change.
+- [x] State survives a Worker restart in `dev`.
 
 **Verification:** `colour.assign` test. Manual check with `agent-browser` once Task 10 is done.
 **Dependencies:** 6, 8
@@ -230,9 +230,9 @@ Add a temporary set of host buttons (Start, Move on, Reset) on `/demo-ui` so a r
 `EmceePane` replaces them in Task 11.
 
 **Acceptance criteria:**
-- [ ] One real tab goes through start → waiting → matched (colour) → found, with the right N.
-- [ ] Reloading during a round keeps the same colour (criterion 8).
-- [ ] A tab that joins during a round sees `late` and is matched in the next round (criterion 7).
+- [x] One real tab goes through start → waiting → matched (colour) → found, with the right N.
+- [x] Reloading during a round keeps the same colour (criterion 8).
+- [x] A tab that joins during a round sees `late` and is matched in the next round (criterion 7).
 
 **Verification:** Run `agent-browser` with 2–3 participant tabs and 1 host tab. Screenshot each status.
 **Dependencies:** 9
@@ -240,7 +240,7 @@ Add a temporary set of host buttons (Start, Move on, Reset) on `/demo-ui` so a r
 **Scope:** M
 
 ### ✅ Checkpoint B: one round, end to end
-- [ ] All tests pass, and lint, typecheck and build pass.
+- [x] All tests pass, and lint, typecheck and build pass.
 - [ ] `dev:lan` on a real phone plus a desktop tab, both as participants, complete a colour round with
   "x of N found" updating live.
 - [ ] **Your review** of the reducer, the protocol and how the participant screens feel. Commit.
