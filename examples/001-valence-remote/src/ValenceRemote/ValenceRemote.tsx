@@ -25,6 +25,8 @@ export interface ValenceRemoteProps {
   idle?: Partial<IdleSettings>;
   /** Turn the screen the idle badge's yellow while idle, so it shows on the phone too. */
   tintWhenIdle?: boolean;
+  /** Show the valence as a number, and touch mode's ends as +1 and −1. */
+  showNumeric?: boolean;
   /** How the phone reads as valence. Touch also works on desktop. */
   detection?: Detection;
   /** Keep the screen awake while running, via the Wake Lock API. */
@@ -68,6 +70,7 @@ export function ValenceRemote({
   onActivity,
   idle,
   tintWhenIdle = false,
+  showNumeric = false,
   detection = 'flip',
   keepAwake = true,
   badges,
@@ -145,9 +148,10 @@ export function ValenceRemote({
       notes={notesFor(touch, orientation.status, wakeLockLost)}
       onPointer={touch ? onPointer : undefined}
       onRelease={() => tracker.touch(false)}
+      showNumeric={showNumeric}
       valence={valence}
     >
-      {touch && <TouchGuides fingerY={fingerY} />}
+      {touch && <TouchGuides fingerY={fingerY} showLabels={showNumeric} />}
     </RemoteScreen>
   );
 }

@@ -30,11 +30,12 @@ describe('parseRoomMessage', () => {
 });
 
 describe('settings messages', () => {
-  const set = '{"type":"settings","settings":{"detection":"touch","tintWhenIdle":true,"allowSelection":false}}';
+  const set =
+    '{"type":"settings","settings":{"detection":"touch","tintWhenIdle":true,"showNumeric":false,"allowSelection":false}}';
   const unset = '{"type":"settings","settings":null}';
 
   it('reads settings from a viewer or from the room', () => {
-    const settings = { allowSelection: false, detection: 'touch', tintWhenIdle: true };
+    const settings = { allowSelection: false, detection: 'touch', showNumeric: false, tintWhenIdle: true };
     expect(parseViewerMessage(set)).toEqual({ settings, type: 'settings' });
     expect(parseRoomMessage(set)).toEqual({ settings, type: 'settings' });
   });
@@ -46,9 +47,14 @@ describe('settings messages', () => {
 
   it('rejects unknown or missing settings', () => {
     expect(
-      parseViewerMessage('{"type":"settings","settings":{"detection":"shake","tintWhenIdle":true,"allowSelection":false}}'),
+      parseViewerMessage(
+        '{"type":"settings","settings":{"detection":"shake","tintWhenIdle":true,"showNumeric":false,"allowSelection":false}}',
+      ),
     ).toBeNull();
     expect(parseViewerMessage('{"type":"settings","settings":{"detection":"flip","tintWhenIdle":true}}')).toBeNull();
+    expect(
+      parseViewerMessage('{"type":"settings","settings":{"detection":"flip","tintWhenIdle":true,"allowSelection":false}}'),
+    ).toBeNull();
     expect(parseViewerMessage('{"type":"settings"}')).toBeNull();
   });
 

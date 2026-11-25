@@ -4,6 +4,8 @@ import { formatValence, valenceColor } from '../lib/valenceColor.ts';
 
 interface RemoteScreenProps {
   valence: number | null;
+  /** Show the valence as a number in the middle. */
+  showNumeric?: boolean;
   /** Fill with the idle colour (see `valenceColor`). */
   idle?: boolean;
   instruction: string;
@@ -29,11 +31,12 @@ function share(event: PointerEvent<HTMLDivElement>): number {
 }
 
 /**
- * The running remote: the whole screen in the valence's colour, with any badges top left and controls top right, a readout,
+ * The running remote: the whole screen in the valence's colour, with any badges top left and controls top right, an optional readout,
  * the instruction on a card, and any notes as banners.
  */
 export function RemoteScreen({
   valence,
+  showNumeric = false,
   idle = false,
   instruction,
   notes,
@@ -74,9 +77,11 @@ export function RemoteScreen({
       )}
       {/* Centred without a transform: one would isolate the readout's blend from the colour behind. */}
       <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-3 px-6 text-center">
-        <output aria-label="Valence" className="font-mono text-5xl tabular-nums mix-blend-difference">
-          {formatValence(valence)}
-        </output>
+        {showNumeric && (
+          <output aria-label="Valence" className="font-mono text-5xl tabular-nums mix-blend-difference">
+            {formatValence(valence)}
+          </output>
+        )}
         <LayerCard className="max-w-sm rounded-lg bg-kumo-base/85 px-4 py-2 backdrop-blur">
           <Text>{instruction}</Text>
         </LayerCard>

@@ -15,6 +15,7 @@ function settingsFromUrl(): RemoteSettings {
   return {
     allowSelection: params.has('allowSelection'),
     detection: isDetection(detection) ? detection : 'flip',
+    showNumeric: params.has('showNumeric'),
     tintWhenIdle: params.get('tintWhenIdle') !== '0',
   };
 }
@@ -60,6 +61,7 @@ function ConnectedRemote() {
       badges={connected ? null : <RoomStatusBadge />}
       detection={detection}
       onPickDetection={settings.allowSelection ? setPicked : undefined}
+      showNumeric={settings.showNumeric}
       tintWhenIdle={settings.tintWhenIdle}
       idle={idleFromUrl()}
       onActivity={setActivity}
@@ -71,8 +73,8 @@ function ConnectedRemote() {
 /**
  * `/remote`: this device as a phone in the room. `?detection=` picks the mode (default `flip`);
  * `?idleMs=` and `?stillDeg=` override when it counts as idle (see DEFAULT_IDLE); `?tintWhenIdle=0`
- * stops tinting the screen while idle; `?allowSelection` shows a badge on the running screen that cycles through
- * the modes. Once a viewer sets the room's settings, they override these three, live. While selection is allowed,
+ * stops tinting the screen while idle; `?showNumeric` shows the valence as a number; `?allowSelection` shows a badge on the running screen that cycles through
+ * the modes. Once a viewer sets the room's settings, they override these four, live. While selection is allowed,
  * the holder's pick overrides the detection.
  */
 export function Remote({ room }: { room: string }) {

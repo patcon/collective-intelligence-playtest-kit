@@ -5,10 +5,13 @@ import { isDetection } from '../../ValenceRemote/lib/valence.ts';
 import type { RemoteSettingsControl } from '../hooks/useRemoteSettings.ts';
 
 /** The remote's URL with `settings` as query parameters. */
-export function remoteUrl(origin: string, { detection, tintWhenIdle, allowSelection }: RemoteSettings): string {
+export function remoteUrl(origin: string, { detection, tintWhenIdle, showNumeric, allowSelection }: RemoteSettings): string {
   const params = new URLSearchParams({ detection });
   if (!tintWhenIdle) {
     params.set('tintWhenIdle', '0');
+  }
+  if (showNumeric) {
+    params.set('showNumeric', '1');
   }
   if (allowSelection) {
     params.set('allowSelection', '1');
@@ -31,6 +34,11 @@ export function RemoteOptions({ settings, setSettings }: RemoteSettingsControl) 
         checked={settings.tintWhenIdle}
         label="Tint when idle"
         onCheckedChange={(tintWhenIdle) => setSettings({ ...settings, tintWhenIdle })}
+      />
+      <Switch
+        checked={settings.showNumeric}
+        label="Show numbers on phones"
+        onCheckedChange={(showNumeric) => setSettings({ ...settings, showNumeric })}
       />
       <Switch
         checked={settings.allowSelection}
