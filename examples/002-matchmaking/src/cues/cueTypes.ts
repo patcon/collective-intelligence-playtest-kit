@@ -14,21 +14,36 @@ export type Cue = ColourCue | AvatarCue | BirdsongCue;
 
 export type CueTypeId = Cue['type'];
 
+/** How a group finds each other with a cue: by ear or by eye. */
+export type CueSense = 'audio' | 'visual';
+
 /** One kind of cue, as the room uses it. Kept free of React, so the Worker can import it. */
 export interface CueType {
   /** One payload per group, all different up to `maxDistinct`. */
   assign: (groupCount: number, rng: Rng) => Array<Cue>;
   /** How many groups it can tell apart; past this, cues repeat. */
   maxDistinct: number;
-  /** Its name for the emcee, led by the sense it's found with: "Audio: Birds". */
-  label: string;
+  sense: CueSense;
+  /** Its name for the emcee, after the sense: "Birds, sound-only". */
+  name: string;
 }
 
 export const CUE_TYPES: Record<CueTypeId, CueType> = {
-  avatar: { assign: assignAvatars, label: 'Visual: Avatars', maxDistinct: Number.POSITIVE_INFINITY },
-  birdsong: { assign: assignBirdsongs, label: 'Audio: Birds', maxDistinct: BIRDSONG_COUNT },
-  colour: { assign: assignColours, label: 'Visual: Colour', maxDistinct: PALETTE.length },
+  avatar: { assign: assignAvatars, maxDistinct: Number.POSITIVE_INFINITY, name: 'Avatars', sense: 'visual' },
+  birdsong: { assign: assignBirdsongs, maxDistinct: BIRDSONG_COUNT, name: 'Birds, sound-only', sense: 'audio' },
+  colour: { assign: assignColours, maxDistinct: PALETTE.length, name: 'Colour', sense: 'visual' },
 };
+
+/** Every cue type. */
+export const CUE_TYPE_IDS: ReadonlyArray<CueTypeId> = Object.keys(CUE_TYPES).filter(isCueTypeId);
+
+const SENSE_NAMES: Record<CueSense, string> = { audio: 'Audio', visual: 'Visual' };
+
+/** A cue type's name for the emcee, led by its sense: "Audio: Birds, sound-only". */
+export function cueLabel(type: CueTypeId): string {
+  const { name, sense } = CUE_TYPES[type];
+  return `${SENSE_NAMES[sense]}: ${name}`;
+}
 
 export function isCueTypeId(value: unknown): value is CueTypeId {
   return typeof value === 'string' && Object.hasOwn(CUE_TYPES, value);

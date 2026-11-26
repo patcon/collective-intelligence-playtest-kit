@@ -22,7 +22,7 @@ The design is in [`docs/specs/matchmaking.md`](../../docs/specs/matchmaking.md).
 | Path | What it is |
 | --- | --- |
 | `src/matching/` | Pure matching engine: `match(ids, { algorithm, grouping }, rng)`, one file per algorithm |
-| `src/cues/` | Cue types (`colour/`, `avatar/`, `birdsong/`): `cueTypes.ts` (assign, `maxDistinct`; no React, so the Worker can use it), `CueView.tsx` (full screen) and `CueChip.tsx` (on cards) |
+| `src/cues/` | Cue types (`colour/`, `avatar/`, `birdsong/`): `cueTypes.ts` (assign, `maxDistinct`, sense and name; no React, so the Worker can use it), `CueView.tsx` (full screen) and `CueChip.tsx` (on cards) |
 | `src/room/matchRoom.ts` | The room as a pure reducer over join, leave, ready, found, config, start, move on and reset |
 | `src/room/roomSelectors.ts` | `viewFor` (one participant's screen) and `snapshotOf` (the host's view of the room) |
 | `src/room/protocol.ts` | Socket messages, validated at the boundary by `parse*` functions |

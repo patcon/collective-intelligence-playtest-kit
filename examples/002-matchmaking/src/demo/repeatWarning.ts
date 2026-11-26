@@ -1,4 +1,4 @@
-import { CUE_TYPES } from '../cues/cueTypes.ts';
+import { CUE_TYPES, cueLabel } from '../cues/cueTypes.ts';
 import { groupCount } from '../matching/match.ts';
 import type { RoomSnapshot } from '../room/protocol.ts';
 
@@ -14,6 +14,6 @@ function nextRoundSize(snapshot: RoomSnapshot): number {
 export function repeatWarning(snapshot: RoomSnapshot): string | null {
   const { cue, grouping } = snapshot.config;
   const groups = groupCount(nextRoundSize(snapshot), grouping);
-  const { label, maxDistinct } = CUE_TYPES[cue];
-  return groups > maxDistinct ? `${groups} groups, but ${label} can only tell ${maxDistinct} apart, so some groups will share a cue.` : null;
+  const { maxDistinct } = CUE_TYPES[cue];
+  return groups > maxDistinct ? `${groups} groups, but ${cueLabel(cue)} can only tell ${maxDistinct} apart, so some groups will share a cue.` : null;
 }

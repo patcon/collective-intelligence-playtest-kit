@@ -459,7 +459,7 @@ Raised after Phase 4 (2026-11-25):
   easier or redundant matching. The payload becomes a list of cues, one per chosen type.
 - [ ] **Other audio sets** besides birds (for example instruments, animals or tones), as their own
   cue types or as sets within one audio cue.
-- [ ] **Sound-only birdsong by default.** The point of an audio cue is finding people by ear alone, so
+- [x] **Sound-only birdsong by default.** The point of an audio cue is finding people by ear alone, so
   don't show the species name or icon. For now, call it "Audio: Birds (sound-only)". (Today the name
   shows as a fallback for when sound can't play; keep a smaller fallback for that case only.)
 - [ ] **Warn about sound before it's needed.** When the next round's cue is audio, the start and

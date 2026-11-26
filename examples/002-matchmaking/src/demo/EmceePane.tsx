@@ -1,6 +1,6 @@
 import { Badge, Button, Meter } from '@cloudflare/kumo';
 import { ActivityCard } from '../activity/ActivityCard.tsx';
-import { CUE_TYPES } from '../cues/cueTypes.ts';
+import { cueLabel } from '../cues/cueTypes.ts';
 import type { MatchConfig, RoomSnapshot } from '../room/protocol.ts';
 import { progressOf } from './progressOf.ts';
 import type { RoomProgress } from './progressOf.ts';
@@ -19,7 +19,7 @@ function plural(n: number, one: string, many: string): string {
 
 function describeConfig({ grouping, cue }: MatchConfig): string {
   const groups = grouping.by === 'size' ? `groups of ${grouping.size}` : plural(grouping.count, 'group', 'groups');
-  return `Random · ${groups} · ${CUE_TYPES[cue].label}`;
+  return `Random · ${groups} · ${cueLabel(cue)}`;
 }
 
 function LobbyStatus({ progress }: { progress: RoomProgress }) {
