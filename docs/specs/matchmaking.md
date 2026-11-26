@@ -87,6 +87,7 @@ packages/ui/                          # existing
 
 - `/` redirects to `/demo` with `history.replaceState`, on the client.
 - `/demo` and `/participate` are each their own `lazy()` chunk, as in `001`.
+- `/emcee` (added after the build), also its own chunk: `EmceePane` alone, connected as a host, for running the room from a phone.
 - One room, named `demo`.
 
 ### Roles and phases

@@ -1,6 +1,5 @@
 import { Loader } from '@cloudflare/kumo';
 import { RoomStatusBadge } from '@playtest-kit/ui';
-import { useState } from 'react';
 import type { ReactNode } from 'react';
 import { ConfigPanels } from '../demo/ConfigPanels.tsx';
 import { EmceePane } from '../demo/EmceePane.tsx';
@@ -10,11 +9,12 @@ import { PhoneFrame } from '../demo/PhoneFrame.tsx';
 import { repeatWarning } from '../demo/repeatWarning.ts';
 import { hostRoom } from '../room/client.ts';
 import type { RoomSnapshot } from '../room/protocol.ts';
+import { useRoomSnapshot } from '../room/useRoomSnapshot.ts';
 import { SimControls } from '../simulation/SimControls.tsx';
 import { useSimulation } from '../simulation/useSimulation.ts';
 import type { Simulation } from '../simulation/useSimulation.ts';
 
-const { RoomProvider, useRoomMessages, useRoomSend, useRoomStatus } = hostRoom;
+const { RoomProvider, useRoomSend, useRoomStatus } = hostRoom;
 
 /** The page's panels, with `header` above those on the left, so the phone's column reaches the top. */
 function Dashboard({ header, snapshot, simulation }: { header: ReactNode; snapshot: RoomSnapshot; simulation: Simulation }) {
@@ -50,8 +50,7 @@ function Dashboard({ header, snapshot, simulation }: { header: ReactNode; snapsh
 function HostView({ room }: { room: string }) {
   const status = useRoomStatus();
   const simulation = useSimulation(room);
-  const [snapshot, setSnapshot] = useState<RoomSnapshot | null>(null);
-  useRoomMessages((msg) => setSnapshot(msg.snapshot));
+  const snapshot = useRoomSnapshot();
 
   const header = (
     <header className="flex items-center gap-3">

@@ -432,7 +432,7 @@ Raised at Checkpoint C (2026-11-25):
   (with the reason) when the next round would make more groups than the cue can tell apart.
 - [ ] **Show the round as it happens on `EmceePane`.** A visual of people joining groups and moving
   through waiting → looking → found, not just counts.
-- [ ] **An `/emcee` route** with `EmceePane` on its own, for running the room from a phone.
+- [x] **An `/emcee` route** with `EmceePane` on its own, for running the room from a phone.
 - [x] **Clearer labels for the group numbers** (no change in behaviour): "Groups (max)" and "People per
   group (min)", since fewer people make fewer groups and leftovers make some groups bigger.
 - [x] **Phone-style chrome around `EmceePane`.** A minimal phone frame with phone-like proportions,

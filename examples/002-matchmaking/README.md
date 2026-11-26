@@ -11,6 +11,8 @@ The design is in [`docs/specs/matchmaking.md`](../../docs/specs/matchmaking.md).
 - `/` redirects to `/demo`.
 - `/demo`: the host. Config for the next round, the emcee's pane (counts, Start matchmaking, Start activity, End activity, Reset), a QR code to
   `/participate`, up to 20 simulated participants, and a card for everyone in the room.
+- `/emcee`: the emcee's pane on its own, for running the room from a phone. It's a host too, so it can be
+  open alongside `/demo`.
 - `/participate`: a participant. Start screen → "Waiting for the emcee…" → the group's cue → "You're a group of N"
   → after Start activity, a placeholder card for the activity that matching is for → back to waiting when the emcee ends it.
   Its connection id is kept per tab (`sessionId`), so a reload comes back to the same group and cue.
