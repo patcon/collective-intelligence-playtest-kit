@@ -13,8 +13,8 @@ interface ConfigPanelsProps {
 /** Only `random` exists so far; the others are placeholders for what's planned. */
 const ALGORITHMS = {
   random: 'Random',
-  maxDiversity: { disabled: true, label: 'Maximized Perspective Diversity' },
-  minDiversity: { disabled: true, label: 'Minimized Perspective Diversity' },
+  maxDiversity: { disabled: true, label: 'Perspective Diversity (Max)' },
+  minDiversity: { disabled: true, label: 'Perspective Diversity (Min)' },
 };
 const GROUP_BY = { count: 'Number of groups', size: 'Group size' };
 
