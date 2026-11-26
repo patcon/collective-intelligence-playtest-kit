@@ -2,7 +2,17 @@ import { lazy, Suspense } from 'react';
 
 const ROOM = 'demo';
 
-// Each page is its own chunk, so phones on `/remote` don't download the viewer and vice versa.
+// `/` is the viewer, at `/demo`, as in 002; `/remote` was the phone's page before `/participate`, so
+// old QR codes and bookmarks still work. Rewritten before the first render, so the address bar says
+// where you are, with the remote's settings (`?detection=` and the rest) kept.
+const { pathname, search, hash } = window.location;
+if (pathname === '/') {
+  window.history.replaceState(null, '', `/demo${search}${hash}`);
+} else if (pathname.startsWith('/remote')) {
+  window.history.replaceState(null, '', `/participate${search}${hash}`);
+}
+
+// Each page is its own chunk, so phones on `/participate` don't download the viewer and vice versa.
 const Remote = lazy(() => import('./pages/Remote.tsx').then((m) => ({ default: m.Remote })));
 const Viewer = lazy(() => import('./pages/Viewer.tsx').then((m) => ({ default: m.Viewer })));
 
@@ -14,7 +24,7 @@ function PageLoading() {
 export default function App() {
   return (
     <Suspense fallback={<PageLoading />}>
-      {window.location.pathname.startsWith('/remote') ? <Remote room={ROOM} /> : <Viewer room={ROOM} />}
+      {window.location.pathname.startsWith('/participate') ? <Remote room={ROOM} /> : <Viewer room={ROOM} />}
     </Suspense>
   );
 }

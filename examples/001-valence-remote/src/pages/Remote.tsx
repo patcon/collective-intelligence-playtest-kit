@@ -99,7 +99,7 @@ function ConnectedRemote() {
 }
 
 /**
- * `/remote`: this device as a phone in the room. `?detection=` picks the mode (default `flip`);
+ * `/participate`: this device as a phone in the room. `?detection=` picks the mode (default `flip`);
  * `?idleMs=` and `?stillDeg=` override when it counts as idle (see DEFAULT_IDLE); `?tintWhenIdle=0`
  * stops tinting the screen while idle; `?bar=left` runs the valence bar up the left edge rather
  * than along the top; `?barVariant=` picks how the bar shows the raw reading against the level sent

@@ -6,10 +6,12 @@ pieces in [`@playtest-kit/common`](../../packages/common) and [`@playtest-kit/ui
 
 ## Pages
 
-- `/`: the viewer. A row per phone with its live valence and activity, the raw message log, and a QR
-  code to `/remote`, whose settings (detection, labels, resolution and so on) the viewer sets for every phone.
-- `/remote`: this device as a remote. Start screen (motion and audio permission, wake lock), then the
+- `/` redirects to `/demo`.
+- `/demo`: the viewer. A row per phone with its live valence and activity, the raw message log, and a QR
+  code to `/participate`, whose settings (detection, labels, resolution and so on) the viewer sets for every phone.
+- `/participate`: this device as a remote. Start screen (motion and audio permission, wake lock), then the
   valence bar. Its URL parameters are listed on `Remote` in `src/pages/Remote.tsx`.
+- `/remote`, its old address, redirects to `/participate`, keeping its URL parameters.
 
 ## Layout
 
