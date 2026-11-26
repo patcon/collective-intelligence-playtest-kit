@@ -1,3 +1,4 @@
+import { parseJsonObject } from '@playtest-kit/common';
 import { isActivity } from '../ValenceRemote/lib/activity.ts';
 import type { Activity } from '../ValenceRemote/lib/activity.ts';
 import { isRemoteSettings } from './remoteSettings.ts';
@@ -86,15 +87,6 @@ interface RawMessage {
   settings?: unknown;
 }
 
-function readMessage(raw: string): RawMessage | null {
-  try {
-    const value: unknown = JSON.parse(raw);
-    return typeof value === 'object' && value !== null ? value : null;
-  } catch {
-    return null;
-  }
-}
-
 function phoneMessageOf(msg: RawMessage): PhoneMessage | null {
   if (msg.type === 'valence' && isValence(msg.v)) {
     return { type: 'valence', v: msg.v };
@@ -107,7 +99,7 @@ function phoneMessageOf(msg: RawMessage): PhoneMessage | null {
 
 /** A phone's message from raw socket text, or null if it isn't one. */
 export function parsePhoneMessage(raw: string): PhoneMessage | null {
-  const msg = readMessage(raw);
+  const msg: RawMessage | null = parseJsonObject(raw);
   return msg && phoneMessageOf(msg);
 }
 
@@ -120,7 +112,7 @@ function settingsMessageOf(msg: RawMessage): SettingsMessage | null {
 
 /** A viewer's message from raw socket text, or null if it isn't one. */
 export function parseViewerMessage(raw: string): ViewerMessage | null {
-  const msg = readMessage(raw);
+  const msg: RawMessage | null = parseJsonObject(raw);
   return msg?.type === 'settings' && isRemoteSettings(msg.settings) ? { settings: msg.settings, type: 'settings' } : null;
 }
 
@@ -149,7 +141,7 @@ function aboutConnection(msg: RawMessage, id: string): RoomMessage | null {
 
 /** A message from the room, from raw socket text, or null if it isn't one. */
 export function parseRoomMessage(raw: string): RoomMessage | null {
-  const msg = readMessage(raw);
+  const msg: RawMessage | null = parseJsonObject(raw);
   if (!msg) {
     return null;
   }

@@ -1,6 +1,6 @@
 # TODO
 
-## Ideas: smaller `/remote`, faster connect
+## Ideas: smaller `/participate`, faster connect
 
 Not yet worth doing: the remote will grow, and the examples should keep the full Agents SDK. Measured 2026-11-24 with `vite build`. Before the `lazy()` page split, both routes shared one bundle: 164 KB JS + 20 KB CSS brotli.
 

@@ -2,6 +2,9 @@
   "name": "@playtest-kit/ui",
   "private": true,
   "type": "module",
+  "sideEffects": [
+    "**/*.css"
+  ],
   "exports": {
     ".": "./src/index.ts"
   },
@@ -44,5 +47,9 @@
     "tsrs": "0.25.0-ts7.1.0-beta",
     "vite": "8.3.8",
     "vitest": "5.1.0"
+  },
+  "dependencies": {
+    "@playtest-kit/common": "workspace:*",
+    "uqr": "0.1.3"
   }
 }

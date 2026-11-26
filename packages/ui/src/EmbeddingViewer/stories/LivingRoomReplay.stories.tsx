@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useMemo, useRef, useState } from 'react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
-import useInterval from '../../hooks/effects/useInterval.ts';
+import { useInterval } from '@playtest-kit/common';
 import EmbeddingViewer from '../EmbeddingViewer.tsx';
 import livingRoom from './fixtures/living-room.json';
 import { expectNoPageErrors, recordDataset, sleep } from './storyChecks.ts';

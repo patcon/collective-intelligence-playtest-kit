@@ -1,9 +1,7 @@
+import { RoomStatusBadge } from '@playtest-kit/ui';
 import { useState } from 'react';
-import { useRoomMessages } from '../hooks/effects/useRoomMessages.ts';
-import { useSendOnOpen } from '../hooks/effects/useSendOnOpen.ts';
-import { RoomProvider, useRoomStatus } from '../room/RoomProvider.tsx';
+import { RoomProvider, useRoomMessages, useRoomStatus, useSendOnOpen } from '../room/client.ts';
 import type { RemoteSettings } from '../room/remoteSettings.ts';
-import { RoomStatusBadge } from '../room/RoomStatusBadge.tsx';
 import { isBarVariant } from '../ValenceRemote/components/BarTracks.tsx';
 import { isBackgroundMode } from '../ValenceRemote/components/RemoteScreen.tsx';
 import { isBarPosition } from '../ValenceRemote/components/ValenceBar.tsx';
@@ -69,7 +67,7 @@ function barVariantFromUrl() {
 
 function ConnectedRemote() {
   // Holders can take the connection for granted, so the badge only shows when it isn't open.
-  const connected = useRoomStatus() === 'open';
+  const status = useRoomStatus();
   const [activity, setActivity] = useState<Activity | null>(null);
   const [roomSettings, setRoomSettings] = useState<RemoteSettings | null>(null);
   const [picked, setPicked] = useState<Detection | null>(null);
@@ -83,7 +81,7 @@ function ConnectedRemote() {
 
   return (
     <ValenceRemote
-      badges={connected ? null : <RoomStatusBadge />}
+      badges={status === 'open' ? null : <RoomStatusBadge status={status} />}
       axisLabels={settings.axisLabels}
       barPosition={barFromUrl()}
       barVariant={barVariantFromUrl()}
@@ -101,7 +99,7 @@ function ConnectedRemote() {
 }
 
 /**
- * `/remote`: this device as a phone in the room. `?detection=` picks the mode (default `flip`);
+ * `/participate`: this device as a phone in the room. `?detection=` picks the mode (default `flip`);
  * `?idleMs=` and `?stillDeg=` override when it counts as idle (see DEFAULT_IDLE); `?tintWhenIdle=0`
  * stops tinting the screen while idle; `?bar=left` runs the valence bar up the left edge rather
  * than along the top; `?barVariant=` picks how the bar shows the raw reading against the level sent
@@ -115,7 +113,7 @@ function ConnectedRemote() {
  */
 export function Remote({ room }: { room: string }) {
   return (
-    <RoomProvider role="phone" room={room}>
+    <RoomProvider closeWhenHidden role="phone" room={room}>
       <ConnectedRemote />
     </RoomProvider>
   );

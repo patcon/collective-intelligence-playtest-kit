@@ -2,7 +2,7 @@ import type { MouseEvent as ReactMouseEvent, RefObject } from 'react';
 import { useMemo, useRef, useState } from 'react';
 import { Vector2 } from 'three';
 import useLatestRef from '../hooks/effects/useLatestRef.ts';
-import useOnChange from '../hooks/effects/useOnChange.ts';
+import { useOnChange } from '@playtest-kit/common';
 import useThreeScene from '../hooks/effects/useThreeScene.ts';
 import FollowButton from './components/FollowButton.tsx';
 import { createLayoutTween } from './lib/layoutTween.ts';

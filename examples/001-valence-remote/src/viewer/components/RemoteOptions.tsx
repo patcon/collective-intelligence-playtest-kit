@@ -28,7 +28,7 @@ export function remoteUrl(origin: string, settings: RemoteSettings): string {
   if (allowSelection) {
     params.set('allowSelection', '1');
   }
-  return `${origin}/remote?${params}`;
+  return `${origin}/participate?${params}`;
 }
 
 const NO_LABELS = 'none';
