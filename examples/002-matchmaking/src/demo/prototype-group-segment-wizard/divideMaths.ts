@@ -1,4 +1,4 @@
-// PROTOTYPE (throwaway): the maths behind `GroupSegmentWizard`. See docs/intent/emcee-divide-the-room.md.
+// PROTOTYPE (throwaway): the maths behind `GroupSegmentWizard`. See docs/intent/group-segmenter-wizard.md.
 import { MIN_GROUP_SIZE } from '../../matching/match.ts';
 
 export type Locked = 'groups' | 'size';

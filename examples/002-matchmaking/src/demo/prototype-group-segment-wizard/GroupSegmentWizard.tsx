@@ -1,4 +1,4 @@
-// PROTOTYPE (throwaway): `GroupSegmentWizard`, the emcee's control for dividing the room. See docs/intent/emcee-divide-the-room.md.
+// PROTOTYPE (throwaway): `GroupSegmentWizard`, the emcee's control for dividing the room. See docs/intent/group-segmenter-wizard.md.
 import type { Division } from './useDivision.ts';
 import { LAYOUTS } from './variants.tsx';
 import type { GroupSegmentWizardLayout } from './variants.tsx';

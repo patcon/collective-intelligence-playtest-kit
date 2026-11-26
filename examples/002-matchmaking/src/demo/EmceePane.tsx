@@ -96,7 +96,7 @@ export function EmceePane({ snapshot, onCommand }: EmceePaneProps) {
       {/* At the bottom of the screen, where a thumb reaches. */}
       <div className="mt-auto flex flex-col gap-5">
         {/* PROTOTYPE (throwaway): `GroupSegmentWizard`, in the layout ?variant= names (compact by default). Pinned
-            above Start, so people arriving (more dots in the stages) doesn't move it. See docs/intent/emcee-divide-the-room.md. */}
+            above Start, so people arriving (more dots in the stages) doesn't move it. See docs/intent/group-segmenter-wizard.md. */}
         {import.meta.env.DEV && snapshot.phase === 'lobby' && (
           <>
             <GroupSegmentWizard division={division} layout={layout} />
