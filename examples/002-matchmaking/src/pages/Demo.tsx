@@ -1,4 +1,4 @@
-import { Loader } from '@cloudflare/kumo';
+import { Button, Loader } from '@cloudflare/kumo';
 import { RoomStatusBadge } from '@playtest-kit/ui';
 import type { ReactNode } from 'react';
 import { ConfigPanels } from '../demo/ConfigPanels.tsx';
@@ -7,6 +7,7 @@ import { JoinPanel } from '../demo/JoinPanel.tsx';
 import { ParticipantCards } from '../demo/ParticipantCards.tsx';
 import { PhoneFrame } from '../demo/PhoneFrame.tsx';
 import { repeatWarning } from '../demo/repeatWarning.ts';
+import { straySimIds } from '../demo/straySimIds.ts';
 import { hostRoom } from '../room/client.ts';
 import type { RoomSnapshot } from '../room/protocol.ts';
 import { useRoomSnapshot } from '../room/useRoomSnapshot.ts';
@@ -19,6 +20,8 @@ const { RoomProvider, useRoomSend, useRoomStatus } = hostRoom;
 /** The page's panels, with `header` above those on the left, so the phone's column reaches the top. */
 function Dashboard({ header, snapshot, simulation }: { header: ReactNode; snapshot: RoomSnapshot; simulation: Simulation }) {
   const send = useRoomSend();
+  const simNames = new Map(simulation.sims.map((sim) => [sim.id, sim.name]));
+  const strays = straySimIds(snapshot, new Set(simNames.keys()));
   return (
     <div className="flex flex-col gap-4 md:flex-row md:items-start">
       <div className="flex min-w-0 flex-1 flex-col gap-4">
@@ -30,12 +33,16 @@ function Dashboard({ header, snapshot, simulation }: { header: ReactNode; snapsh
             <SimControls simulation={simulation} />
           </div>
         </div>
-        <h2 className="text-lg font-semibold">Participants</h2>
-        <ParticipantCards
-          onSimFound={simulation.found}
-          simNames={new Map(simulation.sims.map((sim) => [sim.id, sim.name]))}
-          snapshot={snapshot}
-        />
+        <div className="flex items-center gap-3">
+          <h2 className="text-lg font-semibold">Participants</h2>
+          {/* A catch for sims another tab, or a page that lost track of them, left connected. */}
+          {strays.length > 0 && (
+            <Button onClick={() => send({ ids: strays, type: 'remove' })} size="xs" variant="secondary">
+              {`Clear ${strays.length} stray ${strays.length === 1 ? 'sim' : 'sims'}`}
+            </Button>
+          )}
+        </div>
+        <ParticipantCards onSimFound={simulation.found} simNames={simNames} snapshot={snapshot} />
       </div>
       {/* Kept in view while the participant cards scroll, since it's what the emcee is using. */}
       <div className="shrink-0 md:sticky md:top-4 md:w-92">

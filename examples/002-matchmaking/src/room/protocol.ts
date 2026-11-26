@@ -19,8 +19,11 @@ export type Role = 'participant' | 'host';
 /** A participant → the room: past the start screen, so match me; or, I've found my group (or, unticked, not yet). */
 export type ParticipantMessage = { type: 'ready' } | { type: 'found'; found: boolean };
 
-/** The host → the room. */
-export type HostMessage = { type: 'config'; config: MatchConfig } | { type: 'start' | 'moveOn' | 'back' | 'reset' };
+/**
+ * The host → the room. `remove` disconnects participants and keeps them out: for stray simulated
+ * phones whose page lost track of them, which would otherwise reconnect.
+ */
+export type HostMessage = { type: 'config'; config: MatchConfig } | { type: RoundControl } | { type: 'remove'; ids: Array<string> };
 
 /**
  * The room → one participant, on joining and after every change: what their screen shows, the cue
@@ -49,6 +52,7 @@ interface RawMessage {
   type?: unknown;
   found?: unknown;
   config?: unknown;
+  ids?: unknown;
   view?: unknown;
   nextCue?: unknown;
   showFoundCount?: unknown;
@@ -64,11 +68,25 @@ export function parseParticipantMessage(raw: string): ParticipantMessage | null 
   return type === 'found' && typeof found === 'boolean' ? { found, type } : null;
 }
 
+type RoundControl = 'start' | 'moveOn' | 'back' | 'reset';
+const ROUND_CONTROLS: ReadonlySet<unknown> = new Set<RoundControl>(['start', 'moveOn', 'back', 'reset']);
+
+function isRoundControl(value: unknown): value is RoundControl {
+  return ROUND_CONTROLS.has(value);
+}
+
+function isStringList(value: unknown): value is Array<string> {
+  return Array.isArray(value) && value.every((item: unknown) => typeof item === 'string');
+}
+
 /** The host's message from raw socket text, or null if it isn't one. */
 export function parseHostMessage(raw: string): HostMessage | null {
   const msg: RawMessage = parseJsonObject(raw) ?? {};
-  if (msg.type === 'start' || msg.type === 'moveOn' || msg.type === 'back' || msg.type === 'reset') {
+  if (isRoundControl(msg.type)) {
     return { type: msg.type };
+  }
+  if (msg.type === 'remove' && isStringList(msg.ids)) {
+    return { ids: msg.ids, type: 'remove' };
   }
   return msg.type === 'config' && isMatchConfig(msg.config) ? { config: msg.config, type: 'config' } : null;
 }

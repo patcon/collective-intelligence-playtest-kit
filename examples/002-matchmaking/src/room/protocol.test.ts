@@ -45,6 +45,13 @@ describe('parseHostMessage', () => {
       expect(parseHostMessage(json({ config, type: 'config' }))).toBeNull();
     }
   });
+
+  it('reads a list of ids to remove, and rejects anything else', () => {
+    expect(parseHostMessage(json({ ids: ['sim-a', 'sim-b'], type: 'remove' }))).toEqual({ ids: ['sim-a', 'sim-b'], type: 'remove' });
+    expect(parseHostMessage(json({ ids: 'sim-a', type: 'remove' }))).toBeNull();
+    expect(parseHostMessage(json({ ids: ['sim-a', 3], type: 'remove' }))).toBeNull();
+    expect(parseHostMessage(json({ type: 'remove' }))).toBeNull();
+  });
 });
 
 describe('parseToParticipant', () => {
