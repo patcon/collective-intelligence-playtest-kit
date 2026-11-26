@@ -60,8 +60,8 @@ const PHASE_BADGE: Record<RoomSnapshot['phase'], { variant: 'primary' | 'seconda
 };
 
 /**
- * The emcee's pane, phone-width: how many are ready, how the round is going, and the controls to
- * move back and forward (see `EmceeControls`). Start activity never waits for every group. The config
+ * The emcee's pane, phone-width and filling its screen: how many are ready and how the round is going
+ * at the top, and the controls to move back and forward at the bottom (see `EmceeControls`). Start activity never waits for every group. The config
  * shows here read-only; it's set elsewhere. It has no frame of its own: `/demo` puts it in a `PhoneFrame`.
  */
 export function EmceePane({ snapshot, onCommand }: EmceePaneProps) {
@@ -70,7 +70,7 @@ export function EmceePane({ snapshot, onCommand }: EmceePaneProps) {
   const controls = { blocker: startBlocker(progress.nextRound, snapshot.config.grouping), onCommand, phase: snapshot.phase };
 
   return (
-    <div className="flex w-full flex-col gap-5 p-5">
+    <div className="flex min-h-full w-full flex-1 flex-col gap-5 p-5">
       {/* Like a phone app's top bar: Reset on the left, the title in the middle, the phase on the right. */}
       <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
         <div className="justify-self-start">
@@ -84,8 +84,11 @@ export function EmceePane({ snapshot, onCommand }: EmceePaneProps) {
       {snapshot.phase === 'lobby' && <LobbyStatus progress={progress} />}
       {snapshot.phase === 'round' && <RoundStatus progress={progress} />}
       {snapshot.phase === 'activity' && <ActivityStatus progress={progress} />}
-      <EmceeControls {...controls} />
       <p className="text-sm text-kumo-subtle">Next round: {describeConfig(snapshot.config)}</p>
+      {/* At the bottom of the screen, where a thumb reaches. */}
+      <div className="mt-auto">
+        <EmceeControls {...controls} />
+      </div>
     </div>
   );
 }
