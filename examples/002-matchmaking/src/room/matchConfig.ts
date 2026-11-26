@@ -1,5 +1,6 @@
 import { isCueTypeId } from '../cues/cueTypes.ts';
 import type { CueTypeId } from '../cues/cueTypes.ts';
+import { FITS } from '../matching/match.ts';
 import type { Algorithm, Grouping } from '../matching/match.ts';
 
 /**
@@ -14,7 +15,7 @@ export interface MatchConfig {
   showFoundCount: boolean;
 }
 
-export const DEFAULT_CONFIG: MatchConfig = { algorithm: 'random', cue: 'colour', grouping: { by: 'groupSize', groupSize: 3 }, showFoundCount: false };
+export const DEFAULT_CONFIG: MatchConfig = { algorithm: 'random', cue: 'colour', grouping: { by: 'groupSize', fit: 'smart', groupSize: 3 }, showFoundCount: false };
 
 /** The most people a room expects, and so the largest group size or count worth asking for. */
 export const MAX_GROUPING = 50;
@@ -28,7 +29,7 @@ function isGrouping(value: unknown): value is Grouping {
     return false;
   }
   if (value.by === 'groupSize') {
-    return 'groupSize' in value && isWhole(value.groupSize, 2);
+    return 'groupSize' in value && isWhole(value.groupSize, 2) && 'fit' in value && (FITS as ReadonlyArray<unknown>).includes(value.fit);
   }
   return value.by === 'groupCount' && 'groupCount' in value && isWhole(value.groupCount, 1);
 }

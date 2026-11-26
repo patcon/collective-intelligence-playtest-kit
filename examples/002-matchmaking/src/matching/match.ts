@@ -3,8 +3,15 @@ import type { Rng } from './rng.ts';
 
 export type Algorithm = 'random';
 
+/**
+ * How people per group handles people who don't divide evenly: `smart` aims for the average closest
+ * to it, `min` makes groups of at least it, `max` groups of at most it. See `groupSizes`.
+ */
+export type Fit = 'smart' | 'min' | 'max';
+export const FITS: ReadonlyArray<Fit> = ['smart', 'min', 'max'];
+
 /** How to split people up: into groups of about `groupSize` people, or into `groupCount` groups. */
-export type Grouping = { by: 'groupSize'; groupSize: number } | { by: 'groupCount'; groupCount: number };
+export type Grouping = { by: 'groupSize'; groupSize: number; fit: Fit } | { by: 'groupCount'; groupCount: number };
 
 /**
  * Each algorithm orders the ids so that neighbours suit each other; `match` deals them out from there.

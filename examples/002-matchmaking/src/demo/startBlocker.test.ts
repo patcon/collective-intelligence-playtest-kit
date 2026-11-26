@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { startBlocker } from './startBlocker.ts';
 
-const threes = { by: 'groupSize', groupSize: 3 } as const;
+const threes = { by: 'groupSize', fit: 'smart', groupSize: 3 } as const;
 
 describe('startBlocker', () => {
   it('blocks with no one, or only one person, ready', () => {

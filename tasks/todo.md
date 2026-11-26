@@ -25,9 +25,9 @@ Plan: [`plan.md`](plan.md). Spec: [`docs/specs/group-segment-wizard.md`](../docs
 **Description:** Add `Fit` and the `fit` field to the `groupSize` branch of `Grouping`. Port `sizesOf` / `sizesForSize` from the prototype into `src/matching/split.ts` as `groupSizes(n, grouping)`. Validation requires `fit`. The default is group size 3, Smart. `ConfigPanels` keeps working by setting `fit: 'smart'` when it builds a group-size grouping (it gets deleted in T7).
 
 **Acceptance criteria:**
-- [ ] Every worked example in the spec's Behaviour section is a passing case in `split.test.ts`, including `20 at Min 15 → 15·5` and `0 at count 3 → 0·0·0`.
-- [ ] Table test over n = 0..50 × count 2..6 × size 2..5 × each fit: sizes sum to n, there are at least 2 groups, and they're largest first.
-- [ ] `isMatchConfig` rejects a group-size grouping with no `fit` or an unknown `fit`, and the old `{ by: 'size', size }` shape (`protocol.test.ts`).
+- [x] Every worked example in the spec's Behaviour section is a passing case in `split.test.ts`, including `20 at Min 15 → 15·5` and `0 at count 3 → 0·0·0`.
+- [x] Table test over n = 0..50 × count 2..6 × size 2..5 × each fit: sizes sum to n, there are at least 2 groups, and they're largest first.
+- [x] `isMatchConfig` rejects a group-size grouping with no `fit` or an unknown `fit`, and the old `{ by: 'size', size }` shape (`protocol.test.ts`).
 
 **Verification:** `pnpm test` · `pnpm typecheck` · `pnpm lint`
 

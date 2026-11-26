@@ -4,7 +4,7 @@ import { straySimIds } from './straySimIds.ts';
 
 function roomWith(...ids: Array<string>): RoomSnapshot {
   return {
-    config: { algorithm: 'random', cue: 'colour', grouping: { by: 'groupSize', groupSize: 2 }, showFoundCount: false },
+    config: { algorithm: 'random', cue: 'colour', grouping: { by: 'groupSize', fit: 'smart', groupSize: 2 }, showFoundCount: false },
     groups: [],
     participants: ids.map((id) => ({ group: null, id, status: 'waiting' })),
     phase: 'lobby',

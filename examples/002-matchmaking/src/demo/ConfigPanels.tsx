@@ -34,7 +34,7 @@ function amountOf(grouping: Grouping): number {
 
 function groupingOf(by: string, amount: number): Grouping | null {
   if (by === 'groupSize' && amount >= 2) {
-    return { by, groupSize: amount };
+    return { by, fit: 'smart', groupSize: amount };
   }
   return by === 'groupCount' && amount >= 1 ? { by, groupCount: amount } : null;
 }

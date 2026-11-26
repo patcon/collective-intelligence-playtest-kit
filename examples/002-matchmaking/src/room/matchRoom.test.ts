@@ -22,7 +22,7 @@ const readied = (...ids: Array<string>): Array<RoomEvent> =>
 /** Move on twice: from the round to the activity, then back to the lobby. */
 const toLobby: Array<RoomEvent> = [{ type: 'moveOn' }, { type: 'moveOn' }];
 
-const pairs: RoomEvent = { config: { algorithm: 'random', cue: 'colour', grouping: { by: 'groupSize', groupSize: 2 }, showFoundCount: false }, type: 'config' };
+const pairs: RoomEvent = { config: { algorithm: 'random', cue: 'colour', grouping: { by: 'groupSize', fit: 'smart', groupSize: 2 }, showFoundCount: false }, type: 'config' };
 
 /** Someone else in `id`'s group. */
 function partnerOf(state: RoomState, id: string): string {
