@@ -52,7 +52,7 @@ function HostView({ room }: { room: string }) {
 
   return (
     <main className="mx-auto flex min-h-screen max-w-400 flex-col gap-4 p-4">
-      <header className="flex items-center justify-between gap-2">
+      <header className="flex items-center gap-3">
         <h1 className="text-xl font-semibold">Matchmaking</h1>
         <RoomStatusBadge status={status} />
       </header>
