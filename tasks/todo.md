@@ -387,8 +387,8 @@ and add it to the config options.
 - Mark the spec as built.
 
 **Acceptance criteria:**
-- [ ] Criterion 13.
-- [ ] A new reader could build next week's app following the Patterns section.
+- [x] Criterion 13.
+- [x] A new reader could build next week's app following the Patterns section.
 
 **Verification:** Read-through. Links resolve.
 **Dependencies:** 15, 16 (it can be drafted after Checkpoint B)
@@ -396,8 +396,8 @@ and add it to the config options.
 **Scope:** S
 
 ### ✅ Checkpoint D: complete
-- [ ] All 13 success criteria pass (10 on your devices).
-- [ ] `pnpm lint && pnpm typecheck`, all tests, and both examples' builds pass.
+- [ ] All 13 success criteria pass (10 on your devices). All but 10 pass on my side.
+- [x] `pnpm lint && pnpm typecheck`, all tests, and both examples' builds pass.
 - [ ] Ready for PR (regular merge commit).
 
 ---

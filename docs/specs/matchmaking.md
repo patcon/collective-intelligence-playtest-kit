@@ -1,6 +1,6 @@
 # Spec: Matchmaking example, and the first shared room framework
 
-_Status: draft, open questions resolved, awaiting approval (2026-11-25). Intent: [`docs/intent/matchmaking.md`](../intent/matchmaking.md)._
+_Status: built (2026-11-25). Criterion 10, birdsong on real phones, is still to be checked on iOS Safari and Android Chrome. Intent: [`docs/intent/matchmaking.md`](../intent/matchmaking.md)._
 
 ## Objective
 
