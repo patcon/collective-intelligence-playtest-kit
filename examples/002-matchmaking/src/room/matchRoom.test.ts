@@ -39,6 +39,13 @@ describe('reduce', () => {
     expect(run([{ type: 'start' }], state)).toBe(state);
   });
 
+  it('rejects a start that would leave anyone in a group of one', () => {
+    const alone = run(readied('a'));
+    expect(run([{ type: 'start' }], alone)).toBe(alone);
+    const threeIntoTwo = run([{ config: { algorithm: 'random', cue: 'colour', grouping: { by: 'count', count: 2 } }, type: 'config' }, ...readied('a', 'b', 'c')]);
+    expect(run([{ type: 'start' }], threeIntoTwo)).toBe(threeIntoTwo);
+  });
+
   it('matches everyone ready into groups, each with its own cue', () => {
     const state = run([pairs, ...readied('a', 'b', 'c', 'd'), { type: 'start' }]);
     expect(state.phase).toBe('round');
@@ -150,7 +157,7 @@ describe('reduce', () => {
   });
 
   it('ignores a found tap outside a round, a start outside the lobby, and move on in the lobby', () => {
-    const lobby = run(readied('a'));
+    const lobby = run(readied('a', 'b'));
     expect(run([{ id: 'a', type: 'found' }], lobby)).toBe(lobby);
     expect(run([{ type: 'moveOn' }], lobby)).toBe(lobby);
     const started = run([{ type: 'start' }], lobby);

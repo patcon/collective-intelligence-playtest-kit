@@ -100,7 +100,7 @@ packages/ui/                          # existing
   - `round`: groups are assigned, cues are shown and confirmations are tracked.
   - `activity` (added after the build): groups keep their cue and see a placeholder card for the activity that matching is for.
 - Moves between phases:
-  - **Start** (from `lobby`) goes to `round`.
+  - **Start** (from `lobby`) goes to `round`. It's refused, and the emcee's button disabled with the reason, if anyone would be in a group of 1: fewer than 2 ready, or more groups asked for than the ready people can fill in twos (added after the build).
   - **Move on** goes from `round` to `activity`, then from `activity` back to `lobby`, and the next Start makes new groups. (Since the activity was added, the emcee's buttons read "Start matchmaking", "Start activity" and "End activity"; the messages are still `start` and `moveOn`.)
   - **Reset** clears groups and sends everyone back to waiting, from either phase, and starts the round count again.
 - What each participant sees:
@@ -171,7 +171,7 @@ so tests are deterministic.
 - **by size `k`:** `floor(n / k)` groups. Each leftover person joins a different existing group (with
   n=20, k=3 that gives 6 groups: two of 4 and four of 3). If `n < k`, everyone forms one group.
 - **by count `c`:** `min(c, n)` groups, with sizes differing by at most 1.
-- Edge cases: `n = 0` gives no groups (Start is disabled). `n = 1` gives one group of 1.
+- Edge cases: `n = 0` gives no groups (Start is disabled). `n = 1` gives one group of 1, which the engine allows but the room won't start (see Start, above).
 
 The engine is laid out so that adding an algorithm means adding a single file, but it stays in `002`.
 

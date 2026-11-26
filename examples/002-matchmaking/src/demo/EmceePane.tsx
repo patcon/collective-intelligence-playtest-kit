@@ -3,6 +3,7 @@ import { ActivityCard } from '../activity/ActivityCard.tsx';
 import { cueLabel } from '../cues/cueTypes.ts';
 import type { MatchConfig, RoomSnapshot } from '../room/protocol.ts';
 import { progressOf } from './progressOf.ts';
+import { startBlocker } from './startBlocker.ts';
 import type { RoomProgress } from './progressOf.ts';
 
 /** What the emcee can tell the room to do. */
@@ -56,13 +57,14 @@ function ActivityStatus({ progress }: { progress: RoomProgress }) {
   );
 }
 
-function StartButton({ progress, onStart }: { progress: RoomProgress; onStart: () => void }) {
+/** Start, disabled with the reason when the room would refuse it (see `startBlocker`). */
+function StartButton({ blocker, onStart }: { blocker: string | null; onStart: () => void }) {
   return (
     <div className="flex flex-col gap-1">
-      <Button disabled={progress.ready === 0} onClick={onStart} size="lg" variant="primary">
+      <Button disabled={blocker !== null} onClick={onStart} size="lg" variant="primary">
         Start matchmaking
       </Button>
-      {progress.ready === 0 && <p className="text-sm text-kumo-subtle">No one is ready yet. People join on /participate and tap Start.</p>}
+      {blocker && <p className="text-sm text-kumo-subtle">{blocker}</p>}
     </div>
   );
 }
@@ -96,7 +98,7 @@ export function EmceePane({ snapshot, onCommand }: EmceePaneProps) {
         <Badge variant={badge.variant}>{badge.label(snapshot.round)}</Badge>
       </div>
       {snapshot.phase === 'lobby' && <LobbyStatus progress={progress} />}
-      {snapshot.phase === 'lobby' && <StartButton onStart={() => onCommand({ type: 'start' })} progress={progress} />}
+      {snapshot.phase === 'lobby' && <StartButton blocker={startBlocker(progress.ready, snapshot.config.grouping)} onStart={() => onCommand({ type: 'start' })} />}
       {snapshot.phase === 'round' && <RoundStatus progress={progress} />}
       {snapshot.phase === 'round' && moveOn('Start activity')}
       {snapshot.phase === 'activity' && <ActivityStatus progress={progress} />}

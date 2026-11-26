@@ -23,6 +23,14 @@ export function groupCount(n: number, grouping: Grouping): number {
   return grouping.by === 'size' ? Math.max(1, Math.floor(n / grouping.size)) : Math.min(grouping.count, n);
 }
 
+/** No one is matched into a group smaller than this: a group of one has no one to find. */
+export const MIN_GROUP_SIZE = 2;
+
+/** The size of the smallest group `n` people make (sizes differ by at most one), or 0 with no people. */
+export function smallestGroupSize(n: number, grouping: Grouping): number {
+  return n === 0 ? 0 : Math.floor(n / groupCount(n, grouping));
+}
+
 /**
  * Splits `ids` into groups as `grouping` asks. Dealt round-robin, so sizes differ by at most one:
  * by size, leftovers join existing groups one each.

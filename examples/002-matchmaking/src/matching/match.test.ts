@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { match } from './match.ts';
+import { match, smallestGroupSize } from './match.ts';
 import type { Grouping } from './match.ts';
 import { seededRng } from './rng.ts';
 
@@ -34,6 +34,14 @@ describe('match', () => {
 
   it('makes no more groups than people by count', () => {
     expect(sizes(2, { by: 'count', count: 5 })).toEqual([1, 1]);
+  });
+
+  it('knows the smallest group it will make', () => {
+    expect(smallestGroupSize(0, { by: 'size', size: 3 })).toBe(0);
+    expect(smallestGroupSize(1, { by: 'size', size: 3 })).toBe(1);
+    expect(smallestGroupSize(20, { by: 'size', size: 3 })).toBe(3);
+    expect(smallestGroupSize(3, { by: 'count', count: 2 })).toBe(1);
+    expect(smallestGroupSize(20, { by: 'count', count: 4 })).toBe(5);
   });
 
   it('makes no groups from no one, and one group of one from one person', () => {

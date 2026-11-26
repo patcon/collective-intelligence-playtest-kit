@@ -1,5 +1,5 @@
 import type { Cue, CueTypeId } from '../cues/cueTypes.ts';
-import { match } from '../matching/match.ts';
+import { match, MIN_GROUP_SIZE, smallestGroupSize } from '../matching/match.ts';
 import type { Rng } from '../matching/rng.ts';
 import { DEFAULT_CONFIG } from './matchConfig.ts';
 import type { MatchConfig } from './matchConfig.ts';
@@ -74,10 +74,10 @@ function found(state: RoomState, id: string): RoomState {
     : state;
 }
 
-/** Matches everyone connected and ready. Does nothing outside the lobby, or with no one to match. */
+/** Matches everyone connected and ready. Does nothing outside the lobby, or if anyone would be in a group of one. */
 function start(state: RoomState, { assignCues, rng }: RoomDeps): RoomState {
   const ids = state.participants.filter((p) => p.connected && p.ready).map((p) => p.id);
-  if (state.phase !== 'lobby' || ids.length === 0) {
+  if (state.phase !== 'lobby' || smallestGroupSize(ids.length, state.config.grouping) < MIN_GROUP_SIZE) {
     return state;
   }
   const groups = match(ids, state.config, rng);
