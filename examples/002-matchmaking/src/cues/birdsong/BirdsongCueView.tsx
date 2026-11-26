@@ -20,7 +20,7 @@ export function BirdsongCueView({ cue, children }: { cue: BirdsongCue; children?
         </p>
       ) : (
         <p className="max-w-sm text-kumo-subtle">
-          {status === 'loading' ? 'Loading the sound…' : 'Find the phones playing the same birdsong as yours.'}
+          {status === 'loading' ? 'Loading the sound…' : 'Find phones playing the same sound as yours.'}
         </p>
       )}
       {children}
