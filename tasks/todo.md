@@ -421,3 +421,21 @@ Raised at Checkpoint B (2026-11-25). Not scheduled yet.
   (with a trusted local cert, or after a deploy).
 - [ ] **"Looking elsewhere" status.** Tell the room when a participant's page is hidden (they switched
   apps or locked the phone), and show it on the host, so the emcee can see who's distracted.
+
+Raised at Checkpoint C (2026-11-25):
+
+- [ ] **Show the colours.** Show the cue's palette where it's chosen (my reading: swatches by the Cue
+  picker on `/demo-ui`), so the emcee can see what phones will show.
+- [ ] **More colours, kept far apart.** A bigger palette, and for the expected number of groups pick the
+  subset that's most spread out, rather than a random one.
+- [ ] **Block Start when there aren't enough cues.** Today the config panel only warns. Disable Start
+  (with the reason) when the next round would make more groups than the cue can tell apart.
+- [ ] **Show the round as it happens on `EmceePane`.** A visual of people joining groups and moving
+  through waiting → looking → found, not just counts.
+- [ ] **An `/emcee` route** with `EmceePane` on its own, for running the room from a phone.
+- [ ] **Clearer labels for the group numbers** (no change in behaviour): "Groups (max)" and "People per
+  group (min)", since fewer people make fewer groups and leftovers make some groups bigger.
+- [ ] **Phone-style chrome around `EmceePane`.** A minimal phone frame with phone-like proportions,
+  so it reads as what the emcee holds.
+- [ ] **Yellow Start until everyone's ready.** While anyone connected is still on the start screen,
+  show Start in a warning colour, so the emcee doesn't leave them behind (it still works).
