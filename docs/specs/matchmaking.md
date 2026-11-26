@@ -230,8 +230,6 @@ What each screen shows:
 
 - `waiting`: "Waiting for the emcee…"
 - `matched`: the cue, full-screen, with a big "found them" button and "x of N found" in the group.
-  On a phone, x always counts that phone's own person, tapped or not, since no one has to find
-  themselves (changed after the build; the room's counts are still taps).
 - `found`: "You're a group of N · x of N found", which updates live as others in the group tap. Showing
   the count is meant to nudge everyone to tap.
 - `late`: "You'll be matched next round".
