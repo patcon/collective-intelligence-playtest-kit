@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { AvatarCueView } from './avatar/AvatarCueView.tsx';
+import { BirdsongCueView } from './birdsong/BirdsongCueView.tsx';
 import { ColourCueView } from './colour/ColourCueView.tsx';
 import type { Cue } from './cueTypes.ts';
 
@@ -8,6 +9,8 @@ export function CueView({ cue, children }: { cue: Cue; children?: ReactNode }) {
   switch (cue.type) {
     case 'avatar':
       return <AvatarCueView cue={cue}>{children}</AvatarCueView>;
+    case 'birdsong':
+      return <BirdsongCueView cue={cue}>{children}</BirdsongCueView>;
     case 'colour':
       return <ColourCueView cue={cue}>{children}</ColourCueView>;
   }

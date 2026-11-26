@@ -2,7 +2,7 @@ import { VitePWA } from 'vite-plugin-pwa';
 import type { Plugin, PluginOption } from 'vite';
 
 /**
- * A service worker that keeps the built app (every HTML, JS, CSS and font file) cached, so a refresh
+ * A service worker that keeps the built app (every HTML, JS, CSS and font file, and the birdsong recordings) cached, so a refresh
  * while offline still loads the page. Navigations fall back to the cached `index.html`, the same
  * single-page fallback the Worker gives online; `/agents/*` (the room's socket) is left alone, so it
  * fails offline as it should. A new deploy's worker takes over on the next load. Built only, so try it with `pnpm preview`.
@@ -15,7 +15,7 @@ export function offline(): PluginOption {
       registerType: 'autoUpdate',
       workbox: {
         cleanupOutdatedCaches: true,
-        globPatterns: ['**/*.{html,js,css,svg,png,woff2}'],
+        globPatterns: ['**/*.{html,js,css,svg,png,woff2,mp3}'],
         navigateFallback: 'index.html',
         navigateFallbackDenylist: [/^\/agents\//],
       },

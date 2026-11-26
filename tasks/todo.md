@@ -364,9 +364,9 @@ and add it to the config options.
 - Stop playback when leaving `matched` or `found`.
 
 **Acceptance criteria:**
-- [ ] Each group hears a different species, and audio plays with no extra tap.
-- [ ] The total audio is ≤ ~1 MB.
-- [ ] Every file is attributed.
+- [x] Each group hears a different species, and audio plays with no extra tap (desktop Chrome; phones are criterion 10).
+- [x] The total audio is ≤ ~1 MB (516 KB for 6 clips).
+- [x] Every file is attributed.
 
 **Verification:** `assign` test. Desktop check with `agent-browser`. **You check criterion 10 on a real iPhone (Safari) and Android phone (Chrome).**
 **Dependencies:** Checkpoint C
