@@ -447,8 +447,8 @@ Raised after Phase 4 (2026-11-25):
   Fix: start the alternation at a random style each round (from `rng`), or pick styles per round.
 - [ ] **A placeholder activity card on "Move on".** After a round, show participants (and the emcee)
   a card standing in for the activity that would follow matching, instead of going straight back to waiting.
-- [ ] **Show how many each cue can tell apart**, in the Cue picker: "(12)", or "(no limit)".
-- [ ] **Name cues by sense**: "Audio: Birds", "Visual: Colour", "Visual: Avatars".
+- [x] **Show how many each cue can tell apart**, in the Cue picker: "(12)", or "(no limit)".
+- [x] **Name cues by sense**: "Audio: Birds", "Visual: Colour", "Visual: Avatars".
 - [ ] **Audio playback modes.** Choose how a group's sound plays: *loop* (continuous, as now),
   *staggered start* (each phone starts after its own random delay, then loops, so the group isn't in
   unison), or *intermittent* (each phone plays the clip once, then waits a random interval before

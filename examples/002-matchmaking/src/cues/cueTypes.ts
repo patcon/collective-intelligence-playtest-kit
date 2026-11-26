@@ -20,12 +20,14 @@ export interface CueType {
   assign: (groupCount: number, rng: Rng) => Array<Cue>;
   /** How many groups it can tell apart; past this, cues repeat. */
   maxDistinct: number;
+  /** Its name for the emcee, led by the sense it's found with: "Audio: Birds". */
+  label: string;
 }
 
 export const CUE_TYPES: Record<CueTypeId, CueType> = {
-  avatar: { assign: assignAvatars, maxDistinct: Number.POSITIVE_INFINITY },
-  birdsong: { assign: assignBirdsongs, maxDistinct: BIRDSONG_COUNT },
-  colour: { assign: assignColours, maxDistinct: PALETTE.length },
+  avatar: { assign: assignAvatars, label: 'Visual: Avatars', maxDistinct: Number.POSITIVE_INFINITY },
+  birdsong: { assign: assignBirdsongs, label: 'Audio: Birds', maxDistinct: BIRDSONG_COUNT },
+  colour: { assign: assignColours, label: 'Visual: Colour', maxDistinct: PALETTE.length },
 };
 
 export function isCueTypeId(value: unknown): value is CueTypeId {

@@ -1,6 +1,5 @@
 import { Banner, Select, Surface } from '@cloudflare/kumo';
-import { isCueTypeId } from '../cues/cueTypes.ts';
-import type { CueTypeId } from '../cues/cueTypes.ts';
+import { CUE_TYPES, isCueTypeId } from '../cues/cueTypes.ts';
 import type { Grouping } from '../matching/match.ts';
 import type { MatchConfig } from '../room/protocol.ts';
 
@@ -13,7 +12,13 @@ interface ConfigPanelsProps {
 
 const ALGORITHMS = { random: 'Random' };
 const GROUP_BY = { count: 'Number of groups', size: 'Group size' };
-const CUES: Record<CueTypeId, string> = { avatar: 'Avatar', birdsong: 'Birdsong', colour: 'Colour' };
+
+/** Each cue by name and how many groups it can tell apart, "Audio: Birds (6)", sorted so each sense's cues sit together. */
+const CUES = Object.fromEntries(
+  Object.entries(CUE_TYPES)
+    .map(([id, { label, maxDistinct }]) => [id, `${label} (${Number.isFinite(maxDistinct) ? maxDistinct : 'no limit'})`] as const)
+    .toSorted(([, a], [, b]) => a.localeCompare(b)),
+);
 
 /** The choices for each way of grouping: sizes from 2, counts from 1. */
 const NUMBERS: Record<Grouping['by'], Record<string, string>> = {
