@@ -18,9 +18,9 @@ const { RoomProvider, useRoomMessages, useRoomSend, useRoomStatus } = hostRoom;
 function Dashboard({ snapshot, simulation }: { snapshot: RoomSnapshot; simulation: Simulation }) {
   const send = useRoomSend();
   return (
-    <div className="flex flex-col gap-4 lg:flex-row lg:items-start">
+    <div className="flex flex-col gap-4 md:flex-row md:items-start">
       <div className="flex min-w-0 flex-1 flex-col gap-4">
-        <div className="grid items-start gap-4 md:grid-cols-2">
+        <div className="grid items-start gap-4 lg:grid-cols-2">
           <ConfigPanels config={snapshot.config} onConfig={(config) => send({ config, type: 'config' })} warning={repeatWarning(snapshot)} />
           <div className="flex flex-col gap-4">
             <JoinPanel />
@@ -35,7 +35,7 @@ function Dashboard({ snapshot, simulation }: { snapshot: RoomSnapshot; simulatio
         />
       </div>
       {/* Kept in view while the participant cards scroll, since it's what the emcee is using. */}
-      <div className="shrink-0 lg:sticky lg:top-4 lg:w-92">
+      <div className="shrink-0 md:sticky md:top-4 md:w-92">
         <PhoneFrame label="The emcee's phone">
           <EmceePane onCommand={send} snapshot={snapshot} />
         </PhoneFrame>
@@ -64,7 +64,7 @@ function HostView({ room }: { room: string }) {
 /**
  * `/demo-ui`: the room, as the host running it, left to right in the order it's used: config, then
  * joining and simulated participants, with a card for everyone in the room below them, then the
- * emcee's pane on a phone, which stays in view on wide screens.
+ * emcee's pane on a phone, on the right and in view once the screen is wide enough for two columns.
  */
 export function DemoUi({ room }: { room: string }) {
   return (
