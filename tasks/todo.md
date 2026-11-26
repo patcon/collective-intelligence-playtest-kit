@@ -406,7 +406,7 @@ and add it to the config options.
 
 Raised at Checkpoint B (2026-11-25). Not scheduled yet.
 
-- [ ] **No "connected" badge on `/participate` while connected.** Show `RoomStatusBadge` only when
+- [x] **No "connected" badge on `/participate` while connected.** Show `RoomStatusBadge` only when
   the socket isn't open, as `001`'s remote does.
 - [ ] **Late-comers can join a group.** A config option to put someone who's ready mid-round into an
   existing group (for example the smallest), instead of making them wait for the next round.

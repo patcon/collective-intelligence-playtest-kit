@@ -37,9 +37,11 @@ function ParticipantFlow() {
   return (
     <>
       <ParticipantScreen note={wakeLock.supported && !wakeLock.acquired ? LOST_WAKE_LOCK : null} onFound={() => send({ type: 'found' })} view={view} />
-      <div className="fixed top-4 right-4">
-        <RoomStatusBadge status={status} />
-      </div>
+      {status === 'open' ? null : (
+        <div className="fixed top-4 right-4">
+          <RoomStatusBadge status={status} />
+        </div>
+      )}
     </>
   );
 }
