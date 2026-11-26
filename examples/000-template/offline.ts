@@ -5,14 +5,17 @@ import type { Plugin, PluginOption } from 'vite';
  * A service worker that keeps the built app (every HTML, JS, CSS and font file) cached, so a refresh
  * while offline still loads the page. Navigations fall back to the cached `index.html`, the same
  * single-page fallback the Worker gives online; `/api/*` is left alone, so it fails offline as it
- * should. A new deploy's worker takes over on the next load. Built only, so try it with `pnpm preview`.
+ * should. A load still shows the cached build first; a new deploy's worker installs alongside it
+ * and waits, and `registerSW` in src/main.tsx has it take over and reloads the page onto the new
+ * build. Built only, so try it with `pnpm preview`.
  */
 export function offline(): PluginOption {
   return [
     VitePWA({
-      injectRegister: 'script-defer',
+      injectRegister: false,
       manifest: false,
-      registerType: 'autoUpdate',
+      // Wait once installed, rather than taking over mid-load where the page can miss it.
+      registerType: 'prompt',
       workbox: {
         cleanupOutdatedCaches: true,
         globPatterns: ['**/*.{html,js,css,svg,png,woff2}'],
