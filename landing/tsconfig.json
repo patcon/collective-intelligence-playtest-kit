@@ -1,0 +1,7 @@
+{
+  "extends": "@playtest-kit/config/tsconfig.json",
+  "compilerOptions": {
+    "types": []
+  },
+  "include": ["alchemy.run.ts", "apps.ts", "oxlint.config.ts"]
+}
