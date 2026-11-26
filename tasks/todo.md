@@ -433,7 +433,7 @@ Raised at Checkpoint C (2026-11-25):
 - [ ] **Show the round as it happens on `EmceePane`.** A visual of people joining groups and moving
   through waiting → looking → found, not just counts.
 - [ ] **An `/emcee` route** with `EmceePane` on its own, for running the room from a phone.
-- [ ] **Clearer labels for the group numbers** (no change in behaviour): "Groups (max)" and "People per
+- [x] **Clearer labels for the group numbers** (no change in behaviour): "Groups (max)" and "People per
   group (min)", since fewer people make fewer groups and leftovers make some groups bigger.
 - [ ] **Phone-style chrome around `EmceePane`.** A minimal phone frame with phone-like proportions,
   so it reads as what the emcee holds.

@@ -59,7 +59,8 @@ export function ConfigPanels({ config, onConfig, warning }: ConfigPanelsProps) {
       <Select
         className="w-full"
         items={NUMBERS[config.grouping.by]}
-        label={config.grouping.by === 'size' ? 'People per group' : 'Groups'}
+        // Fewer people make fewer groups, and leftovers make some groups bigger.
+        label={config.grouping.by === 'size' ? 'People per group (min)' : 'Groups (max)'}
         onValueChange={(amount) => setGrouping(config.grouping.by, Number(amount))}
         value={String(amountOf(config.grouping))}
       />
