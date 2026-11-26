@@ -45,9 +45,9 @@ export class SimulatedParticipant {
     this.#schedule();
   }
 
-  /** Tap "found them", as a phone's button does. */
+  /** Tick "found them", as a phone does. */
   found(): void {
-    this.#send({ type: 'found' });
+    this.#send({ found: true, type: 'found' });
   }
 
   dispose(): void {

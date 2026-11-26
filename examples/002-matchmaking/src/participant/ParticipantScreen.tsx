@@ -1,4 +1,4 @@
-import { Button, Loader } from '@cloudflare/kumo';
+import { Checkbox, Loader } from '@cloudflare/kumo';
 import type { ReactNode } from 'react';
 import { ActivityCard } from '../activity/ActivityCard.tsx';
 import { CueChip } from '../cues/CueChip.tsx';
@@ -8,7 +8,8 @@ import type { ParticipantView } from '../room/protocol.ts';
 interface ParticipantScreenProps {
   /** Null until the room's first message. */
   view: ParticipantView | null;
-  onFound: () => void;
+  /** Ticks (or unticks) "found them". */
+  onFound: (found: boolean) => void;
   /** Something to know while waiting, such as the screen may sleep, or null. */
   note: string | null;
   /** Something to get ready for the next round, such as turning the sound up, or null. */
@@ -53,18 +54,14 @@ export function ParticipantScreen({ view, onFound, note, notice }: ParticipantSc
     case 'late':
       return <Message detail="This round has already started." note={note} notice={notice} title="You'll be matched next round" />;
     case 'matched':
-      return (
-        <CueView cue={view.cue}>
-          <Button onClick={onFound} size="lg" variant="secondary">
-            Found them
-          </Button>
-          <p className="text-lg">{foundCount(view.group)}</p>
-        </CueView>
-      );
     case 'found':
       return (
         <CueView cue={view.cue}>
-          <p className="text-2xl font-semibold">{`You're a group of ${view.group.size}`}</p>
+          {view.status === 'found' && <p className="text-2xl font-semibold">{`You're a group of ${view.group.size}`}</p>}
+          {/* On a light card, so it reads over any cue. The label is part of the tap target. */}
+          <div className="rounded-lg bg-kumo-base px-5 py-3 text-kumo-default shadow-md">
+            <Checkbox checked={view.status === 'found'} label="Found them" onCheckedChange={(checked) => onFound(checked)} />
+          </div>
           <p className="text-lg">{foundCount(view.group)}</p>
         </CueView>
       );

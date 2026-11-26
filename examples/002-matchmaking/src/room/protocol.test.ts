@@ -9,13 +9,14 @@ const cue = { hex: '#e6194b', name: 'Red', type: 'colour' } as const;
 const view = (v: unknown, nextCue = 'colour') => json({ nextCue, type: 'view', view: v });
 
 describe('parseParticipantMessage', () => {
-  it('reads ready and found', () => {
+  it('reads ready, and found ticked or unticked', () => {
     expect(parseParticipantMessage(json({ type: 'ready' }))).toEqual({ type: 'ready' });
-    expect(parseParticipantMessage(json({ extra: 1, type: 'found' }))).toEqual({ type: 'found' });
+    expect(parseParticipantMessage(json({ extra: 1, found: true, type: 'found' }))).toEqual({ found: true, type: 'found' });
+    expect(parseParticipantMessage(json({ found: false, type: 'found' }))).toEqual({ found: false, type: 'found' });
   });
 
-  it('rejects anything else', () => {
-    for (const raw of ['not json', json(null), json([]), json({ type: 'start' }), json({})]) {
+  it('rejects anything else, including found without a yes or no', () => {
+    for (const raw of ['not json', json(null), json([]), json({ type: 'start' }), json({}), json({ type: 'found' }), json({ found: 'yes', type: 'found' })]) {
       expect(parseParticipantMessage(raw)).toBeNull();
     }
   });

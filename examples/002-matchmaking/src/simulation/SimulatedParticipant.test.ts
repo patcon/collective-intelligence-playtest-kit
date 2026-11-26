@@ -49,7 +49,7 @@ describe('SimulatedParticipant', () => {
     vi.advanceTimersByTime(DELAY - 1);
     expect(sent).toEqual([]);
     vi.advanceTimersByTime(1);
-    expect(sent).toEqual([{ type: 'found' }]);
+    expect(sent).toEqual([{ found: true, type: 'found' }]);
   });
 
   it('forgets a pending tap when the round ends first', () => {
@@ -67,7 +67,7 @@ describe('SimulatedParticipant', () => {
     expect(sent).toEqual([]);
     sim.setAutoConfirm(true);
     vi.advanceTimersByTime(DELAY);
-    expect(sent).toEqual([{ type: 'found' }]);
+    expect(sent).toEqual([{ found: true, type: 'found' }]);
   });
 
   it('closes its socket and drops a pending tap when disposed', () => {

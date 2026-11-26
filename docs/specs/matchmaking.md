@@ -142,7 +142,7 @@ wrong choice there. The README records when to use which.
 ### Protocol (`src/room/protocol.ts`, validated at the boundary)
 
 ```ts
-type ParticipantMessage = { type: 'ready' } | { type: 'found' };
+type ParticipantMessage = { type: 'ready' } | { type: 'found'; found: boolean }; // found: boolean added after the build
 type HostMessage =
   | { type: 'config'; config: MatchConfig }
   | { type: 'start' } | { type: 'moveOn' } | { type: 'reset' };
@@ -229,7 +229,8 @@ people past the start screen get matched.
 What each screen shows:
 
 - `waiting`: "Waiting for the emcee…"
-- `matched`: the cue, full-screen, with a big "found them" button and "x of N found" in the group.
+- `matched`: the cue, full-screen, with a "Found them" checkbox and "x of N found" in the group. (It
+  was a one-way button; since the build it's a checkbox that can be unticked during the round.)
 - `found`: "You're a group of N · x of N found", which updates live as others in the group tap. Showing
   the count is meant to nudge everyone to tap.
 - `late`: "You'll be matched next round".

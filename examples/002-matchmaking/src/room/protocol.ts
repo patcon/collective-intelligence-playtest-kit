@@ -16,8 +16,8 @@ export const AGENT = 'MatchRoom';
 /** Who a connection is: someone being matched (a phone, or a simulated one), or the demo page running the room. */
 export type Role = 'participant' | 'host';
 
-/** A participant → the room: past the start screen, so match me; or, I've found my group. */
-export type ParticipantMessage = { type: 'ready' } | { type: 'found' };
+/** A participant → the room: past the start screen, so match me; or, I've found my group (or, unticked, not yet). */
+export type ParticipantMessage = { type: 'ready' } | { type: 'found'; found: boolean };
 
 /** The host → the room. */
 export type HostMessage = { type: 'config'; config: MatchConfig } | { type: 'start' } | { type: 'moveOn' } | { type: 'reset' };
@@ -45,6 +45,7 @@ export function isRole(value: unknown): value is Role {
 /** The fields any message might carry, before they're checked. */
 interface RawMessage {
   type?: unknown;
+  found?: unknown;
   config?: unknown;
   view?: unknown;
   nextCue?: unknown;
@@ -53,8 +54,11 @@ interface RawMessage {
 
 /** A participant's message from raw socket text, or null if it isn't one. */
 export function parseParticipantMessage(raw: string): ParticipantMessage | null {
-  const { type }: RawMessage = parseJsonObject(raw) ?? {};
-  return type === 'ready' || type === 'found' ? { type } : null;
+  const { type, found }: RawMessage = parseJsonObject(raw) ?? {};
+  if (type === 'ready') {
+    return { type };
+  }
+  return type === 'found' && typeof found === 'boolean' ? { found, type } : null;
 }
 
 /** The host's message from raw socket text, or null if it isn't one. */

@@ -64,8 +64,8 @@ describe('reduce', () => {
     const started = run([pairs, ...readied('a', 'b', 'c', 'd'), { type: 'start' }]);
     const state = run(
       [
-        { id: 'a', type: 'found' },
-        { id: 'a', type: 'found' },
+        { found: true, id: 'a', type: 'found' },
+        { found: true, id: 'a', type: 'found' },
       ],
       started,
     );
@@ -81,8 +81,15 @@ describe('reduce', () => {
     expect(viewFor(next, 'c').status).toBe('matched');
   });
 
+  it('unticks found, taking it off the group count', () => {
+    const started = run([pairs, ...readied('a', 'b', 'c', 'd'), { type: 'start' }, { found: true, id: 'a', type: 'found' }]);
+    const state = run([{ found: false, id: 'a', type: 'found' }], started);
+    expect(viewFor(state, 'a')).toMatchObject({ group: { found: 0, size: 2 }, status: 'matched' });
+    expect(run([{ found: false, id: 'a', type: 'found' }], state)).toBe(state);
+  });
+
   it('keeps the group and cue of someone who leaves mid-round and comes back', () => {
-    const started = run([pairs, ...readied('a', 'b', 'c', 'd'), { type: 'start' }, { id: 'a', type: 'found' }]);
+    const started = run([pairs, ...readied('a', 'b', 'c', 'd'), { type: 'start' }, { found: true, id: 'a', type: 'found' }]);
     const back = run(
       [
         { id: 'a', type: 'leave' },
@@ -94,7 +101,7 @@ describe('reduce', () => {
   });
 
   it('drops a leaver from the counts', () => {
-    const started = run([pairs, ...readied('a', 'b', 'c', 'd'), { type: 'start' }, { id: 'a', type: 'found' }]);
+    const started = run([pairs, ...readied('a', 'b', 'c', 'd'), { type: 'start' }, { found: true, id: 'a', type: 'found' }]);
     const partner = partnerOf(started, 'a');
     const state = run([{ id: 'a', type: 'leave' }], started);
     expect(viewFor(state, partner)).toMatchObject({ group: { found: 0, size: 1 } });
@@ -107,7 +114,7 @@ describe('reduce', () => {
   });
 
   it('moves every group on to the activity, keeping its cue, whether or not they found each other', () => {
-    const started = run([pairs, ...readied('a', 'b', 'c', 'd'), { type: 'start' }, { id: 'a', type: 'found' }]);
+    const started = run([pairs, ...readied('a', 'b', 'c', 'd'), { type: 'start' }, { found: true, id: 'a', type: 'found' }]);
     const state = run([{ type: 'moveOn' }], started);
     expect(state.phase).toBe('activity');
     expect(state.groups).toEqual(started.groups);
@@ -130,7 +137,7 @@ describe('reduce', () => {
   });
 
   it('returns everyone to waiting when the activity ends', () => {
-    const state = run([...readied('a', 'b', 'c'), { type: 'start' }, { id: 'a', type: 'found' }, ...toLobby]);
+    const state = run([...readied('a', 'b', 'c'), { type: 'start' }, { found: true, id: 'a', type: 'found' }, ...toLobby]);
     expect(state.phase).toBe('lobby');
     expect(state.round).toBe(1);
     expect(state.groups).toEqual([]);
@@ -158,13 +165,13 @@ describe('reduce', () => {
 
   it('ignores a found tap outside a round, a start outside the lobby, and move on in the lobby', () => {
     const lobby = run(readied('a', 'b'));
-    expect(run([{ id: 'a', type: 'found' }], lobby)).toBe(lobby);
+    expect(run([{ found: true, id: 'a', type: 'found' }], lobby)).toBe(lobby);
     expect(run([{ type: 'moveOn' }], lobby)).toBe(lobby);
     const started = run([{ type: 'start' }], lobby);
     expect(run([{ type: 'start' }], started)).toBe(started);
     const activity = run([{ type: 'moveOn' }], started);
     expect(run([{ type: 'start' }], activity)).toBe(activity);
-    expect(run([{ id: 'a', type: 'found' }], activity)).toBe(activity);
+    expect(run([{ found: true, id: 'a', type: 'found' }], activity)).toBe(activity);
   });
 });
 

@@ -65,7 +65,7 @@ export class MatchRoom extends Agent<RoomEnv, RoomState> {
     if (roleOfConnection(connection) === 'participant') {
       const msg = parseParticipantMessage(message);
       if (msg) {
-        this.apply({ id: connection.id, type: msg.type });
+        this.apply({ ...msg, id: connection.id });
       }
     } else {
       const msg = parseHostMessage(message);

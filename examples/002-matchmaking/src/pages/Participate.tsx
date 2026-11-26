@@ -53,7 +53,7 @@ function ParticipantFlow() {
       <ParticipantScreen
         note={wakeLock.supported && !wakeLock.acquired ? LOST_WAKE_LOCK : null}
         notice={soundNext ? <SoundNotice /> : null}
-        onFound={() => send({ type: 'found' })}
+        onFound={(found) => send({ found, type: 'found' })}
         view={view}
       />
       {status === 'open' ? null : (

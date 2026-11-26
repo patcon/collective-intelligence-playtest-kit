@@ -27,7 +27,8 @@ export interface RoomState {
 }
 
 export type RoomEvent =
-  | { type: 'join' | 'leave' | 'ready' | 'found'; id: string }
+  | { type: 'join' | 'leave' | 'ready'; id: string }
+  | { type: 'found'; id: string; found: boolean }
   | { type: 'config'; config: MatchConfig }
   | { type: 'start' | 'moveOn' | 'reset' };
 
@@ -67,10 +68,11 @@ function leave(state: RoomState, id: string): RoomState {
   return { ...state, participants: state.participants.filter((p) => p.id !== id) };
 }
 
-function found(state: RoomState, id: string): RoomState {
+/** Ticks or unticks "found them" for someone in a group, during a round only. */
+function setFound(state: RoomState, id: string, found: boolean): RoomState {
   const finder = state.participants.find((p) => p.id === id);
-  return state.phase === 'round' && finder && finder.group !== null && !finder.found
-    ? withParticipant(state, id, (p) => ({ ...p, found: true }))
+  return state.phase === 'round' && finder && finder.group !== null && finder.found !== found
+    ? withParticipant(state, id, (p) => ({ ...p, found }))
     : state;
 }
 
@@ -127,7 +129,7 @@ export function reduce(state: RoomState, event: RoomEvent, deps: RoomDeps): Room
     case 'ready':
       return withParticipant(state, event.id, (p) => ({ ...p, ready: true }));
     case 'found':
-      return found(state, event.id);
+      return setFound(state, event.id, event.found);
     case 'config':
       return { ...state, config: event.config };
     case 'start':
