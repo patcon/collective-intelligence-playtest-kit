@@ -42,9 +42,9 @@ Plan: [`plan.md`](plan.md). Spec: [`docs/specs/group-segment-wizard.md`](../docs
 **Description:** Move `startBlocker` to `split.ts` as `startBlocker(ready, grouping, maxDistinct)`, built on `groupSizes`, with every blocker in the spec: fewer than 2 ready, anyone alone, more groups than the cue tells apart, or a group short of a Min. Add `groupConcerns`. The reducer's `start` and `EmceePane` both call it. `EmceePane` keeps its prototype blocker until T5.
 
 **Acceptance criteria:**
-- [ ] `split.test.ts` has a case for each blocker, plus "short of Min blocks" (17 at Min 12) and "Max with a small last group doesn't block" (13 at Max 3).
-- [ ] `matchRoom.test.ts`: `start` leaves the state unchanged for each blocker, including too many groups for the cue.
-- [ ] `src/demo/startBlocker.ts` and its test are gone. Nothing imports `smallestGroupSize`.
+- [x] `split.test.ts` has a case for each blocker, plus "short of Min blocks" (17 at Min 12) and "Max with a small last group doesn't block" (13 at Max 3).
+- [x] `matchRoom.test.ts`: `start` leaves the state unchanged for each blocker, including too many groups for the cue.
+- [x] `src/demo/startBlocker.ts` and its test are gone. Nothing imports `smallestGroupSize`.
 
 **Verification:** `pnpm test` · `pnpm typecheck` · `pnpm lint`
 

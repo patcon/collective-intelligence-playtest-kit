@@ -1,6 +1,8 @@
+import { CUE_TYPES } from '../cues/cueTypes.ts';
 import type { Cue, CueTypeId } from '../cues/cueTypes.ts';
-import { match, MIN_GROUP_SIZE, smallestGroupSize } from '../matching/match.ts';
+import { match } from '../matching/match.ts';
 import type { Rng } from '../matching/rng.ts';
+import { startBlocker } from '../matching/split.ts';
 import { DEFAULT_CONFIG } from './matchConfig.ts';
 import type { MatchConfig } from './matchConfig.ts';
 import type { Phase } from './roomViews.ts';
@@ -80,11 +82,11 @@ function setFound(state: RoomState, id: string, found: boolean): RoomState {
 
 /**
  * The next round: new groups for everyone connected and ready, each group with its own cue, and anyone
- * gone forgotten. Lobby only, and does nothing if anyone would be in a group of one.
+ * gone forgotten. Lobby only, and does nothing while `startBlocker` refuses it.
  */
 function start(state: RoomState, { assignCues, rng }: RoomDeps): RoomState {
   const ids = state.participants.filter((p) => p.connected && p.ready).map((p) => p.id);
-  if (state.phase !== 'lobby' || smallestGroupSize(ids.length, state.config.grouping) < MIN_GROUP_SIZE) {
+  if (state.phase !== 'lobby' || startBlocker(ids.length, state.config.grouping, CUE_TYPES[state.config.cue].maxDistinct) !== null) {
     return state;
   }
   const groups = match(ids, state.config, rng);

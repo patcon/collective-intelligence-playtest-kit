@@ -43,3 +43,40 @@ export function groupSizes(n: number, grouping: Grouping): Array<number> {
   }
   return evenSizes(n, Math.max(MIN_GROUPS, groups));
 }
+
+/** The people per group a Min asks for, or null when no group has a minimum beyond `MIN_GROUP_SIZE`. */
+function minimumOf(grouping: Grouping): number | null {
+  return grouping.by === 'groupSize' && grouping.fit === 'min' ? grouping.groupSize : null;
+}
+
+/**
+ * Why `ready` people can't start with `grouping` under a cue that tells `maxDistinct` groups apart, or
+ * null when they can. The emcee's Start and the room's reducer both use it, so they never disagree.
+ */
+export function startBlocker(ready: number, grouping: Grouping, maxDistinct: number): string | null {
+  if (ready === 0) {
+    return 'No one is ready yet. People join on /participate and tap Start.';
+  }
+  if (ready < MIN_GROUP_SIZE) {
+    return `Only 1 person is ready. Matching needs at least ${MIN_GROUP_SIZE}.`;
+  }
+  const sizes = groupSizes(ready, grouping);
+  const smallest = Math.min(...sizes);
+  if (smallest < MIN_GROUP_SIZE) {
+    return `${ready} people can't make ${sizes.length} groups without someone on their own.`;
+  }
+  if (sizes.length > maxDistinct) {
+    return `This cue can tell only ${maxDistinct} groups apart, not ${sizes.length}.`;
+  }
+  const minimum = minimumOf(grouping);
+  if (minimum !== null && smallest < minimum) {
+    return `${ready} people can't make ${sizes.length} groups of at least ${minimum}.`;
+  }
+  return null;
+}
+
+/** For each group in `sizes`, whether it's a concern (shown orange): someone alone, short of a Min, or past what the cue can tell apart. */
+export function groupConcerns(sizes: ReadonlyArray<number>, grouping: Grouping, maxDistinct: number): Array<boolean> {
+  const floor = Math.max(MIN_GROUP_SIZE, minimumOf(grouping) ?? 0);
+  return sizes.map((size, i) => size < floor || i >= maxDistinct);
+}

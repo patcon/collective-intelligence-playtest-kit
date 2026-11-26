@@ -1,5 +1,6 @@
 import { Badge, Meter } from '@cloudflare/kumo';
 import { ActivityCard } from '../activity/ActivityCard.tsx';
+import { startBlocker } from '../matching/split.ts';
 import { CUE_TYPES, cueLabel } from '../cues/cueTypes.ts';
 import type { MatchConfig, RoomSnapshot } from '../room/protocol.ts';
 import { EmceeControls, ResetButton } from './EmceeControls.tsx';
@@ -9,7 +10,6 @@ import { progressOf } from './progressOf.ts';
 import { GroupSegmentWizard, familyOf } from './prototype-group-segment-wizard/GroupSegmentWizard.tsx';
 import { LayoutSwitcher, useLayoutChoice } from './prototype-group-segment-wizard/LayoutSwitcher.tsx';
 import { useDivision } from './prototype-group-segment-wizard/useDivision.ts';
-import { startBlocker } from './startBlocker.ts';
 import type { RoomProgress } from './progressOf.ts';
 
 interface EmceePaneProps {
@@ -73,7 +73,7 @@ export function EmceePane({ snapshot, onCommand }: EmceePaneProps) {
   const { layout, select } = useLayoutChoice();
   const division = useDivision(progress.ready, CUE_TYPES[snapshot.config.cue].maxDistinct, familyOf(layout));
   const prototypeBlocker = import.meta.env.DEV ? division.problem : null;
-  const controls = { blocker: startBlocker(progress.nextRound, snapshot.config.grouping) ?? prototypeBlocker, onCommand, phase: snapshot.phase };
+  const controls = { blocker: startBlocker(progress.nextRound, snapshot.config.grouping, CUE_TYPES[snapshot.config.cue].maxDistinct) ?? prototypeBlocker, onCommand, phase: snapshot.phase };
 
   return (
     <div className="flex min-h-full w-full flex-1 flex-col gap-5 p-5">
