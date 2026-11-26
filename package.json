@@ -10,6 +10,9 @@
     "new-example": "node scripts/new-example.mjs",
     "lint": "pnpm -r --if-present lint",
     "typecheck": "pnpm -r --if-present typecheck",
-    "storybook": "pnpm --filter @playtest-kit/ui storybook"
+    "storybook": "pnpm --filter @playtest-kit/ui storybook",
+    "deploy:setup": "pnpm --filter @playtest-kit/landing run deploy:setup",
+    "deploy": "pnpm --filter 001-valence-remote run deploy && pnpm --filter 002-matchmaking run deploy && pnpm --filter @playtest-kit/landing run deploy",
+    "destroy": "pnpm --filter @playtest-kit/landing run destroy && pnpm --filter 002-matchmaking run destroy && pnpm --filter 001-valence-remote run destroy"
   }
 }

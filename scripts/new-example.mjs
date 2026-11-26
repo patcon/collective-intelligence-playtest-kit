@@ -50,4 +50,6 @@ console.log(`Created examples/${name}
 
 Next:
   pnpm install
-  pnpm --filter ${name} dev`);
+  pnpm --filter ${name} dev
+
+To deploy it with the others, add it to landing/apps.ts and the root deploy and destroy scripts.`);
