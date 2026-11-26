@@ -1,11 +1,14 @@
 import { Badge, Meter } from '@cloudflare/kumo';
 import { ActivityCard } from '../activity/ActivityCard.tsx';
-import { cueLabel } from '../cues/cueTypes.ts';
+import { CUE_TYPES, cueLabel } from '../cues/cueTypes.ts';
 import type { MatchConfig, RoomSnapshot } from '../room/protocol.ts';
 import { EmceeControls, ResetButton } from './EmceeControls.tsx';
 import type { RoundCommand } from './EmceeControls.tsx';
 import { PhaseFlow } from './PhaseFlow.tsx';
 import { progressOf } from './progressOf.ts';
+import { GroupSegmentWizard, familyOf } from './prototype-group-segment-wizard/GroupSegmentWizard.tsx';
+import { LayoutSwitcher, useLayoutChoice } from './prototype-group-segment-wizard/LayoutSwitcher.tsx';
+import { useDivision } from './prototype-group-segment-wizard/useDivision.ts';
 import { startBlocker } from './startBlocker.ts';
 import type { RoomProgress } from './progressOf.ts';
 
@@ -66,7 +69,11 @@ const PHASE_BADGE: Record<RoomSnapshot['phase'], { variant: 'primary' | 'seconda
 export function EmceePane({ snapshot, onCommand }: EmceePaneProps) {
   const progress = progressOf(snapshot);
   const badge = PHASE_BADGE[snapshot.phase];
-  const controls = { blocker: startBlocker(progress.nextRound, snapshot.config.grouping), onCommand, phase: snapshot.phase };
+  // PROTOTYPE (throwaway): a split the people ready can't make blocks Start too.
+  const { layout, select } = useLayoutChoice();
+  const division = useDivision(progress.ready, CUE_TYPES[snapshot.config.cue].maxDistinct, familyOf(layout));
+  const prototypeBlocker = import.meta.env.DEV ? division.problem : null;
+  const controls = { blocker: startBlocker(progress.nextRound, snapshot.config.grouping) ?? prototypeBlocker, onCommand, phase: snapshot.phase };
 
   return (
     <div className="flex min-h-full w-full flex-1 flex-col gap-5 p-5">
@@ -87,7 +94,15 @@ export function EmceePane({ snapshot, onCommand }: EmceePaneProps) {
       {/* The round being played, or in the lobby, the one about to start. */}
       <p className="text-sm text-kumo-subtle">This round: {describeConfig(snapshot.roundConfig ?? snapshot.config)}</p>
       {/* At the bottom of the screen, where a thumb reaches. */}
-      <div className="mt-auto">
+      <div className="mt-auto flex flex-col gap-5">
+        {/* PROTOTYPE (throwaway): `GroupSegmentWizard`, in the layout ?variant= names (compact by default). Pinned
+            above Start, so people arriving (more dots in the stages) doesn't move it. See docs/intent/emcee-divide-the-room.md. */}
+        {import.meta.env.DEV && snapshot.phase === 'lobby' && (
+          <>
+            <GroupSegmentWizard division={division} layout={layout} />
+            <LayoutSwitcher layout={layout} onLayout={select} />
+          </>
+        )}
         <EmceeControls {...controls} />
       </div>
     </div>
