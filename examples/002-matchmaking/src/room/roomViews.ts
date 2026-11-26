@@ -48,7 +48,7 @@ export interface GroupSummary extends GroupProgress {
 /** Everything the host sees: the whole room, as it is now. */
 export interface RoomSnapshot {
   phase: Phase;
-  /** Rounds started since the last reset. */
+  /** Rounds started so far. A round undone with Back doesn't count. */
   round: number;
   config: MatchConfig;
   participants: Array<ParticipantSummary>;

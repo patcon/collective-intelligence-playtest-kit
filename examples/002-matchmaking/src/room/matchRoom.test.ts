@@ -144,11 +144,41 @@ describe('reduce', () => {
     expect(['a', 'b', 'c'].map((id) => viewFor(state, id))).toEqual(Array.from({ length: 3 }, () => ({ status: 'waiting' })));
   });
 
-  it('returns everyone to waiting on reset, and starts the round count again', () => {
-    const state = run([...readied('a', 'b'), { type: 'start' }, { type: 'reset' }]);
+  it('goes back from a round to the lobby, undoing the round', () => {
+    const state = run([...readied('a', 'b'), { type: 'start' }, { type: 'back' }]);
     expect(state.phase).toBe('lobby');
     expect(state.round).toBe(0);
     expect(viewFor(state, 'a')).toEqual({ status: 'waiting' });
+  });
+
+  it('goes back from the activity to its round, keeping groups and ticks', () => {
+    const round = run([pairs, ...readied('a', 'b', 'c', 'd'), { type: 'start' }, { found: true, id: 'a', type: 'found' }]);
+    const state = run([{ type: 'moveOn' }, { type: 'back' }], round);
+    expect(state).toEqual(round);
+  });
+
+  it('ignores back in the lobby', () => {
+    const lobby = run(readied('a', 'b'));
+    expect(run([{ type: 'back' }], lobby)).toBe(lobby);
+  });
+
+  it('reshuffles into new groups for the same round, from a round or the activity, with ticks cleared', () => {
+    const round = run([pairs, ...readied('a', 'b', 'c', 'd', 'e', 'f'), { type: 'start' }, { found: true, id: 'a', type: 'found' }]);
+    const reshuffled = run([{ type: 'reshuffle' }], round);
+    expect(reshuffled.phase).toBe('round');
+    expect(reshuffled.round).toBe(1);
+    expect(reshuffled.groups).toHaveLength(3);
+    expect(reshuffled.participants.every((p) => !p.found && p.group !== null)).toBe(true);
+    expect(reshuffled.participants.map((p) => p.group)).not.toEqual(round.participants.map((p) => p.group));
+    expect(run([{ type: 'moveOn' }, { type: 'reshuffle' }], round).phase).toBe('round');
+  });
+
+  it('ignores reshuffle in the lobby, and one that would leave someone on their own', () => {
+    const lobby = run(readied('a', 'b'));
+    expect(run([{ type: 'reshuffle' }], lobby)).toBe(lobby);
+    const round = run([{ type: 'start' }], lobby);
+    const alone = run([{ id: 'b', type: 'leave' }], round);
+    expect(run([{ type: 'reshuffle' }], alone)).toBe(alone);
   });
 
   it('forgets anyone gone at the end of a round', () => {

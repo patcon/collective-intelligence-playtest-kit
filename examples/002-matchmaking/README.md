@@ -9,7 +9,7 @@ The design is in [`docs/specs/matchmaking.md`](../../docs/specs/matchmaking.md).
 ## Pages
 
 - `/` redirects to `/demo`.
-- `/demo`: the host. Config for the next round, the emcee's pane (counts, Start matchmaking, Start activity, End activity, Reset), a QR code to
+- `/demo`: the host. Config for the next round, the emcee's pane (counts; Start matchmaking, Start activity and End activity, each with a back arrow; Reshuffle groups), a QR code to
   `/participate`, up to 20 simulated participants, and a card for everyone in the room.
 - `/emcee`: the emcee's pane on its own, for running the room from a phone. It's a host too, so it can be
   open alongside `/demo`.
@@ -25,7 +25,7 @@ The design is in [`docs/specs/matchmaking.md`](../../docs/specs/matchmaking.md).
 | --- | --- |
 | `src/matching/` | Pure matching engine: `match(ids, { algorithm, grouping }, rng)`, one file per algorithm |
 | `src/cues/` | Cue types (`colour/`, `avatar/`, `birdsong/`): `cueTypes.ts` (assign, `maxDistinct`, sense and name; no React, so the Worker can use it), `CueView.tsx` (full screen) and `CueChip.tsx` (on cards) |
-| `src/room/matchRoom.ts` | The room as a pure reducer over join, leave, ready, found, config, start, move on and reset |
+| `src/room/matchRoom.ts` | The room as a pure reducer over join, leave, ready, found, config, start, move on, back and reshuffle |
 | `src/room/roomSelectors.ts` | `viewFor` (one participant's screen) and `snapshotOf` (the host's view of the room) |
 | `src/room/protocol.ts` | Socket messages, validated at the boundary by `parse*` functions |
 | `src/room/client.ts` | `participantRoom` and `hostRoom`, from `createRoomClient` |
@@ -41,7 +41,7 @@ These are the shapes to carry into the next playtest app.
 ### A pure reducer, and a thin Agent
 
 All the room's logic is `reduce(state, event, deps)` in `src/room/matchRoom.ts`. It's pure: socket
-events become plain events (`join`, `leave`, `ready`, `found`, `config`, `start`, `moveOn`, `reset`),
+events become plain events (`join`, `leave`, `ready`, `found`, `config`, `start`, `moveOn`, `back`, `reshuffle`),
 and randomness and cue assignment come in through `deps`. `worker/MatchRoom.ts` only:
 
 1. turns `onConnect`, `onClose` and `onMessage` into reducer events,

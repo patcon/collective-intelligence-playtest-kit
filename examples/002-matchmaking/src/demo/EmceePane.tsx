@@ -1,13 +1,12 @@
-import { Badge, Button, Meter } from '@cloudflare/kumo';
+import { Badge, Meter } from '@cloudflare/kumo';
 import { ActivityCard } from '../activity/ActivityCard.tsx';
 import { cueLabel } from '../cues/cueTypes.ts';
 import type { MatchConfig, RoomSnapshot } from '../room/protocol.ts';
+import { EmceeControls } from './EmceeControls.tsx';
+import type { RoundCommand } from './EmceeControls.tsx';
 import { progressOf } from './progressOf.ts';
 import { startBlocker } from './startBlocker.ts';
 import type { RoomProgress } from './progressOf.ts';
-
-/** What the emcee can tell the room to do. */
-export type RoundCommand = { type: 'start' } | { type: 'moveOn' } | { type: 'reset' };
 
 interface EmceePaneProps {
   snapshot: RoomSnapshot;
@@ -57,18 +56,6 @@ function ActivityStatus({ progress }: { progress: RoomProgress }) {
   );
 }
 
-/** Start, disabled with the reason when the room would refuse it (see `startBlocker`). */
-function StartButton({ blocker, onStart }: { blocker: string | null; onStart: () => void }) {
-  return (
-    <div className="flex flex-col gap-1">
-      <Button disabled={blocker !== null} onClick={onStart} size="lg" variant="primary">
-        Start matchmaking
-      </Button>
-      {blocker && <p className="text-sm text-kumo-subtle">{blocker}</p>}
-    </div>
-  );
-}
-
 const PHASE_BADGE: Record<RoomSnapshot['phase'], { variant: 'primary' | 'secondary' | 'beta'; label: (round: number) => string }> = {
   activity: { label: (round) => `Round ${round} · Activity`, variant: 'beta' },
   lobby: { label: () => 'Lobby', variant: 'secondary' },
@@ -76,20 +63,13 @@ const PHASE_BADGE: Record<RoomSnapshot['phase'], { variant: 'primary' | 'seconda
 };
 
 /**
- * The emcee's controls, phone-width: how many are ready, how the round is going, and Start
- * matchmaking, Start activity, End activity and Reset. Start activity never waits for every group.
- * Both activity buttons send `moveOn`: it takes a round to the activity, and the activity
- * back to the lobby. The config shows here read-only; it's set elsewhere. It has no frame of its own:
- * `/demo` puts it in a `PhoneFrame`.
+ * The emcee's pane, phone-width: how many are ready, how the round is going, and the controls to
+ * move back and forward (see `EmceeControls`). Start activity never waits for every group. The config
+ * shows here read-only; it's set elsewhere. It has no frame of its own: `/demo` puts it in a `PhoneFrame`.
  */
 export function EmceePane({ snapshot, onCommand }: EmceePaneProps) {
   const progress = progressOf(snapshot);
   const badge = PHASE_BADGE[snapshot.phase];
-  const moveOn = (label: string) => (
-    <Button onClick={() => onCommand({ type: 'moveOn' })} size="lg" variant="primary">
-      {label}
-    </Button>
-  );
 
   return (
     <div className="flex w-full flex-col gap-5 p-5">
@@ -98,14 +78,9 @@ export function EmceePane({ snapshot, onCommand }: EmceePaneProps) {
         <Badge variant={badge.variant}>{badge.label(snapshot.round)}</Badge>
       </div>
       {snapshot.phase === 'lobby' && <LobbyStatus progress={progress} />}
-      {snapshot.phase === 'lobby' && <StartButton blocker={startBlocker(progress.ready, snapshot.config.grouping)} onStart={() => onCommand({ type: 'start' })} />}
       {snapshot.phase === 'round' && <RoundStatus progress={progress} />}
-      {snapshot.phase === 'round' && moveOn('Start activity')}
       {snapshot.phase === 'activity' && <ActivityStatus progress={progress} />}
-      {snapshot.phase === 'activity' && moveOn('End activity')}
-      <Button onClick={() => onCommand({ type: 'reset' })} variant="secondary">
-        Reset
-      </Button>
+      <EmceeControls blocker={startBlocker(progress.nextRound, snapshot.config.grouping)} onCommand={onCommand} phase={snapshot.phase} />
       <p className="text-sm text-kumo-subtle">Next round: {describeConfig(snapshot.config)}</p>
     </div>
   );

@@ -6,6 +6,8 @@ export interface RoomProgress {
   ready: number;
   /** Connected, but still on the start screen. */
   starting: number;
+  /** Everyone the next match (a start or a reshuffle) would take: past the start screen, in a group or not. */
+  nextRound: number;
   /** Ready after this round's groups were made. */
   late: number;
   groups: number;
@@ -26,6 +28,7 @@ export function progressOf(snapshot: RoomSnapshot): RoomProgress {
     groups: snapshot.groups.length,
     groupsFound: snapshot.groups.filter((g) => g.found > 0).length,
     late: countStatus(snapshot, 'late'),
+    nextRound: snapshot.participants.filter((p) => p.status !== 'joined').length,
     people: snapshot.groups.reduce((sum, g) => sum + g.size, 0),
     peopleFound: snapshot.groups.reduce((sum, g) => sum + g.found, 0),
     ready: countStatus(snapshot, 'waiting'),

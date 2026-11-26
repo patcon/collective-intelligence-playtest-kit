@@ -24,7 +24,10 @@ describe('parseParticipantMessage', () => {
 
 describe('parseHostMessage', () => {
   it('reads the round controls and a valid config', () => {
-    expect(parseHostMessage(json({ type: 'moveOn' }))).toEqual({ type: 'moveOn' });
+    for (const type of ['start', 'moveOn', 'back', 'reshuffle']) {
+      expect(parseHostMessage(json({ type }))).toEqual({ type });
+    }
+    expect(parseHostMessage(json({ type: 'reset' }))).toBeNull();
     expect(parseHostMessage(json({ config: DEFAULT_CONFIG, type: 'config' }))).toEqual({ config: DEFAULT_CONFIG, type: 'config' });
   });
 

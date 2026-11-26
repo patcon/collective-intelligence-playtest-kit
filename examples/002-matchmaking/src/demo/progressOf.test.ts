@@ -19,7 +19,7 @@ describe('progressOf', () => {
       phase: 'lobby',
       round: 0,
     };
-    expect(progressOf(snapshot)).toMatchObject({ groups: 0, people: 0, ready: 2, starting: 1 });
+    expect(progressOf(snapshot)).toMatchObject({ groups: 0, nextRound: 2, people: 0, ready: 2, starting: 1 });
   });
 
   it('counts a group found once anyone in it taps, and people one by one', () => {
@@ -33,6 +33,6 @@ describe('progressOf', () => {
       phase: 'round',
       round: 1,
     };
-    expect(progressOf(snapshot)).toEqual({ groups: 2, groupsFound: 1, late: 1, people: 5, peopleFound: 2, ready: 0, starting: 0 });
+    expect(progressOf(snapshot)).toEqual({ groups: 2, groupsFound: 1, late: 1, nextRound: 1, people: 5, peopleFound: 2, ready: 0, starting: 0 });
   });
 });
