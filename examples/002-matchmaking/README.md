@@ -9,10 +9,10 @@ The design is in [`docs/specs/matchmaking.md`](../../docs/specs/matchmaking.md).
 ## Pages
 
 - `/` redirects to `/demo-ui`.
-- `/demo-ui`: the host. Config for the next round, the emcee's pane (counts, Start, Move on, Reset), a QR code to
+- `/demo-ui`: the host. Config for the next round, the emcee's pane (counts, Start matchmaking, Start activity, End activity, Reset), a QR code to
   `/participate`, up to 20 simulated participants, and a card for everyone in the room.
 - `/participate`: a participant. Start screen → "Waiting for the emcee…" → the group's cue → "You're a group of N"
-  → after Move on, a placeholder card for the activity that matching is for → back to waiting when the emcee ends it.
+  → after Start activity, a placeholder card for the activity that matching is for → back to waiting when the emcee ends it.
   Its connection id is kept per tab (`sessionId`), so a reload comes back to the same group and cue.
 
 ## Layout

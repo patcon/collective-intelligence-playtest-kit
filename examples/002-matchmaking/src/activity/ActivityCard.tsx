@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 
 /**
  * Stands in for the activity that matching is for, which this demo doesn't have. Participants and
- * the emcee both see it after Move on; `children` says who it's for.
+ * the emcee both see it after Start activity; `children` says who it's for.
  */
 export function ActivityCard({ children }: { children: ReactNode }) {
   return (

@@ -100,7 +100,7 @@ packages/ui/                          # existing
   - `activity` (added after the build): groups keep their cue and see a placeholder card for the activity that matching is for.
 - Moves between phases:
   - **Start** (from `lobby`) goes to `round`.
-  - **Move on** goes from `round` to `activity`, then from `activity` back to `lobby` (the emcee's button reads "End activity"), and the next Start makes new groups.
+  - **Move on** goes from `round` to `activity`, then from `activity` back to `lobby`, and the next Start makes new groups. (Since the activity was added, the emcee's buttons read "Start matchmaking", "Start activity" and "End activity"; the messages are still `start` and `moveOn`.)
   - **Reset** clears groups and sends everyone back to waiting, from either phase, and starts the round count again.
 - What each participant sees:
   - `start`: on the device only, before they tap Start. The room calls this status `joined`: connected, not yet ready, so not matched.

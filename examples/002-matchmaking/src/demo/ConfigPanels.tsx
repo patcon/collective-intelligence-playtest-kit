@@ -72,7 +72,7 @@ export function ConfigPanels({ config, onConfig, warning }: ConfigPanelsProps) {
       <Select
         className="w-full"
         items={CUES}
-        label="Cue"
+        label="Cue (max groups)"
         onValueChange={(cue) => isCueTypeId(cue) && onConfig({ ...config, cue })}
         value={config.cue}
       />

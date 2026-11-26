@@ -60,7 +60,7 @@ function StartButton({ progress, onStart }: { progress: RoomProgress; onStart: (
   return (
     <div className="flex flex-col gap-1">
       <Button disabled={progress.ready === 0} onClick={onStart} size="lg" variant="primary">
-        Start round
+        Start matchmaking
       </Button>
       {progress.ready === 0 && <p className="text-sm text-kumo-subtle">No one is ready yet. People join on /participate and tap Start.</p>}
     </div>
@@ -74,8 +74,9 @@ const PHASE_BADGE: Record<RoomSnapshot['phase'], { variant: 'primary' | 'seconda
 };
 
 /**
- * The emcee's controls, phone-width: how many are ready, how the round is going, and Start, Move on
- * and Reset. Move on never waits for every group: it takes a round to the activity, and the activity
+ * The emcee's controls, phone-width: how many are ready, how the round is going, and Start
+ * matchmaking, Start activity, End activity and Reset. Start activity never waits for every group.
+ * Both activity buttons send `moveOn`: it takes a round to the activity, and the activity
  * back to the lobby. The config shows here read-only; it's set elsewhere.
  */
 export function EmceePane({ snapshot, onCommand }: EmceePaneProps) {
@@ -96,7 +97,7 @@ export function EmceePane({ snapshot, onCommand }: EmceePaneProps) {
       {snapshot.phase === 'lobby' && <LobbyStatus progress={progress} />}
       {snapshot.phase === 'lobby' && <StartButton onStart={() => onCommand({ type: 'start' })} progress={progress} />}
       {snapshot.phase === 'round' && <RoundStatus progress={progress} />}
-      {snapshot.phase === 'round' && moveOn('Move on')}
+      {snapshot.phase === 'round' && moveOn('Start activity')}
       {snapshot.phase === 'activity' && <ActivityStatus progress={progress} />}
       {snapshot.phase === 'activity' && moveOn('End activity')}
       <Button onClick={() => onCommand({ type: 'reset' })} variant="secondary">
