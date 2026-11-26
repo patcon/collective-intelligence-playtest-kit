@@ -19,7 +19,7 @@ export function SplitPreview({ division }: { division: Division }) {
         {sizes.map((size, i) => (
           // Empty groups still get a sliver, so the number of groups shows.
           <div
-            className={`grid min-w-0 place-items-center text-xs font-semibold text-white tabular-nums ${isConcern(i) ? 'bg-kumo-warning' : 'bg-kumo-brand odd:bg-kumo-brand/80'}`}
+            className={`grid min-w-0 place-items-center text-xs font-semibold text-white tabular-nums ${isConcern(i) ? 'bg-kumo-warning' : 'bg-kumo-badge-neutral odd:bg-kumo-badge-neutral/80'}`}
             key={i}
             // Scaled by 10: flex-grow weights summing under 1 (two empty groups) leave the bar part empty.
             style={{ flexGrow: Math.max(size, 0.4) * 10 }}
