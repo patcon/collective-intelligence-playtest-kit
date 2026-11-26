@@ -83,9 +83,9 @@ Plan: [`plan.md`](plan.md). Spec: [`docs/specs/group-segment-wizard.md`](../docs
 **Description:** `src/demo/GroupSegmentWizard/nextGrouping.ts`: `nextGrouping(grouping, action, ready, remembered)` returns the next `Grouping` and the remembered values. Actions: step groups ±1, step size ±1, switch to groups or size, and cycle the fit. Ported from `useDivision`'s `current` / `step` / `setLocked`.
 
 **Acceptance criteria:**
-- [ ] Switching between groups and size never changes `groupSizes` for the current `ready` (tested for n = 0..50).
-- [ ] −/+ stop at 2 groups and 2 per group, never because of `ready`. Numbers stay at most two digits (≤ 99).
-- [ ] Cycling the fit goes Smart → Min → Max → Smart, and the last fit comes back after switching to groups and back.
+- [x] Switching to groups keeps the group count (and any even split); switching to people per group keeps the split whenever a size can make it, else takes the nearest size (tested for n = 0..50).
+- [x] −/+ stop at 2 groups and 2 per group, and at `MAX_GROUPING` (50), never because of `ready`.
+- [x] Cycling the fit goes Smart → Min → Max → Smart, and the last fit comes back after switching to groups and back.
 
 **Verification:** `pnpm test` · `pnpm lint`
 

@@ -13,7 +13,7 @@ Today the prototype keeps its own state while Start reads `/demo`'s Group by sel
 ### User stories
 
 - As the emcee, I set "4 groups". The bar shows how the people ready now split, and Start makes exactly those groups.
-- As the emcee, I switch to "people per group". The number starts at the current split, so nothing jumps, and from then on more arrivals make more groups.
+- As the emcee, I switch to "people per group". The number starts from the current split, so nothing jumps when it can avoid it, and from then on more arrivals make more groups.
 - As the emcee, I pick Min at 12 with 17 ready. The bar shows `12·5` with the 5 in orange, and Start stays disabled until 24 are ready, when it makes `12·12`.
 - As the emcee, I set things before anyone arrives. Start stays blocked until the people ready can make the split.
 - As a second host, or after reloading `/emcee`, I see the same setting.
@@ -39,7 +39,7 @@ Worked examples (each is a test case): 7 at 2 Smart → `3·2·2`. 12 at 3 Smart
 
 Every blocking condition also turns the groups it applies to orange. Nothing is flagged without blocking.
 
-**Controls** (as prototyped): −/+ stop only at 2 (groups) and 2 (per group), never because of headcount. Numbers are at most two digits. Switching which number is set starts it from the current calculated value.
+**Controls** (as prototyped): −/+ stop only at 2 (groups) and 2 (per group), and at 50 (`MAX_GROUPING`, the most the room accepts), never because of headcount. Switching to groups sets the current number of groups, which keeps any even split. Switching to people per group picks, with the last fit chosen, the size nearest the average group that keeps the split. Not every split can be kept: 12 in 5 groups (`3·3·2·2·2`) has no people-per-group number, so it takes the nearest size (2).
 
 ## Capability map
 
@@ -83,7 +83,7 @@ Vitest (`pnpm test` in `examples/002-matchmaking`). The tests sit next to the co
 - `match.test.ts`: the group sizes `match` returns equal `groupSizes`. Every id ends up in exactly one group.
 - `matchRoom.test.ts`: the reducer refuses Start for each blocker (including 17 ready at Min 12), and 32 ready at Min 15 makes `16·16`.
 - `protocol.test.ts`: a `config` whose size grouping has no `fit`, or an unknown `fit`, is rejected.
-- `nextGrouping` tests: switching doesn't change the split, and −/+ stop at 2.
+- `nextGrouping` tests: switching keeps the split whenever it can be kept, and −/+ stop at 2 and 50.
 - Manual, on `/demo` with simulated participants: set the wizard, reload, and see it kept. Open a second `/emcee` and see it in step. Start, and see the groups match the bar.
 
 ## Boundaries

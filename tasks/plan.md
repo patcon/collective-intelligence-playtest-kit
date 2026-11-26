@@ -42,7 +42,7 @@ T4 depends only on T1, so it can run alongside T2 and T3. T8 (50 sims) depends o
 - [x] `pnpm test`, `pnpm typecheck` and `pnpm lint` pass. A 20-sim round on `/demo` still works through the old selects.
 
 ### Phase 2: The wizard drives the room (`emcee-control`)
-- [ ] T4: `nextGrouping`, the wizard's logic as a pure function
+- [x] T4: `nextGrouping`, the wizard's logic as a pure function
 - [ ] T5: Graduate `GroupSegmentWizard` and wire it to the room
 - [ ] T6: Variants kept as code, not shown
 - [ ] T7: Remove `/demo`'s grouping selects, and update the docs
