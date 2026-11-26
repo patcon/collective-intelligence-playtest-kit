@@ -9,7 +9,7 @@ The design is in [`docs/specs/matchmaking.md`](../../docs/specs/matchmaking.md).
 ## Pages
 
 - `/` redirects to `/demo`.
-- `/demo`: the host. Config for the next round, the emcee's pane (counts; Start matchmaking, Start activity and End activity, each with a back arrow; Reshuffle groups), a QR code to
+- `/demo`: the host. Config for the next round, the emcee's pane (counts; Start matchmaking, Start activity and End activity, each with a back arrow; a small red Reset, top left, for new groups), a QR code to
   `/participate`, up to 20 simulated participants, and a card for everyone in the room.
 - `/emcee`: the emcee's pane on its own, for running the room from a phone. It's a host too, so it can be
   open alongside `/demo`.

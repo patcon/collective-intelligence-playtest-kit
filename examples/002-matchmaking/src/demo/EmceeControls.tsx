@@ -20,9 +20,8 @@ const STEPS: Record<Phase, { forward: RoundCommand; label: string; back: string 
 };
 
 /**
- * Back and forward through the phases, and a small red Reshuffle groups that throws this round's
- * groups away for new ones. Back is disabled in the lobby, Reshuffle until there are groups; Start
- * says why when it's disabled.
+ * Back and forward through the phases. Back is disabled in the lobby; Start says why when it's
+ * disabled. Reset sits apart, in the pane's header (see `ResetButton`).
  */
 export function EmceeControls({ phase, blocker, onCommand }: EmceeControlsProps) {
   const step = STEPS[phase];
@@ -44,15 +43,18 @@ export function EmceeControls({ phase, blocker, onCommand }: EmceeControlsProps)
         </Button>
       </div>
       {inLobby && blocker && <p className="text-sm text-kumo-subtle">{blocker}</p>}
-      <Button
-        className="self-start"
-        disabled={inLobby || blocker !== null}
-        onClick={() => onCommand({ type: 'reshuffle' })}
-        size="sm"
-        variant="destructive"
-      >
-        Reshuffle groups
-      </Button>
     </div>
+  );
+}
+
+/**
+ * A small red Reset: throws this round's groups away and matches everyone ready again (the room's
+ * `reshuffle`). Disabled until there are groups, or when a new match would be refused.
+ */
+export function ResetButton({ phase, blocker, onCommand }: EmceeControlsProps) {
+  return (
+    <Button disabled={phase === 'lobby' || blocker !== null} onClick={() => onCommand({ type: 'reshuffle' })} size="xs" variant="destructive">
+      Reset
+    </Button>
   );
 }

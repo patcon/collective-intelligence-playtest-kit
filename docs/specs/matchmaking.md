@@ -103,8 +103,8 @@ packages/ui/                          # existing
   - **Start** (from `lobby`) goes to `round`. It's refused, and the emcee's button disabled with the reason, if anyone would be in a group of 1: fewer than 2 ready, or more groups asked for than the ready people can fill in twos (added after the build).
   - **Move on** goes from `round` to `activity`, then from `activity` back to `lobby`, and the next Start makes new groups. (Since the activity was added, the emcee's buttons read "Start matchmaking", "Start activity" and "End activity"; the messages are still `start` and `moveOn`.)
   - **Back** (added after the build) undoes a step: from `round` to `lobby`, as if the round hadn't started; from `activity` to `round`, keeping groups and ticks.
-  - **Reshuffle groups** (added after the build) re-matches everyone ready into new groups and cues, as the same round, from `round` or `activity`. It follows Start's group-of-1 rule.
-  - **Reset** was in the original build: it cleared groups from any phase and restarted the round count. Back and Reshuffle replaced it.
+  - **Reset** (added after the build; the room's `reshuffle`, a small red button top left of `EmceePane`) re-matches everyone ready into new groups and cues, as the same round, from `round` or `activity`. It follows Start's group-of-1 rule.
+  - The original build's Reset was different: it cleared groups from any phase and restarted the round count. Back and the new Reset replaced it.
 - What each participant sees:
   - `start`: on the device only, before they tap Start. The room calls this status `joined`: connected, not yet ready, so not matched.
   - `waiting`

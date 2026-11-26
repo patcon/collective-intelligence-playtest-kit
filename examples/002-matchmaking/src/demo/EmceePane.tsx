@@ -2,7 +2,7 @@ import { Badge, Meter } from '@cloudflare/kumo';
 import { ActivityCard } from '../activity/ActivityCard.tsx';
 import { cueLabel } from '../cues/cueTypes.ts';
 import type { MatchConfig, RoomSnapshot } from '../room/protocol.ts';
-import { EmceeControls } from './EmceeControls.tsx';
+import { EmceeControls, ResetButton } from './EmceeControls.tsx';
 import type { RoundCommand } from './EmceeControls.tsx';
 import { progressOf } from './progressOf.ts';
 import { startBlocker } from './startBlocker.ts';
@@ -67,17 +67,24 @@ const PHASE_BADGE: Record<RoomSnapshot['phase'], { variant: 'primary' | 'seconda
 export function EmceePane({ snapshot, onCommand }: EmceePaneProps) {
   const progress = progressOf(snapshot);
   const badge = PHASE_BADGE[snapshot.phase];
+  const controls = { blocker: startBlocker(progress.nextRound, snapshot.config.grouping), onCommand, phase: snapshot.phase };
 
   return (
     <div className="flex w-full flex-col gap-5 p-5">
-      <div className="flex items-center justify-between gap-2">
+      {/* Like a phone app's top bar: Reset on the left, the title in the middle, the phase on the right. */}
+      <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
+        <div className="justify-self-start">
+          <ResetButton {...controls} />
+        </div>
         <h2 className="text-lg font-semibold">Emcee</h2>
-        <Badge variant={badge.variant}>{badge.label(snapshot.round)}</Badge>
+        <div className="justify-self-end">
+          <Badge variant={badge.variant}>{badge.label(snapshot.round)}</Badge>
+        </div>
       </div>
       {snapshot.phase === 'lobby' && <LobbyStatus progress={progress} />}
       {snapshot.phase === 'round' && <RoundStatus progress={progress} />}
       {snapshot.phase === 'activity' && <ActivityStatus progress={progress} />}
-      <EmceeControls blocker={startBlocker(progress.nextRound, snapshot.config.grouping)} onCommand={onCommand} phase={snapshot.phase} />
+      <EmceeControls {...controls} />
       <p className="text-sm text-kumo-subtle">Next round: {describeConfig(snapshot.config)}</p>
     </div>
   );
