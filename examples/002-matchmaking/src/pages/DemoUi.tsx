@@ -18,24 +18,29 @@ const { RoomProvider, useRoomMessages, useRoomSend, useRoomStatus } = hostRoom;
 function Dashboard({ snapshot, simulation }: { snapshot: RoomSnapshot; simulation: Simulation }) {
   const send = useRoomSend();
   return (
-    <>
-      <div className="grid items-start gap-4 lg:grid-cols-3">
-        <ConfigPanels config={snapshot.config} onConfig={(config) => send({ config, type: 'config' })} warning={repeatWarning(snapshot)} />
-        <div className="flex flex-col gap-4">
-          <JoinPanel />
-          <SimControls simulation={simulation} />
+    <div className="flex flex-col gap-4 lg:flex-row lg:items-start">
+      <div className="flex min-w-0 flex-1 flex-col gap-4">
+        <div className="grid items-start gap-4 md:grid-cols-2">
+          <ConfigPanels config={snapshot.config} onConfig={(config) => send({ config, type: 'config' })} warning={repeatWarning(snapshot)} />
+          <div className="flex flex-col gap-4">
+            <JoinPanel />
+            <SimControls simulation={simulation} />
+          </div>
         </div>
+        <h2 className="text-lg font-semibold">Participants</h2>
+        <ParticipantCards
+          onSimFound={simulation.found}
+          simNames={new Map(simulation.sims.map((sim) => [sim.id, sim.name]))}
+          snapshot={snapshot}
+        />
+      </div>
+      {/* Kept in view while the participant cards scroll, since it's what the emcee is using. */}
+      <div className="shrink-0 lg:sticky lg:top-4 lg:w-92">
         <PhoneFrame label="The emcee's phone">
           <EmceePane onCommand={send} snapshot={snapshot} />
         </PhoneFrame>
       </div>
-      <h2 className="text-lg font-semibold">Participants</h2>
-      <ParticipantCards
-        onSimFound={simulation.found}
-        simNames={new Map(simulation.sims.map((sim) => [sim.id, sim.name]))}
-        snapshot={snapshot}
-      />
-    </>
+    </div>
   );
 }
 
@@ -46,7 +51,7 @@ function HostView({ room }: { room: string }) {
   useRoomMessages((msg) => setSnapshot(msg.snapshot));
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-6xl flex-col gap-4 p-4">
+    <main className="mx-auto flex min-h-screen max-w-400 flex-col gap-4 p-4">
       <header className="flex items-center justify-between gap-2">
         <h1 className="text-xl font-semibold">Matchmaking</h1>
         <RoomStatusBadge status={status} />
@@ -58,8 +63,8 @@ function HostView({ room }: { room: string }) {
 
 /**
  * `/demo-ui`: the room, as the host running it, left to right in the order it's used: config, then
- * joining and simulated participants, then the emcee's pane (on a phone). A card for everyone in the
- * room is below.
+ * joining and simulated participants, with a card for everyone in the room below them, then the
+ * emcee's pane on a phone, which stays in view on wide screens.
  */
 export function DemoUi({ room }: { room: string }) {
   return (
