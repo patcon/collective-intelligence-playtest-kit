@@ -40,10 +40,7 @@ function RoundStatus({ progress }: { progress: RoomProgress }) {
         max={Math.max(1, progress.people)}
         value={progress.peopleFound}
       />
-      <p className="text-sm text-kumo-subtle">
-        {`${progress.groupsFound} of ${plural(progress.groups, 'group', 'groups')} found`}
-        {progress.late > 0 && ` · ${progress.late} waiting for the next round`}
-      </p>
+      {progress.late > 0 && <p className="text-sm text-kumo-subtle">{`${progress.late} waiting for the next round`}</p>}
     </div>
   );
 }
