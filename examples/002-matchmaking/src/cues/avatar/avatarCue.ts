@@ -20,13 +20,15 @@ const MAX_SEED_LENGTH = 32;
 
 /**
  * One avatar per group. Seeds carry the group's number, so no two in a round are the same, and a
- * random part, so rounds differ.
+ * random part, so rounds differ. The alternation starts at a random style, so a round with few
+ * groups can show any of them.
  */
 export function assignAvatars(groupCount: number, rng: Rng): Array<AvatarCue> {
   const round = Math.floor(rng() * 1_000_000).toString(36);
+  const firstStyle = Math.floor(rng() * AVATAR_STYLES.length);
   return Array.from({ length: groupCount }, (_, g) => ({
     seed: `${round}-${g}`,
-    style: AVATAR_STYLES[g % AVATAR_STYLES.length] ?? 'thumbs',
+    style: AVATAR_STYLES[(firstStyle + g) % AVATAR_STYLES.length] ?? 'thumbs',
     type: 'avatar',
   }));
 }
