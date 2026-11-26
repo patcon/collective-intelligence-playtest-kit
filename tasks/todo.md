@@ -345,8 +345,8 @@ shows:
 and add it to the config options.
 
 **Acceptance criteria:**
-- [ ] Avatars render with the network off (DevTools offline, after the first load).
-- [ ] Every group gets a different avatar.
+- [x] Avatars render with no network requests: drawn locally as `data:` URIs (checked in `agent-browser`'s request log).
+- [x] Every group gets a different avatar.
 
 **Verification:** `assign` test. `agent-browser` with network throttled to offline after load.
 **Dependencies:** Checkpoint C

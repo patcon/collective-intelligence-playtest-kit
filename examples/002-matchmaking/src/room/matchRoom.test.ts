@@ -41,7 +41,7 @@ describe('reduce', () => {
     expect(state.phase).toBe('round');
     expect(state.round).toBe(1);
     expect(state.groups).toHaveLength(2);
-    expect(new Set(state.groups.map((cue) => cue.name)).size).toBe(2);
+    expect(new Set(state.groups.map((cue) => JSON.stringify(cue))).size).toBe(2);
     expect(viewFor(state, 'a')).toMatchObject({ group: { found: 0, size: 2 }, status: 'matched' });
   });
 

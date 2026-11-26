@@ -13,7 +13,7 @@ interface ConfigPanelsProps {
 
 const ALGORITHMS = { random: 'Random' };
 const GROUP_BY = { count: 'Number of groups', size: 'Group size' };
-const CUES: Record<CueTypeId, string> = { colour: 'Colour' };
+const CUES: Record<CueTypeId, string> = { avatar: 'Avatar', colour: 'Colour' };
 
 /** The choices for each way of grouping: sizes from 2, counts from 1. */
 const NUMBERS: Record<Grouping['by'], Record<string, string>> = {

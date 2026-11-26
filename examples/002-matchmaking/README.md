@@ -1,7 +1,7 @@
 # 002-matchmaking
 
 A realtime matchmaking demo: participants tap Start on their phones, the host starts a round, each
-group gets a cue (a colour, for now), and people find the others with the same cue and tap
+group gets a cue (a colour or an avatar), and people find the others with the same cue and tap
 "found them". Built from [`000-template`](../000-template) on the shared room pieces in
 [`@playtest-kit/common`](../../packages/common) and [`@playtest-kit/ui`](../../packages/ui).
 The design is in [`docs/specs/matchmaking.md`](../../docs/specs/matchmaking.md).
@@ -45,3 +45,8 @@ The design is in [`docs/specs/matchmaking.md`](../../docs/specs/matchmaking.md).
 `alchemy.run.ts` and `previewWorker()` in `vite.config.ts` both declare `MatchRoom` and route
 `/agents/*` to the Worker first; change them together. The house rules in
 [`000-template`'s README](../000-template/README.md#house-rules-enforced-by-lint) apply.
+
+## Credits
+
+Avatars are drawn on each device with [DiceBear](https://www.dicebear.com) (`@dicebear/core` and
+`@dicebear/collection` 9.4.3), using two styles that are both CC0 1.0: "Thumbs" and "Shapes", by DiceBear.
