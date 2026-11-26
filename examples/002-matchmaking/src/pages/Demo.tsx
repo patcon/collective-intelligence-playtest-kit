@@ -6,7 +6,6 @@ import { EmceePane } from '../demo/EmceePane.tsx';
 import { JoinPanel } from '../demo/JoinPanel.tsx';
 import { ParticipantCards } from '../demo/ParticipantCards.tsx';
 import { PhoneFrame } from '../demo/PhoneFrame.tsx';
-import { repeatWarning } from '../demo/repeatWarning.ts';
 import { straySimIds } from '../demo/straySimIds.ts';
 import { hostRoom } from '../room/client.ts';
 import type { RoomSnapshot } from '../room/protocol.ts';
@@ -27,7 +26,7 @@ function Dashboard({ header, snapshot, simulation }: { header: ReactNode; snapsh
       <div className="flex min-w-0 flex-1 flex-col gap-4">
         {header}
         <div className="grid items-start gap-4 lg:grid-cols-2">
-          <ConfigPanels config={snapshot.config} onConfig={(config) => send({ config, type: 'config' })} warning={repeatWarning(snapshot)} />
+          <ConfigPanels config={snapshot.config} onConfig={(config) => send({ config, type: 'config' })} />
           <div className="flex flex-col gap-4">
             <JoinPanel />
             <SimControls simulation={simulation} />

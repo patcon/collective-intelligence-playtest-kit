@@ -134,9 +134,9 @@ Plan: [`plan.md`](plan.md). Spec: [`docs/specs/group-segment-wizard.md`](../docs
 **Description:** Remove Group by and Groups / People per group from `ConfigPanels`, and its `warning` prop. Delete `repeatWarning`. Algorithm, Cue and Display found count stay. Update the matchmaking spec's config panel and matching engine sections to point to the new spec. Tick "Block Start when there aren't enough cues" in `tasks/matchmaking/todo.md`. Set the spec's status to built.
 
 **Acceptance criteria:**
-- [ ] `/demo`'s config panel shows only Algorithm, Cue and Display found count.
-- [ ] `repeatWarning` (and its test) is gone, and nothing passes `warning` to `ConfigPanels`.
-- [ ] `docs/specs/matchmaking.md` no longer describes the grouping selects or round-robin dealing.
+- [x] `/demo`'s config panel shows only Algorithm, Cue and Display found count.
+- [x] `repeatWarning` (and its test) is gone, and nothing passes `warning` to `ConfigPanels`.
+- [x] `docs/specs/matchmaking.md` no longer describes the grouping selects or round-robin dealing.
 
 **Verification:** `pnpm test` · `pnpm typecheck` · `pnpm lint` · browser check of `/demo`'s panel
 

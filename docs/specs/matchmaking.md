@@ -169,11 +169,11 @@ interface MatchConfig {
 `match(ids, grouping, algorithm, rng) → Array<Array<id>>`. This is a pure function. `rng` is injected
 so tests are deterministic.
 
-- **random:** shuffle, then split into groups.
-- **by size `k`:** `floor(n / k)` groups. Each leftover person joins a different existing group (with
-  n=20, k=3 that gives 6 groups: two of 4 and four of 3). If `n < k`, everyone forms one group.
-- **by count `c`:** `min(c, n)` groups, with sizes differing by at most 1.
-- Edge cases: `n = 0` gives no groups (Start is disabled). `n = 1` gives one group of 1, which the engine allows but the room won't start (see Start, above).
+- **random:** shuffle, then cut into groups.
+- **Group sizes:** _Superseded 2026-11-26 by [`group-segment-wizard.md`](group-segment-wizard.md)._ A
+  grouping is by group count, or by group size with a fit (Smart, Min or Max). `groupSizes` in
+  `src/matching/split.ts` gives the sizes, always at least 2 groups, and `match` cuts the ordering into
+  exactly those (no longer round-robin). `startBlocker` there decides when Start is refused.
 
 The engine is laid out so that adding an algorithm means adding a single file, but it stays in `002`.
 
@@ -185,7 +185,7 @@ Each cue type has the same shape:
 - A React component that renders the payload. It lives apart from `assign` and `maxDistinct` (`cues/CueView.tsx`, not `cues/cueTypes.ts`), so the Worker can import the cue types without React.
 - `maxDistinct`: how many groups it can tell apart.
 
-If there are more groups than `maxDistinct`, cues repeat and the demo page shows a warning.
+More groups than `maxDistinct` blocks Start, so cues never repeat within a round (until 2026-11-26 they repeated, with a warning).
 
 | Cue | Payload | Render | maxDistinct |
 |---|---|---|---|
@@ -201,10 +201,10 @@ Ship order inside this module: `colour` → `avatar` → `birdsong`.
 ```
 ┌ Config panels ───────┐ ┌ EmceePane (phone width) ┐ ┌ Join ─────────┐
 │ Algorithm  [random]  │ │ Lobby · 7 ready         │ │ [QR code]     │
-│ Group by   size|count│ │ [ Start round ]         │ │ /participate  │
-│ Size/count [ 3 ]     │ │ Round · 4/6 groups found│ ├ Simulation ───┤
-│ Cue  colour|avatar|… │ │ ▓▓▓▓░░  [ Move on ]     │ │ [+][-] 12 sims│
-│ ⚠ cues will repeat   │ │ [ Reset ]               │ │ auto-confirm ☑│
+│ Cue  colour|avatar|… │ │ Groups  [-] 3 [+]       │ │ /participate  │
+│ Found count ☐        │ │ ▓▓▓|▓▓▓|▓▓  [ Start ]   │ ├ Simulation ───┤
+│                      │ │ Round · 4/6 groups found│ │ [+][-] 12 sims│
+│                      │ │ [ Reset ]               │ │ auto-confirm ☑│
 └──────────────────────┘ └─────────────────────────┘ │ cards…        │
                                                      └───────────────┘
 ```
@@ -299,18 +299,19 @@ Follow `skills/engineering-standards`. Lint enforces the house rules:
 The pure core looks like this:
 
 ```ts
-/** Splits `ids` into groups, as `grouping` asks; leftovers join existing groups, one each. */
+/** Splits `ids` into groups of exactly the sizes `groupSizes` gives. */
 export function match(ids: ReadonlyArray<string>, grouping: Grouping, rng: Rng): Array<Array<string>> {
   const shuffled = shuffle(ids, rng);
-  const count = groupCount(shuffled.length, grouping);
-  return Array.from({ length: count }, (_, g) => shuffled.filter((_, i) => i % count === g));
+  const sizes = groupSizes(shuffled.length, grouping);
+  const starts = sizes.map((_, g) => sizes.slice(0, g).reduce((a, b) => a + b, 0));
+  return sizes.map((size, g) => shuffled.slice(starts[g], (starts[g] ?? 0) + size));
 }
 ```
 
 ## Testing strategy
 
 - **Unit (vitest), required:**
-  - the matching engine: sizes, leftovers, n=0/1/n<k, count > n, determinism with a seeded rng
+  - the matching engine: `groupSizes` under every fit and count, `match` dealing exactly those, determinism with a seeded rng
   - the room reducer: every phase move, `found`, late join, reconnect keeping the assignment, config applying next round, reset
   - protocol parsers: reject bad input
   - cue `assign`: distinct up to `maxDistinct`
@@ -346,10 +347,10 @@ export function match(ids: ReadonlyArray<string>, grouping: Grouping, rng: Rng):
 
 1. Opening `/` lands on `/demo`.
 2. With 0 participants, Start is disabled and the page explains why.
-3. With 20 sims grouped by size 2, Start makes 10 groups of 2. With size 3, it makes two groups of 4 and four of 3.
-   With count 4, it makes 4 groups of 5.
+3. With 20 sims grouped by size 2, Start makes 10 groups of 2. With size 3 (Smart), it makes six groups of 3 and one of 2.
+   With count 4, it makes 4 groups of 5. (Updated 2026-11-26, see [`group-segment-wizard.md`](group-segment-wizard.md).)
 4. Each participant's cue matches their group's members and differs from other groups' cues (up to `maxDistinct`).
-   When cues will repeat, the config panel warns before Start.
+   More groups than the cue can tell apart blocks Start (this replaced a warning, 2026-11-26).
 5. Tapping "found them" shows "You're a group of N" with the right N. Everyone in that group then sees
    "x of N found" go up within ~1 s, and so does `EmceePane` (groups found, and people found).
 6. "Move on" works at any time during a round, whether or not everyone has confirmed, and returns everyone to "waiting".

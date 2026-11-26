@@ -1,6 +1,6 @@
 # Spec: GroupSegmentWizard, the emcee's control for dividing the room
 
-_Status: draft (2026-11-26), awaiting review. Intent: [`docs/intent/group-segment-wizard.md`](../intent/group-segment-wizard.md). Builds on [matchmaking](matchmaking.md), whose tech stack, commands, code style and boundaries all still apply._
+_Status: built (2026-11-26). Intent: [`docs/intent/group-segment-wizard.md`](../intent/group-segment-wizard.md). Builds on [matchmaking](matchmaking.md), whose tech stack, commands, code style and boundaries all still apply._
 
 ## Objective
 

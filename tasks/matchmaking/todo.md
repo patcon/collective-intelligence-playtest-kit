@@ -428,7 +428,7 @@ Raised at Checkpoint C (2026-11-25):
   picker on `/demo`), so the emcee can see what phones will show.
 - [ ] **More colours, kept far apart.** A bigger palette, and for the expected number of groups pick the
   subset that's most spread out, rather than a random one.
-- [ ] **Block Start when there aren't enough cues.** Today the config panel only warns. Disable Start
+- [x] **Block Start when there aren't enough cues.** _(Done in GroupSegmentWizard, 2026-11-26.)_ Today the config panel only warns. Disable Start
   (with the reason) when the next round would make more groups than the cue can tell apart.
 - [ ] **Show the round as it happens on `EmceePane`.** A visual of people joining groups and moving
   through waiting → looking → found, not just counts.
