@@ -425,7 +425,7 @@ Raised at Checkpoint B (2026-11-25). Not scheduled yet.
 Raised at Checkpoint C (2026-11-25):
 
 - [ ] **Show the colours.** Show the cue's palette where it's chosen (my reading: swatches by the Cue
-  picker on `/demo-ui`), so the emcee can see what phones will show.
+  picker on `/demo`), so the emcee can see what phones will show.
 - [ ] **More colours, kept far apart.** A bigger palette, and for the expected number of groups pick the
   subset that's most spread out, rather than a random one.
 - [ ] **Block Start when there aren't enough cues.** Today the config panel only warns. Disable Start

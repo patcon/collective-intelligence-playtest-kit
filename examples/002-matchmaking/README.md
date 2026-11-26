@@ -8,8 +8,8 @@ The design is in [`docs/specs/matchmaking.md`](../../docs/specs/matchmaking.md).
 
 ## Pages
 
-- `/` redirects to `/demo-ui`.
-- `/demo-ui`: the host. Config for the next round, the emcee's pane (counts, Start matchmaking, Start activity, End activity, Reset), a QR code to
+- `/` redirects to `/demo`.
+- `/demo`: the host. Config for the next round, the emcee's pane (counts, Start matchmaking, Start activity, End activity, Reset), a QR code to
   `/participate`, up to 20 simulated participants, and a card for everyone in the room.
 - `/participate`: a participant. Start screen → "Waiting for the emcee…" → the group's cue → "You're a group of N"
   → after Start activity, a placeholder card for the activity that matching is for → back to waiting when the emcee ends it.
@@ -26,7 +26,7 @@ The design is in [`docs/specs/matchmaking.md`](../../docs/specs/matchmaking.md).
 | `src/room/protocol.ts` | Socket messages, validated at the boundary by `parse*` functions |
 | `src/room/client.ts` | `participantRoom` and `hostRoom`, from `createRoomClient` |
 | `src/activity/` | `ActivityCard`: a placeholder for the activity after matching, shown to participants and the emcee |
-| `src/demo/` | `/demo-ui`'s panels: `ConfigPanels`, `EmceePane` (shown in a `PhoneFrame`, since it's what the emcee holds), `JoinPanel`, `ParticipantCards` |
+| `src/demo/` | `/demo`'s panels: `ConfigPanels`, `EmceePane` (shown in a `PhoneFrame`, since it's what the emcee holds), `JoinPanel`, `ParticipantCards` |
 | `src/simulation/` | Headless participants (`SimulatedParticipant`, `SimulatedCrowd`, `useSimulation`) on their own sockets. Lint lets it import only `room/protocol.ts` and effect hooks from the rest of the app, so it can only do what a phone can |
 | `worker/MatchRoom.ts` | Thin `Agent`: socket events in, `setState`, views and snapshots out |
 

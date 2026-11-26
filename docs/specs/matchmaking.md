@@ -4,7 +4,7 @@ _Status: built (2026-11-25). Criterion 10, birdsong on real phones, is still to 
 
 ## Objective
 
-Build `examples/002-matchmaking`. An evaluator opens `/demo-ui` on a desktop and watches a realtime
+Build `examples/002-matchmaking`. An evaluator opens `/demo` on a desktop and watches a realtime
 matchmaking flow work end to end. Real phones join by QR code, and simulated participants fill the
 room. Participants grant permissions, wait for the emcee, get a cue, find their group in the room,
 and tap "found them".
@@ -17,7 +17,7 @@ follow, without generalizing past two examples.
 
 ### User stories
 
-- As an evaluator, I open `/` and land on `/demo-ui`. I see the configuration panels, an `EmceePane`, a QR code
+- As an evaluator, I open `/` and land on `/demo`. I see the configuration panels, an `EmceePane`, a QR code
   to `/participate`, and the simulated participants.
 - As a participant on a phone, I scan the QR code, see a start screen, and tap Start. That grants audio and keeps
   the screen awake. I then see "Waiting for the emcee…".
@@ -36,7 +36,7 @@ The request covers two separable things, so the work splits into three modules, 
 |---|---|---|
 | `shared-room` | Extract the room connection and other pieces both examples use into `packages/common` and `packages/ui`. Move `001` onto them with no change in behaviour. | — |
 | `matchmaking-core` | The `002` backend and participant flow: `MatchRoom` agent, protocol, room reducer, matching engine, cue types, `/participate`. | `shared-room` |
-| `matchmaking-demo` | `/demo-ui`: config panels, `EmceePane`, QR join, simulation module and cards. | `matchmaking-core` |
+| `matchmaking-demo` | `/demo`: config panels, `EmceePane`, QR join, simulation module and cards. | `matchmaking-core` |
 
 Build order: `shared-room` → `matchmaking-core` → `matchmaking-demo`.
 
@@ -85,15 +85,15 @@ packages/ui/                          # existing
 
 ### Routes
 
-- `/` redirects to `/demo-ui` with `history.replaceState`, on the client.
-- `/demo-ui` and `/participate` are each their own `lazy()` chunk, as in `001`.
+- `/` redirects to `/demo` with `history.replaceState`, on the client.
+- `/demo` and `/participate` are each their own `lazy()` chunk, as in `001`.
 - One room, named `demo`.
 
 ### Roles and phases
 
 - Roles (connection tags from `?role=`):
   - `participant`: real phones and simulated participants, which are treated the same.
-  - `host`: the `/demo-ui` page, which carries both the config panels and `EmceePane`.
+  - `host`: the `/demo` page, which carries both the config panels and `EmceePane`.
 - Room phases:
   - `lobby`: participants become ready and wait.
   - `round`: groups are assigned, cues are shown and confirmations are tracked.
@@ -190,7 +190,7 @@ If there are more groups than `maxDistinct`, cues repeat and the demo page shows
 
 Ship order inside this module: `colour` → `avatar` → `birdsong`.
 
-### `/demo-ui` layout (desktop)
+### `/demo` layout (desktop)
 
 ```
 ┌ Config panels ───────┐ ┌ EmceePane (phone width) ┐ ┌ Join ─────────┐
@@ -262,7 +262,7 @@ pnpm --filter 001-valence-remote build && pnpm --filter 002-matchmaking build
 ```
 src/
   App.tsx                     # redirect + lazy routes
-  pages/DemoUi.tsx  pages/Participate.tsx
+  pages/Demo.tsx  pages/Participate.tsx
   room/protocol.ts (+test)    # messages, MatchConfig, ParticipantView, RoomSnapshot
   room/matchRoom.ts (+test)   # pure reducer
   matching/match.ts (+test)   matching/random.ts
@@ -309,7 +309,7 @@ export function match(ids: ReadonlyArray<string>, grouping: Grouping, rng: Rng):
 - **`001` regression:** its existing tests pass unchanged. A manual check with `preview`: a phone
   joins, valence streams to the viewer, settings apply, and reconnecting after a hidden tab works.
 - **End to end (browser):** use `agent-browser` (`mise exec node@24.16.0 -- agent-browser`). Don't use the
-  Chrome extension, and don't run Playwright directly. Run a 20-sim round on `/demo-ui` plus one real tab on
+  Chrome extension, and don't run Playwright directly. Run a 20-sim round on `/demo` plus one real tab on
   `/participate`, and check every Success Criterion below.
 - **Not tested:** the visuals of cue renderers beyond one story or manual look, and DiceBear's output.
 
@@ -334,7 +334,7 @@ export function match(ids: ReadonlyArray<string>, grouping: Grouping, rng: Rng):
 
 ## Success criteria
 
-1. Opening `/` lands on `/demo-ui`.
+1. Opening `/` lands on `/demo`.
 2. With 0 participants, Start is disabled and the page explains why.
 3. With 20 sims grouped by size 2, Start makes 10 groups of 2. With size 3, it makes two groups of 4 and four of 3.
    With count 4, it makes 4 groups of 5.

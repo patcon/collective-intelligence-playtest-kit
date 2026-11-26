@@ -75,11 +75,11 @@ function HostView({ room }: { room: string }) {
 }
 
 /**
- * `/demo-ui`: the room, as the host running it, left to right in the order it's used: config, then
+ * `/demo`: the room, as the host running it, left to right in the order it's used: config, then
  * joining and simulated participants, with a card for everyone in the room below them, then the
  * emcee's pane on a phone, on the right and in view once the screen is wide enough for two columns.
  */
-export function DemoUi({ room }: { room: string }) {
+export function Demo({ room }: { room: string }) {
   return (
     <RoomProvider role="host" room={room}>
       <HostView room={room} />

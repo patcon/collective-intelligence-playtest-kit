@@ -78,7 +78,7 @@ const PHASE_BADGE: Record<RoomSnapshot['phase'], { variant: 'primary' | 'seconda
  * matchmaking, Start activity, End activity and Reset. Start activity never waits for every group.
  * Both activity buttons send `moveOn`: it takes a round to the activity, and the activity
  * back to the lobby. The config shows here read-only; it's set elsewhere. It has no frame of its own:
- * `/demo-ui` puts it in a `PhoneFrame`.
+ * `/demo` puts it in a `PhoneFrame`.
  */
 export function EmceePane({ snapshot, onCommand }: EmceePaneProps) {
   const progress = progressOf(snapshot);
