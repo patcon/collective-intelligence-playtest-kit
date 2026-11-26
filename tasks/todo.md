@@ -435,7 +435,7 @@ Raised at Checkpoint C (2026-11-25):
 - [ ] **An `/emcee` route** with `EmceePane` on its own, for running the room from a phone.
 - [x] **Clearer labels for the group numbers** (no change in behaviour): "Groups (max)" and "People per
   group (min)", since fewer people make fewer groups and leftovers make some groups bigger.
-- [ ] **Phone-style chrome around `EmceePane`.** A minimal phone frame with phone-like proportions,
+- [x] **Phone-style chrome around `EmceePane`.** A minimal phone frame with phone-like proportions,
   so it reads as what the emcee holds.
 - [ ] **Yellow Start until everyone's ready.** While anyone connected is still on the start screen,
   show Start in a warning colour, so the emcee doesn't leave them behind (it still works).

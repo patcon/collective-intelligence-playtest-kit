@@ -1,4 +1,4 @@
-import { Badge, Button, Meter, Surface } from '@cloudflare/kumo';
+import { Badge, Button, Meter } from '@cloudflare/kumo';
 import { ActivityCard } from '../activity/ActivityCard.tsx';
 import { CUE_TYPES } from '../cues/cueTypes.ts';
 import type { MatchConfig, RoomSnapshot } from '../room/protocol.ts';
@@ -77,7 +77,8 @@ const PHASE_BADGE: Record<RoomSnapshot['phase'], { variant: 'primary' | 'seconda
  * The emcee's controls, phone-width: how many are ready, how the round is going, and Start
  * matchmaking, Start activity, End activity and Reset. Start activity never waits for every group.
  * Both activity buttons send `moveOn`: it takes a round to the activity, and the activity
- * back to the lobby. The config shows here read-only; it's set elsewhere.
+ * back to the lobby. The config shows here read-only; it's set elsewhere. It has no frame of its own:
+ * `/demo-ui` puts it in a `PhoneFrame`.
  */
 export function EmceePane({ snapshot, onCommand }: EmceePaneProps) {
   const progress = progressOf(snapshot);
@@ -89,7 +90,7 @@ export function EmceePane({ snapshot, onCommand }: EmceePaneProps) {
   );
 
   return (
-    <Surface className="flex w-full max-w-sm flex-col gap-5 rounded-lg p-5">
+    <div className="flex w-full flex-col gap-5 p-5">
       <div className="flex items-center justify-between gap-2">
         <h2 className="text-lg font-semibold">Emcee</h2>
         <Badge variant={badge.variant}>{badge.label(snapshot.round)}</Badge>
@@ -104,6 +105,6 @@ export function EmceePane({ snapshot, onCommand }: EmceePaneProps) {
         Reset
       </Button>
       <p className="text-sm text-kumo-subtle">Next round: {describeConfig(snapshot.config)}</p>
-    </Surface>
+    </div>
   );
 }

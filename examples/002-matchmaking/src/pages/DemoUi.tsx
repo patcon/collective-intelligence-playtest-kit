@@ -5,6 +5,7 @@ import { ConfigPanels } from '../demo/ConfigPanels.tsx';
 import { EmceePane } from '../demo/EmceePane.tsx';
 import { JoinPanel } from '../demo/JoinPanel.tsx';
 import { ParticipantCards } from '../demo/ParticipantCards.tsx';
+import { PhoneFrame } from '../demo/PhoneFrame.tsx';
 import { repeatWarning } from '../demo/repeatWarning.ts';
 import { hostRoom } from '../room/client.ts';
 import type { RoomSnapshot } from '../room/protocol.ts';
@@ -20,7 +21,9 @@ function Dashboard({ snapshot, simulation }: { snapshot: RoomSnapshot; simulatio
     <>
       <div className="grid items-start gap-4 lg:grid-cols-3">
         <ConfigPanels config={snapshot.config} onConfig={(config) => send({ config, type: 'config' })} warning={repeatWarning(snapshot)} />
-        <EmceePane onCommand={send} snapshot={snapshot} />
+        <PhoneFrame label="The emcee's phone">
+          <EmceePane onCommand={send} snapshot={snapshot} />
+        </PhoneFrame>
         <div className="flex flex-col gap-4">
           <JoinPanel />
           <SimControls simulation={simulation} />
@@ -54,7 +57,7 @@ function HostView({ room }: { room: string }) {
 }
 
 /**
- * `/demo-ui`: the room, as the host running it. Config on the left, the emcee's pane in the middle,
+ * `/demo-ui`: the room, as the host running it. Config on the left, the emcee's pane (on a phone) in the middle,
  * joining and simulated participants on the right, and a card for everyone in the room below.
  */
 export function DemoUi({ room }: { room: string }) {
