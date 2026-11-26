@@ -21,13 +21,13 @@ function Dashboard({ snapshot, simulation }: { snapshot: RoomSnapshot; simulatio
     <>
       <div className="grid items-start gap-4 lg:grid-cols-3">
         <ConfigPanels config={snapshot.config} onConfig={(config) => send({ config, type: 'config' })} warning={repeatWarning(snapshot)} />
-        <PhoneFrame label="The emcee's phone">
-          <EmceePane onCommand={send} snapshot={snapshot} />
-        </PhoneFrame>
         <div className="flex flex-col gap-4">
           <JoinPanel />
           <SimControls simulation={simulation} />
         </div>
+        <PhoneFrame label="The emcee's phone">
+          <EmceePane onCommand={send} snapshot={snapshot} />
+        </PhoneFrame>
       </div>
       <h2 className="text-lg font-semibold">Participants</h2>
       <ParticipantCards
@@ -57,8 +57,9 @@ function HostView({ room }: { room: string }) {
 }
 
 /**
- * `/demo-ui`: the room, as the host running it. Config on the left, the emcee's pane (on a phone) in the middle,
- * joining and simulated participants on the right, and a card for everyone in the room below.
+ * `/demo-ui`: the room, as the host running it, left to right in the order it's used: config, then
+ * joining and simulated participants, then the emcee's pane (on a phone). A card for everyone in the
+ * room is below.
  */
 export function DemoUi({ room }: { room: string }) {
   return (
