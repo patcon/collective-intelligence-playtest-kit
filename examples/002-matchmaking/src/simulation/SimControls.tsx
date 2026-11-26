@@ -7,7 +7,7 @@ export function SimControls({ simulation }: { simulation: Simulation }) {
   const count = simulation.sims.length;
   return (
     <Surface className="flex flex-col gap-3 rounded-lg p-5">
-      <h2 className="text-lg font-semibold">Simulation</h2>
+      <h2 className="text-lg font-semibold">Simulate more participants</h2>
       <div className="flex items-center gap-3">
         <Button aria-label="Remove a simulated participant" disabled={count === 0} onClick={() => simulation.setCount(count - 1)}>
           −
@@ -17,9 +17,6 @@ export function SimControls({ simulation }: { simulation: Simulation }) {
         </span>
         <Button aria-label="Add a simulated participant" disabled={count === MAX_SIMS} onClick={() => simulation.setCount(count + 1)}>
           +
-        </Button>
-        <Button disabled={count === MAX_SIMS} onClick={() => simulation.setCount(MAX_SIMS)} variant="secondary">
-          Fill to {MAX_SIMS}
         </Button>
       </div>
       <Switch
