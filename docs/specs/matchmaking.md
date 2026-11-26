@@ -208,8 +208,9 @@ Ship order inside this module: `colour` → `avatar` → `birdsong`.
                                                      └───────────────┘
 ```
 
-- **`EmceePane`:** mobile-first and small. It shows the phase, the ready count, group progress ("x of y
-  groups found", with x/y people as secondary text), and the Start, Move on and Reset buttons. It only
+- **`EmceePane`:** mobile-first and small. It shows the phase, the ready count, progress (since the build, a
+  "People found" bar with "x of y groups found" as secondary text; it was the other way round), and the
+  Start, Move on and Reset buttons (since replaced; see Roles and phases). It only
   shows config read-only. Every "found" tap is counted per person and per group. A group counts as found
   once **any** member taps, but the counts are there so the emcee and participants can see who hasn't yet.
   Move on never waits for everyone.

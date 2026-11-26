@@ -35,13 +35,13 @@ function RoundStatus({ progress }: { progress: RoomProgress }) {
   return (
     <div className="flex flex-col gap-2">
       <Meter
-        customValue={`${progress.groupsFound} of ${progress.groups}`}
-        label="Groups found"
-        max={Math.max(1, progress.groups)}
-        value={progress.groupsFound}
+        customValue={`${progress.peopleFound} of ${progress.people}`}
+        label="People found"
+        max={Math.max(1, progress.people)}
+        value={progress.peopleFound}
       />
       <p className="text-sm text-kumo-subtle">
-        {`${progress.peopleFound} of ${plural(progress.people, 'person', 'people')} found`}
+        {`${progress.groupsFound} of ${plural(progress.groups, 'group', 'groups')} found`}
         {progress.late > 0 && ` · ${progress.late} waiting for the next round`}
       </p>
     </div>
