@@ -1,4 +1,6 @@
 import { Button, Loader } from '@cloudflare/kumo';
+import { ActivityCard } from '../activity/ActivityCard.tsx';
+import { CueChip } from '../cues/CueChip.tsx';
 import { CueView } from '../cues/CueView.tsx';
 import type { ParticipantView } from '../room/protocol.ts';
 
@@ -54,6 +56,17 @@ export function ParticipantScreen({ view, onFound, note }: ParticipantScreenProp
           <p className="text-2xl font-semibold">{`You're a group of ${view.group.size}`}</p>
           <p className="text-lg">{foundCount(view.group)}</p>
         </CueView>
+      );
+    case 'activity':
+      return (
+        <main className="fixed inset-0 flex items-center justify-center bg-kumo-base p-8">
+          <ActivityCard>
+            <p className="flex items-center gap-2 font-medium">
+              <CueChip cue={view.cue} />
+              {`· your group of ${view.group.size}`}
+            </p>
+          </ActivityCard>
+        </main>
       );
   }
 }

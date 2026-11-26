@@ -1,4 +1,5 @@
 import type { Participant, RoomState } from './matchRoom.ts';
+import { isGroupedStatus } from './roomViews.ts';
 import type { GroupProgress, ParticipantStatus, ParticipantView, RoomSnapshot } from './roomViews.ts';
 
 function statusOf(state: RoomState, p: Participant): ParticipantStatus {
@@ -10,6 +11,9 @@ function statusOf(state: RoomState, p: Participant): ParticipantStatus {
   }
   if (p.group === null) {
     return 'late';
+  }
+  if (state.phase === 'activity') {
+    return 'activity';
   }
   return p.found ? 'found' : 'matched';
 }
@@ -28,10 +32,10 @@ export function viewFor(state: RoomState, id: string): ParticipantView {
   }
   const status = statusOf(state, p);
   const cue = p.group === null ? undefined : state.groups[p.group];
-  if ((status === 'matched' || status === 'found') && p.group !== null && cue) {
-    return { cue, group: progressOf(state, p.group), status };
+  if (isGroupedStatus(status)) {
+    return p.group !== null && cue ? { cue, group: progressOf(state, p.group), status } : { status: 'late' };
   }
-  return { status: status === 'matched' || status === 'found' ? 'late' : status };
+  return { status };
 }
 
 /** The whole room as the host sees it, leaving out anyone not connected. */

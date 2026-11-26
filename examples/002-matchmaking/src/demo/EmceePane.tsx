@@ -1,4 +1,5 @@
 import { Badge, Button, Meter, Surface } from '@cloudflare/kumo';
+import { ActivityCard } from '../activity/ActivityCard.tsx';
 import { CUE_TYPES } from '../cues/cueTypes.ts';
 import type { MatchConfig, RoomSnapshot } from '../room/protocol.ts';
 import { progressOf } from './progressOf.ts';
@@ -47,33 +48,57 @@ function RoundStatus({ progress }: { progress: RoomProgress }) {
   );
 }
 
+function ActivityStatus({ progress }: { progress: RoomProgress }) {
+  return (
+    <ActivityCard>
+      <p className="font-medium">{`${plural(progress.groups, 'group', 'groups')} · ${plural(progress.people, 'person', 'people')}`}</p>
+    </ActivityCard>
+  );
+}
+
+function StartButton({ progress, onStart }: { progress: RoomProgress; onStart: () => void }) {
+  return (
+    <div className="flex flex-col gap-1">
+      <Button disabled={progress.ready === 0} onClick={onStart} size="lg" variant="primary">
+        Start round
+      </Button>
+      {progress.ready === 0 && <p className="text-sm text-kumo-subtle">No one is ready yet. People join on /participate and tap Start.</p>}
+    </div>
+  );
+}
+
+const PHASE_BADGE: Record<RoomSnapshot['phase'], { variant: 'primary' | 'secondary' | 'beta'; label: (round: number) => string }> = {
+  activity: { label: (round) => `Round ${round} · Activity`, variant: 'beta' },
+  lobby: { label: () => 'Lobby', variant: 'secondary' },
+  round: { label: (round) => `Round ${round}`, variant: 'primary' },
+};
+
 /**
  * The emcee's controls, phone-width: how many are ready, how the round is going, and Start, Move on
- * and Reset. Move on never waits for every group. The config shows here read-only; it's set elsewhere.
+ * and Reset. Move on never waits for every group: it takes a round to the activity, and the activity
+ * back to the lobby. The config shows here read-only; it's set elsewhere.
  */
 export function EmceePane({ snapshot, onCommand }: EmceePaneProps) {
   const progress = progressOf(snapshot);
-  const inRound = snapshot.phase === 'round';
+  const badge = PHASE_BADGE[snapshot.phase];
+  const moveOn = (label: string) => (
+    <Button onClick={() => onCommand({ type: 'moveOn' })} size="lg" variant="primary">
+      {label}
+    </Button>
+  );
 
   return (
     <Surface className="flex w-full max-w-sm flex-col gap-5 rounded-lg p-5">
       <div className="flex items-center justify-between gap-2">
         <h2 className="text-lg font-semibold">Emcee</h2>
-        <Badge variant={inRound ? 'primary' : 'secondary'}>{inRound ? `Round ${snapshot.round}` : 'Lobby'}</Badge>
+        <Badge variant={badge.variant}>{badge.label(snapshot.round)}</Badge>
       </div>
-      {inRound ? <RoundStatus progress={progress} /> : <LobbyStatus progress={progress} />}
-      {inRound ? (
-        <Button onClick={() => onCommand({ type: 'moveOn' })} size="lg" variant="primary">
-          Move on
-        </Button>
-      ) : (
-        <div className="flex flex-col gap-1">
-          <Button disabled={progress.ready === 0} onClick={() => onCommand({ type: 'start' })} size="lg" variant="primary">
-            Start round
-          </Button>
-          {progress.ready === 0 && <p className="text-sm text-kumo-subtle">No one is ready yet. People join on /participate and tap Start.</p>}
-        </div>
-      )}
+      {snapshot.phase === 'lobby' && <LobbyStatus progress={progress} />}
+      {snapshot.phase === 'lobby' && <StartButton onStart={() => onCommand({ type: 'start' })} progress={progress} />}
+      {snapshot.phase === 'round' && <RoundStatus progress={progress} />}
+      {snapshot.phase === 'round' && moveOn('Move on')}
+      {snapshot.phase === 'activity' && <ActivityStatus progress={progress} />}
+      {snapshot.phase === 'activity' && moveOn('End activity')}
       <Button onClick={() => onCommand({ type: 'reset' })} variant="secondary">
         Reset
       </Button>

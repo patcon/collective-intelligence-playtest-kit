@@ -48,8 +48,14 @@ describe('parseToParticipant', () => {
     expect(parseToParticipant(json({ type: 'view', view: { status: 'late' } }))).toEqual({ type: 'view', view: { status: 'late' } });
   });
 
-  it('rejects a matched view with no cue, and an unknown status', () => {
+  it('reads an activity view, which carries the group like a matched one', () => {
+    const activity = { cue, group: { found: 0, size: 2 }, status: 'activity' };
+    expect(parseToParticipant(json({ type: 'view', view: activity }))).toEqual({ type: 'view', view: activity });
+  });
+
+  it('rejects a grouped view with no cue, and an unknown status', () => {
     expect(parseToParticipant(json({ type: 'view', view: { group: { found: 0, size: 2 }, status: 'matched' } }))).toBeNull();
+    expect(parseToParticipant(json({ type: 'view', view: { group: { found: 0, size: 2 }, status: 'activity' } }))).toBeNull();
     expect(parseToParticipant(json({ type: 'view', view: { status: 'dancing' } }))).toBeNull();
   });
 });
@@ -63,8 +69,10 @@ describe('parseToHost', () => {
     round: 1,
   };
 
-  it('reads a snapshot', () => {
+  it('reads a snapshot, in a round or the activity', () => {
     expect(parseToHost(json({ snapshot, type: 'snapshot' }))).toEqual({ snapshot, type: 'snapshot' });
+    const activity: RoomSnapshot = { ...snapshot, participants: [{ group: 0, id: 'a', status: 'activity' }], phase: 'activity' };
+    expect(parseToHost(json({ snapshot: activity, type: 'snapshot' }))).toEqual({ snapshot: activity, type: 'snapshot' });
   });
 
   it('rejects a snapshot with a malformed participant or group', () => {

@@ -3,14 +3,25 @@ import type { Cue } from '../cues/cueTypes.ts';
 import { isMatchConfig } from './matchConfig.ts';
 import type { MatchConfig } from './matchConfig.ts';
 
-export type Phase = 'lobby' | 'round';
+/** `lobby` between rounds, `round` while groups look for each other, `activity` once they've moved on to what follows. */
+export type Phase = 'lobby' | 'round' | 'activity';
 
 /**
  * Where a participant is: `joined` (connected, still on the start screen), `waiting` (ready for the
  * next round), `late` (ready, but joined after this round's groups were made), `matched` (in a group,
- * looking for it) or `found` (in a group, and tapped "found them").
+ * looking for it), `found` (in a group, and tapped "found them") or `activity` (in a group, now doing
+ the activity that follows matching).
  */
-export type ParticipantStatus = 'joined' | 'waiting' | 'late' | 'matched' | 'found';
+export type ParticipantStatus = 'joined' | 'waiting' | 'late' | 'matched' | 'found' | 'activity';
+
+/** The statuses of someone in a group, whose view carries the group's cue and progress. */
+export type GroupedStatus = 'matched' | 'found' | 'activity';
+
+const GROUPED: ReadonlySet<unknown> = new Set<GroupedStatus>(['matched', 'found', 'activity']);
+
+export function isGroupedStatus(status: ParticipantStatus): status is GroupedStatus {
+  return GROUPED.has(status);
+}
 
 /** How many are in a group now, and how many of them have tapped "found them". */
 export interface GroupProgress {
@@ -21,7 +32,7 @@ export interface GroupProgress {
 /** What one participant's screen shows. */
 export type ParticipantView =
   | { status: 'joined' | 'waiting' | 'late' }
-  | { status: 'matched' | 'found'; cue: Cue; group: GroupProgress };
+  | { status: GroupedStatus; cue: Cue; group: GroupProgress };
 
 export interface ParticipantSummary {
   id: string;
@@ -60,7 +71,7 @@ function isGroupSummary(value: unknown): value is GroupSummary {
   return isGroupProgress(value) && 'cue' in value && isCue(value.cue);
 }
 
-const STATUSES: ReadonlySet<unknown> = new Set(['joined', 'waiting', 'late', 'matched', 'found']);
+const STATUSES: ReadonlySet<unknown> = new Set<ParticipantStatus>(['joined', 'waiting', 'late', 'matched', 'found', 'activity']);
 
 function isStatus(value: unknown): value is ParticipantStatus {
   return STATUSES.has(value);
@@ -70,7 +81,7 @@ export function isParticipantView(value: unknown): value is ParticipantView {
   if (!isObject(value) || !('status' in value) || !isStatus(value.status)) {
     return false;
   }
-  if (value.status !== 'matched' && value.status !== 'found') {
+  if (!isGroupedStatus(value.status)) {
     return true;
   }
   return 'cue' in value && isCue(value.cue) && 'group' in value && isGroupProgress(value.group);
@@ -96,7 +107,7 @@ function hasRoomHeader(value: unknown): value is Pick<RoomSnapshot, 'phase' | 'r
   return (
     isObject(value) &&
     'phase' in value &&
-    (value.phase === 'lobby' || value.phase === 'round') &&
+    (value.phase === 'lobby' || value.phase === 'round' || value.phase === 'activity') &&
     'round' in value &&
     isCount(value.round) &&
     'config' in value &&

@@ -15,6 +15,7 @@ interface ParticipantCardsProps {
 }
 
 const STATUS: Record<ParticipantStatus, { label: string; variant: BadgeVariant }> = {
+  activity: { label: 'in activity', variant: 'beta' },
   found: { label: 'found', variant: 'success' },
   joined: { label: 'starting', variant: 'secondary' },
   late: { label: 'late', variant: 'warning' },

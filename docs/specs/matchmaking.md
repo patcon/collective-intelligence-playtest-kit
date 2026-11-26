@@ -97,9 +97,10 @@ packages/ui/                          # existing
 - Room phases:
   - `lobby`: participants become ready and wait.
   - `round`: groups are assigned, cues are shown and confirmations are tracked.
+  - `activity` (added after the build): groups keep their cue and see a placeholder card for the activity that matching is for.
 - Moves between phases:
   - **Start** (from `lobby`) goes to `round`.
-  - **Move on** goes back to `lobby`, and the next Start makes new groups.
+  - **Move on** goes from `round` to `activity`, then from `activity` back to `lobby` (the emcee's button reads "End activity"), and the next Start makes new groups.
   - **Reset** clears groups and sends everyone back to waiting, from either phase, and starts the round count again.
 - What each participant sees:
   - `start`: on the device only, before they tap Start. The room calls this status `joined`: connected, not yet ready, so not matched.
@@ -107,7 +108,8 @@ packages/ui/                          # existing
   - `matched`: shows their cue, and how many in their group have marked found ("1 of 3 found").
   - `found`: shows the same count, live.
   - `late`: joined during a round. Their screen says they'll be matched next round.
-- Someone who leaves mid-round is kept, out of the counts, so they come back to the same group and cue. Anyone who leaves the lobby, and anyone still gone at Move on or Reset, is forgotten.
+  - `activity`: the placeholder activity card, with their group's cue and size.
+- Someone who leaves mid-round or during the activity is kept, out of the counts, so they come back to the same group and cue. Anyone who leaves the lobby, and anyone still gone at Move on or Reset, is forgotten.
 
 ### Pattern: pure room reducer, thin Agent
 

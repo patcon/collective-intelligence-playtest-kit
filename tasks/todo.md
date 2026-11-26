@@ -445,7 +445,7 @@ Raised after Phase 4 (2026-11-25):
 - [x] **Bug: avatars are always Thumbs in small rounds.** `assignAvatars` alternates styles by group
   number starting from Thumbs, so group 1 is always Thumbs, and a one-group round never shows Shapes.
   Fix: start the alternation at a random style each round (from `rng`), or pick styles per round.
-- [ ] **A placeholder activity card on "Move on".** After a round, show participants (and the emcee)
+- [x] **A placeholder activity card on "Move on".** After a round, show participants (and the emcee)
   a card standing in for the activity that would follow matching, instead of going straight back to waiting.
 - [x] **Show how many each cue can tell apart**, in the Cue picker: "(12)", or "(no limit)".
 - [x] **Name cues by sense**: "Audio: Birds", "Visual: Colour", "Visual: Avatars".

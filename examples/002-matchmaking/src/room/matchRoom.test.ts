@@ -18,6 +18,9 @@ const readied = (...ids: Array<string>): Array<RoomEvent> =>
     { id, type: 'ready' },
   ]);
 
+/** Move on twice: from the round to the activity, then back to the lobby. */
+const toLobby: Array<RoomEvent> = [{ type: 'moveOn' }, { type: 'moveOn' }];
+
 const pairs: RoomEvent = { config: { algorithm: 'random', cue: 'colour', grouping: { by: 'size', size: 2 } }, type: 'config' };
 
 /** Someone else in `id`'s group. */
@@ -67,7 +70,7 @@ describe('reduce', () => {
   it('makes anyone ready after the start late, and matches them next round', () => {
     const late = run([...readied('a', 'b'), { type: 'start' }, ...readied('c')]);
     expect(viewFor(late, 'c')).toEqual({ status: 'late' });
-    const next = run([{ type: 'moveOn' }, { type: 'start' }], late);
+    const next = run([...toLobby, { type: 'start' }], late);
     expect(viewFor(next, 'c').status).toBe('matched');
   });
 
@@ -96,8 +99,31 @@ describe('reduce', () => {
     expect(state.participants).toEqual([]);
   });
 
-  it('returns everyone to waiting on move on, whether or not they found their group', () => {
-    const state = run([...readied('a', 'b', 'c'), { type: 'start' }, { id: 'a', type: 'found' }, { type: 'moveOn' }]);
+  it('moves every group on to the activity, keeping its cue, whether or not they found each other', () => {
+    const started = run([pairs, ...readied('a', 'b', 'c', 'd'), { type: 'start' }, { id: 'a', type: 'found' }]);
+    const state = run([{ type: 'moveOn' }], started);
+    expect(state.phase).toBe('activity');
+    expect(state.groups).toEqual(started.groups);
+    for (const id of ['a', 'b', 'c', 'd']) {
+      const { group } = started.participants.find((p) => p.id === id) ?? {};
+      expect(viewFor(state, id)).toMatchObject({ cue: started.groups[group ?? -1], group: { size: 2 }, status: 'activity' });
+    }
+  });
+
+  it('keeps someone who leaves during the activity, so they come back to it', () => {
+    const activity = run([...readied('a', 'b'), { type: 'start' }, { type: 'moveOn' }]);
+    const back = run(
+      [
+        { id: 'a', type: 'leave' },
+        { id: 'a', type: 'join' },
+      ],
+      activity,
+    );
+    expect(viewFor(back, 'a')).toEqual(viewFor(activity, 'a'));
+  });
+
+  it('returns everyone to waiting when the activity ends', () => {
+    const state = run([...readied('a', 'b', 'c'), { type: 'start' }, { id: 'a', type: 'found' }, ...toLobby]);
     expect(state.phase).toBe('lobby');
     expect(state.round).toBe(1);
     expect(state.groups).toEqual([]);
@@ -112,7 +138,7 @@ describe('reduce', () => {
   });
 
   it('forgets anyone gone at the end of a round', () => {
-    const state = run([...readied('a', 'b'), { type: 'start' }, { id: 'a', type: 'leave' }, { type: 'moveOn' }]);
+    const state = run([...readied('a', 'b'), { type: 'start' }, { id: 'a', type: 'leave' }, ...toLobby]);
     expect(state.participants.map((p) => p.id)).toEqual(['b']);
   });
 
@@ -120,15 +146,18 @@ describe('reduce', () => {
     const started = run([pairs, ...readied('a', 'b', 'c', 'd'), { type: 'start' }]);
     const changed = run([{ config: { ...started.config, grouping: { by: 'count', count: 1 } }, type: 'config' }], started);
     expect(changed.groups).toEqual(started.groups);
-    expect(run([{ type: 'moveOn' }, { type: 'start' }], changed).groups).toHaveLength(1);
+    expect(run([...toLobby, { type: 'start' }], changed).groups).toHaveLength(1);
   });
 
-  it('ignores a found tap outside a round, a second start, and move on in the lobby', () => {
+  it('ignores a found tap outside a round, a start outside the lobby, and move on in the lobby', () => {
     const lobby = run(readied('a'));
     expect(run([{ id: 'a', type: 'found' }], lobby)).toBe(lobby);
     expect(run([{ type: 'moveOn' }], lobby)).toBe(lobby);
     const started = run([{ type: 'start' }], lobby);
     expect(run([{ type: 'start' }], started)).toBe(started);
+    const activity = run([{ type: 'moveOn' }], started);
+    expect(run([{ type: 'start' }], activity)).toBe(activity);
+    expect(run([{ id: 'a', type: 'found' }], activity)).toBe(activity);
   });
 });
 

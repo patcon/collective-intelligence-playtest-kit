@@ -61,7 +61,7 @@ function leave(state: RoomState, id: string): RoomState {
   if (!leaving) {
     return state;
   }
-  if (state.phase === 'round' && leaving.group !== null) {
+  if (state.phase !== 'lobby' && leaving.group !== null) {
     return withParticipant(state, id, (p) => ({ ...p, connected: false }));
   }
   return { ...state, participants: state.participants.filter((p) => p.id !== id) };
@@ -74,10 +74,10 @@ function found(state: RoomState, id: string): RoomState {
     : state;
 }
 
-/** Matches everyone connected and ready. Does nothing mid-round, or with no one to match. */
+/** Matches everyone connected and ready. Does nothing outside the lobby, or with no one to match. */
 function start(state: RoomState, { assignCues, rng }: RoomDeps): RoomState {
   const ids = state.participants.filter((p) => p.connected && p.ready).map((p) => p.id);
-  if (state.phase === 'round' || ids.length === 0) {
+  if (state.phase !== 'lobby' || ids.length === 0) {
     return state;
   }
   const groups = match(ids, state.config, rng);
@@ -102,6 +102,18 @@ function toLobby(state: RoomState, round: number): RoomState {
   };
 }
 
+/** From a round, groups move on to the activity, keeping their cue; from the activity, back to the lobby. */
+function moveOn(state: RoomState): RoomState {
+  switch (state.phase) {
+    case 'lobby':
+      return state;
+    case 'round':
+      return { ...state, phase: 'activity' };
+    case 'activity':
+      return toLobby(state, state.round);
+  }
+}
+
 /**
  * The room's next state after `event`. Pure: the same state, event and deps always give the same
  * result, and an event that doesn't apply returns `state` itself.
@@ -121,7 +133,7 @@ export function reduce(state: RoomState, event: RoomEvent, deps: RoomDeps): Room
     case 'start':
       return start(state, deps);
     case 'moveOn':
-      return state.phase === 'round' ? toLobby(state, state.round) : state;
+      return moveOn(state);
     case 'reset':
       return toLobby(state, 0);
   }
