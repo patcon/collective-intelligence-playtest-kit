@@ -167,3 +167,11 @@ Plan: [`plan.md`](plan.md). Spec: [`docs/specs/group-segment-wizard.md`](../docs
 - [x] All 7 success criteria in the spec pass.
 - [x] `pnpm test`, `pnpm typecheck` and `pnpm lint` pass.
 - [ ] Review with Patrick, then PR (regular merge commit).
+
+## Later (not in this plan)
+
+- [ ] **Say why Start is blocked when the cue runs out.** With more groups than the cue can tell apart
+  (e.g. 50 in pairs under Colour's 12), Start is disabled and the extra groups turn orange, but nothing
+  says the cue is the reason. Tell the emcee, and how to get going: fewer groups, or a cue with more
+  options (Avatars have no limit). The spec currently says "nothing is explained under Start", so
+  decide where this goes (under Start, on the bar, or by the cue picker) before building it.
