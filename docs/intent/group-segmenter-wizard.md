@@ -26,10 +26,10 @@ Decided while trying the prototype on `/demo`. Where this differs from the inten
 - **Never one group:** a calculated split always has at least 2 groups.
 - **Fits for people per group *k*:**
   - **Smart** (the default): the group count whose average is closest to *k*, never leaving anyone alone. 7 in pairs is `3·2·2`.
-  - **Min:** groups of *k* or more, with extras joining groups. With people for only one full group, the rest make a short group (20 at 15 is `15·5`), so the emcee sees how many are short.
+  - **Min:** groups of *k* or more, with extras joining groups. With people for only one full group, the rest make a short group (20 at 15 is `15·5`), so the emcee sees how many are short. Start stays blocked until that group fills.
   - **Max:** groups of *k* or fewer, with extras making another group.
 - **Bar:** one segment per group, each showing its size, and no text line (the bar is labelled for screen readers instead). Fine groups are neutral grey, since blue looked like the Start button. Groups that are a concern are warning orange: under 2 people, short of a Min, or past what the cue can tell apart. Shown even at 0 ready.
-- **Blocking Start:** blocked by someone on their own, a single group, or more groups than the cue can tell apart. Short groups are flagged but don't block. Nothing is explained under Start.
+- **Blocking Start:** blocked by someone on their own, a single group, more groups than the cue can tell apart, or a group short of a Min (so Min waits for people for 2 full groups: 24 at Min 12). Nothing is explained under Start.
 
 ## Next: make it real
 

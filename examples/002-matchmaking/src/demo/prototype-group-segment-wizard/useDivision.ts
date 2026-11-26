@@ -27,7 +27,8 @@ export interface Division {
   setLeftovers: (leftovers: Leftovers) => void;
 }
 
-function problemOf(ready: number, groups: number, cueMax: number): string | null {
+function problemOf(ready: number, sizes: ReadonlyArray<number>, cueMax: number, min: number | null): string | null {
+  const groups = sizes.length;
   if (ready < MIN_GROUP_SIZE) {
     return null;
   }
@@ -39,6 +40,9 @@ function problemOf(ready: number, groups: number, cueMax: number): string | null
   }
   if (Math.floor(ready / groups) < MIN_GROUP_SIZE) {
     return `${ready} ready can't make ${groups} groups without someone on their own.`;
+  }
+  if (min !== null && Math.min(...sizes) < min) {
+    return `${ready} ready can't make ${groups} groups of at least ${min}.`;
   }
   return null;
 }
@@ -81,12 +85,12 @@ export function useDivision(ready: number, cueMax: number, family: LeftoversFami
   };
 
   // Short of the people per group set is flagged when it's a target ("aim for") or a minimum ("min"),
-  // for the emcee to judge; it doesn't block Start.
+  // for the emcee to judge. Only a minimum blocks Start: a target is a hope, a minimum isn't.
   const aim = locked === 'size' && (leftovers === 'aimFor' || leftovers === 'atLeast') ? sizeSet : null;
   const isConcern = (i: number) => {
     const groupSize = sizes[i] ?? 0;
     return groups < MIN_GROUPS || groupSize < MIN_GROUP_SIZE || (aim !== null && groupSize < aim) || i >= cueMax;
   };
-  const problem = problemOf(ready, groups, cueMax);
+  const problem = problemOf(ready, sizes, cueMax, locked === 'size' && leftovers === 'atLeast' ? sizeSet : null);
   return { canStep, cueMax, groups, isConcern, leftovers, locked, problem, ready, setLeftovers, setLocked, size: sizeSet, sizes, step };
 }
