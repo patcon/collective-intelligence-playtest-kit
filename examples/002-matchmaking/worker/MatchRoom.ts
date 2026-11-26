@@ -14,6 +14,9 @@ type RoomEnv = object;
 
 const DEPS = { assignCues, rng: Math.random };
 
+/** The close code a removed participant's socket gets (4000–4999 is for applications). */
+const REMOVED_CODE = 4001;
+
 /**
  * One matchmaking room. All its logic is the pure `reduce` in `src/room/matchRoom.ts`; this class
  * turns socket events into reducer events, keeps the result with `setState` (so it outlasts
@@ -38,6 +41,7 @@ export class MatchRoom extends Agent<RoomEnv, RoomState> {
    * that this one can't read (a field added since, a cue type renamed) goes back to the defaults.
    */
   onStart(): void {
+    void this.sql`CREATE TABLE IF NOT EXISTS removed_participants (id TEXT PRIMARY KEY)`;
     if (!isMatchConfig(this.state.config)) {
       this.setState({ ...this.state, config: DEFAULT_CONFIG });
     }
@@ -50,6 +54,10 @@ export class MatchRoom extends Agent<RoomEnv, RoomState> {
   }
 
   onConnect(connection: Connection): void {
+    if (roleOfConnection(connection) === 'participant' && this.isRemoved(connection.id)) {
+      connection.close(REMOVED_CODE, 'Removed from the room');
+      return;
+    }
     if (roleOfConnection(connection) === 'participant') {
       this.apply({ id: connection.id, type: 'join' });
     }
@@ -74,10 +82,32 @@ export class MatchRoom extends Agent<RoomEnv, RoomState> {
       }
     } else {
       const msg = parseHostMessage(message);
-      if (msg) {
+      if (msg?.type === 'remove') {
+        this.remove(msg.ids);
+      } else if (msg) {
         this.apply(msg);
       }
     }
+  }
+
+  /**
+   * Disconnects these participants and turns them away if they try again (a stray sim's socket
+   * reconnects by itself). Kept in storage, so it holds after the room hibernates or restarts.
+   */
+  private remove(ids: ReadonlyArray<string>): void {
+    for (const id of ids) {
+      void this.sql`INSERT OR IGNORE INTO removed_participants (id) VALUES (${id})`;
+      for (const connection of this.getConnections('participant')) {
+        if (connection.id === id) {
+          connection.close(REMOVED_CODE, 'Removed from the room');
+        }
+      }
+      this.apply({ id, type: 'leave' });
+    }
+  }
+
+  private isRemoved(id: string): boolean {
+    return this.sql<{ id: string }>`SELECT id FROM removed_participants WHERE id = ${id}`.length > 0;
   }
 
   private apply(event: RoomEvent): void {

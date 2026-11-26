@@ -1,26 +1,29 @@
 import { Badge, Meter } from '@cloudflare/kumo';
 import { ActivityCard } from '../activity/ActivityCard.tsx';
-import { cueLabel } from '../cues/cueTypes.ts';
+import { startBlocker } from '../matching/split.ts';
+import { CUE_TYPES, cueLabel } from '../cues/cueTypes.ts';
 import type { MatchConfig, RoomSnapshot } from '../room/protocol.ts';
 import { EmceeControls, ResetButton } from './EmceeControls.tsx';
 import type { RoundCommand } from './EmceeControls.tsx';
 import { PhaseFlow } from './PhaseFlow.tsx';
 import { progressOf } from './progressOf.ts';
-import { startBlocker } from './startBlocker.ts';
+import { GroupSegmentWizard } from './GroupSegmentWizard/GroupSegmentWizard.tsx';
 import type { RoomProgress } from './progressOf.ts';
 
 interface EmceePaneProps {
   snapshot: RoomSnapshot;
   onCommand: (command: RoundCommand) => void;
+  /** Sends the room a new config, as the wizard changes the grouping. */
+  onConfig: (config: MatchConfig) => void;
 }
 
 function plural(n: number, one: string, many: string): string {
   return `${n} ${n === 1 ? one : many}`;
 }
 
-function describeConfig({ grouping, cue }: MatchConfig): string {
-  const groups = grouping.by === 'size' ? `groups of ${grouping.size}` : plural(grouping.count, 'group', 'groups');
-  return `Random · ${groups} · ${cueLabel(cue)}`;
+/** The algorithm and cue. Not the grouping: in the lobby the wizard shows the split, and in a round the stages show the groups. */
+function describeConfig({ cue }: MatchConfig): string {
+  return `Random · ${cueLabel(cue)}`;
 }
 
 /**
@@ -60,13 +63,14 @@ const PHASE_BADGE: Record<RoomSnapshot['phase'], { variant: 'primary' | 'seconda
 
 /**
  * The emcee's pane, phone-width and filling its screen: how many are ready and how the round is going
- * at the top, and the controls to move back and forward at the bottom (see `EmceeControls`). Start activity never waits for every group. The config
- * shows here read-only; it's set elsewhere. It has no frame of its own: `/demo` puts it in a `PhoneFrame`.
+ * at the top, and the controls to move back and forward at the bottom (see `EmceeControls`). Start activity never waits for every group. In the
+ * lobby, `GroupSegmentWizard` sets how the room divides. It has no frame of its own: `/demo` puts it in a `PhoneFrame`.
  */
-export function EmceePane({ snapshot, onCommand }: EmceePaneProps) {
+export function EmceePane({ snapshot, onCommand, onConfig }: EmceePaneProps) {
   const progress = progressOf(snapshot);
   const badge = PHASE_BADGE[snapshot.phase];
-  const controls = { blocker: startBlocker(progress.nextRound, snapshot.config.grouping), onCommand, phase: snapshot.phase };
+  const { maxDistinct } = CUE_TYPES[snapshot.config.cue];
+  const controls = { blocker: startBlocker(progress.nextRound, snapshot.config.grouping, maxDistinct), onCommand, phase: snapshot.phase };
 
   return (
     <div className="flex min-h-full w-full flex-1 flex-col gap-5 p-5">
@@ -87,7 +91,16 @@ export function EmceePane({ snapshot, onCommand }: EmceePaneProps) {
       {/* The round being played, or in the lobby, the one about to start. */}
       <p className="text-sm text-kumo-subtle">This round: {describeConfig(snapshot.roundConfig ?? snapshot.config)}</p>
       {/* At the bottom of the screen, where a thumb reaches. */}
-      <div className="mt-auto">
+      <div className="mt-auto flex flex-col gap-5">
+        {/* Pinned above Start, so people arriving (more dots in the stages) doesn't move it. */}
+        {snapshot.phase === 'lobby' && (
+          <GroupSegmentWizard
+            grouping={snapshot.config.grouping}
+            maxDistinct={maxDistinct}
+            onChange={(grouping) => onConfig({ ...snapshot.config, grouping })}
+            ready={progress.nextRound}
+          />
+        )}
         <EmceeControls {...controls} />
       </div>
     </div>

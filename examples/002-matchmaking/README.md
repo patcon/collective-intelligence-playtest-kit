@@ -10,7 +10,7 @@ The design is in [`docs/specs/matchmaking.md`](../../docs/specs/matchmaking.md).
 
 - `/` redirects to `/demo`.
 - `/demo`: the host. Config for the next round (with the cues grouped by Audio and Visual, and a "Display found count" switch, off by default, that shows each phone "x found" in its group), the emcee's pane (counts; Start matchmaking, Start activity and End activity, each with a back arrow; a small red Reset, top left), a QR code to
-  `/participate`, up to 20 simulated participants, and a card for everyone in the room.
+  `/participate`, up to 50 simulated participants, and a card for everyone in the room.
 - `/emcee`: the emcee's pane on its own, for running the room from a phone. It's a host too, so it can be
   open alongside `/demo`.
 - `/participate`: a participant. Start screen → "Waiting for the emcee…" → the group's cue → "You're a group of N"

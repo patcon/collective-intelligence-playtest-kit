@@ -19,7 +19,7 @@ function EmceeView() {
         </div>
       )}
       {snapshot ? (
-        <EmceePane onCommand={send} snapshot={snapshot} />
+        <EmceePane onCommand={send} onConfig={(config) => send({ config, type: 'config' })} snapshot={snapshot} />
       ) : (
         <div className="grid flex-1 place-items-center">
           <Loader />

@@ -1,79 +1,66 @@
-# Implementation Plan: Matchmaking example + shared room framework
+# Implementation Plan: GroupSegmentWizard drives the room's grouping
 
-_Spec: [`docs/specs/matchmaking.md`](../docs/specs/matchmaking.md) (approved 2026-11-25). Tasks: [`tasks/todo.md`](todo.md)._
+_Spec: [`docs/specs/group-segment-wizard.md`](../docs/specs/group-segment-wizard.md) (approved 2026-11-26). Tasks: [`tasks/todo.md`](todo.md). The previous plan (matchmaking) is in [`tasks/matchmaking/`](matchmaking/)._
 
 ## Overview
 
-There are three modules, built in order:
+Make `GroupSegmentWizard` (the compact layout) the room's grouping control. The splitting maths moves from the prototype into `src/matching/`. The matcher deals into exactly the sizes the bar shows, so Min really makes `15·5`. One `startBlocker` covers both the UI and the room reducer. The wizard sends `config` messages instead of keeping its own state. `/demo` loses its grouping selects. The other layouts stay as code that nothing renders.
 
-1. **`shared-room`** creates `packages/common` and moves `001-valence-remote` onto it. `001`'s
-   behaviour doesn't change.
-2. **`matchmaking-core`** builds `examples/002-matchmaking`'s room, engine, protocol and phone flow.
-3. **`matchmaking-demo`** adds `/demo-ui`'s panels, the simulated participants, and the avatar and
-   birdsong cues.
-
-The riskiest part comes first: a TS-source workspace package that Vite, tsrs, vitest and the
-Worker bundle all have to consume. One real phone running a round with the colour cue comes next,
-before anything is added around it.
+All work is in `examples/002-matchmaking` unless a task says otherwise. Read `skills/engineering-standards/` before writing code.
 
 ## Architecture decisions
 
-- **`createRoomClient({ agent, parse })` factory** in `common`. It returns a typed `RoomProvider`,
-  `useRoomMessages`, `useRoomSend` and `useRoomStatus` for one agent and protocol. Each example writes
-  one line (`src/room/client.ts`), and its imports barely change. This avoids passing generics at every
-  call site.
-- **Effect hooks live in `common/src/hooks/effects/`**, because `RoomProvider` needs `usePageVisibility`.
-  `ui` depends on `common`, never the reverse. `RoomStatusBadge` in `ui` takes `status` as a prop.
-- **Stable participant id:** a `sessionStorage` id is passed to the socket's `id` option, so a reload
-  keeps the same group and cue. `001` keeps its current behaviour, where a new id after a reload means a
-  new phone row.
-- **The room is a pure reducer, with `MatchRoom` as a thin Agent shell.** Snapshots go to the host and a
-  personal view goes to each participant (see the spec's Patterns sections).
-- **Cue assignment is injected into the reducer** (`assignCues(type, groupCount, rng)`), so the reducer
-  doesn't change as cue types are added.
-- **Simulation** is headless `AgentClient`s in `src/simulation/`. Lint checks that it only imports
-  `room/protocol.ts` (or review checks it, if oxlint can't express that rule).
+- **`Grouping` is renamed for clarity and gains `fit` on the size branch only:** `{ by: 'groupSize'; groupSize: number; fit: 'smart' | 'min' | 'max' } | { by: 'groupCount'; groupCount: number }`. Today's `size` / `count` were ambiguous (size of what?). The rename is its own mechanical task (T0), so T1's diff is only about `fit`. The default becomes group size 3, Smart.
+- **`src/matching/split.ts` is the single source** for `groupSizes`, `startBlocker` and `groupConcerns`. The bar, the Start button, the reducer and `match` all call it.
+- **`match` hands out people in chunks of `groupSizes`** instead of round-robin. That's what makes Min (`15·5`) true. With `random` ordering, the result is statistically the same for the other fits.
+- **The cue's `maxDistinct` is a `startBlocker` argument.** `CUE_TYPES` already loads in the Worker, so the reducer can enforce it. `repeatWarning` is deleted.
+- **No migration code.** `MatchRoom.onStart` already resets a config that `isMatchConfig` rejects to `DEFAULT_CONFIG`, so a room saved without `fit` heals itself.
+- **The wizard's state is the room's `grouping`.** Which number the emcee sets is `grouping.by`. The only local state is what that leaves out: the number not being set and the last fit chosen, remembered for switching back. `nextGrouping(grouping, action, ready)` is a pure function holding every step, cycle and switch.
+- **Variants are kept but not shown** (decided 2026-11-26). This is an exception to engineering-standards' "no dead code", so the folder's header comment says so and links to the spec.
 
-## Phases
+## Dependency graph
 
-- **Phase 1: `shared-room` (Tasks 1–5).** Ends at Checkpoint A, where `001` behaves the same and is
-  verified by you.
-- **Phase 2: `matchmaking-core` (Tasks 6–10).** Ends at Checkpoint B, where one real tab completes a
-  colour round.
-- **Phase 3: `matchmaking-demo` (Tasks 11–14).** Ends at Checkpoint C, a 20-sim round.
-- **Phase 4: cues and docs (Tasks 15–17).** Ends at Checkpoint D, where every success criterion passes.
+```
+T0 rename ──► T1 Grouping.fit + groupSizes ──► T2 shared startBlocker ──► T3 match deals into groupSizes
+                       │                                                         │
+                       └──────────────► T4 nextGrouping (pure) ──────────────────┤
+                                                                                 ▼
+                                                 T5 graduate wizard, drive room ──► T6 variants: hide ──► T7 /demo panel + docs
+```
 
-## Parallelization
+T4 depends only on T1, so it can run alongside T2 and T3. T8 (50 sims) depends on nothing.
 
-The work is mostly sequential. Some tasks can run in parallel once their dependencies are done:
+## Task list
 
-- Tasks 7 (engine) and 8 (protocol/reducer) can run alongside Task 6 (scaffold).
-- Tasks 15 (avatar) and 16 (birdsong) are independent after Checkpoint C.
-- Task 17 (docs) can start drafting after Checkpoint B.
+### Phase 1: Grouping model (`grouping-model`, `room-grouping`)
+- [x] T0: Rename `Grouping`'s fields to `groupSize` / `groupCount`
+- [x] T1: `Grouping` gains `fit`; `groupSizes` in `split.ts`
+- [x] T2: One `startBlocker` for the UI and the room
+- [x] T3: `match` deals into `groupSizes`
+
+### Checkpoint A
+- [x] `pnpm test`, `pnpm typecheck` and `pnpm lint` pass. A 20-sim round on `/demo` still works through the old selects.
+
+### Phase 2: The wizard drives the room (`emcee-control`)
+- [x] T4: `nextGrouping`, the wizard's logic as a pure function
+- [x] T5: Graduate `GroupSegmentWizard` and wire it to the room
+- [x] T6: Variants kept as code, not shown
+- [x] T7: Remove `/demo`'s grouping selects, and update the docs
+- [x] T8: Up to 50 simulated participants (independent, any time)
+
+### Checkpoint B: complete
+- [x] All 7 spec success criteria pass. Review before PR.
 
 ## Risks and mitigations
 
 | Risk | Impact | Mitigation |
 |---|---|---|
-| A workspace TS-source package isn't resolved by tsrs, the Worker bundle (Alchemy/workerd), or vitest | High | Task 1 proves it with the smallest possible export before anything moves |
-| Moving hooks out of `ui` breaks EmbeddingViewer stories | Med | Task 3 runs `test:unit` and `test:stories` |
-| Generic `RoomProvider` changes `001`'s reconnect or visibility behaviour | Med | Moved code is kept byte-for-byte apart from types. Checkpoint A has a manual check with a hidden tab |
-| iOS doesn't play birdsong after the Start tap (autoplay) | Med | Play through the `AudioContext` that `unlockAudio` resumed, not `<audio>`. You verify on a real iPhone at Checkpoint D |
-| 20 `AgentClient`s from one tab hit browser or dev-proxy limits | Low | Task 12 tests with 20 early, and the room sends small snapshots |
-| `agent-browser` can't run two origins or tabs well | Low | Fall back to 2 tabs in one session. If it's still blocked, stop and ask |
-| Birdsong clip licences | Low | CC0 or CC-BY only, with attribution in `ATTRIBUTION.md`. Anything else is "ask first" |
-
-## Verification commands
-
-```
-pnpm lint && pnpm typecheck
-pnpm --filter @playtest-kit/common test
-pnpm --filter @playtest-kit/ui test:unit && pnpm --filter @playtest-kit/ui test:stories
-pnpm --filter 001-valence-remote test && pnpm --filter 001-valence-remote build
-pnpm --filter 002-matchmaking test && pnpm --filter 002-matchmaking build
-mise exec node@24.16.0 -- agent-browser …   # browser checks; never the Chrome extension
-```
+| The compact layout reads `Division` (prototype state) deeply, so rewiring it to `grouping` + `onChange` is a bigger change than moving files | Med | T4 pins down the behaviour as a pure function first, so T5 only swaps where the state comes from |
+| Changing the default from "by size, extras join" to Smart changes the groups existing demos get | Low | This is intended (spec). Smart never leaves anyone alone, and old rooms reset on load |
+| `cccc` complexity budget on `groupSizes` / `nextGrouping` | Low | One small function per fit or action, picked from a lookup table, as `ALGORITHMS` is |
+| At 50 sims, the bar can have 25 segments (pairs) and become cramped on a phone | Med | T8's browser check looks at it. If it's unreadable, raise it before changing the bar, since that's a design call |
+| Two hosts set the wizard at once | Low | Last write wins, the same as today's selects. Each host sees the room's snapshot |
 
 ## Open questions
 
-None. Anything that comes up during the build goes back into the spec first.
+None.

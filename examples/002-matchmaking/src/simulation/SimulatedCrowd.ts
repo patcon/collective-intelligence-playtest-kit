@@ -2,7 +2,7 @@ import { SimulatedParticipant } from './SimulatedParticipant.ts';
 import type { ConnectSim } from './SimulatedParticipant.ts';
 
 /** The most simulated participants a page runs at once. */
-export const MAX_SIMS = 20;
+export const MAX_SIMS = 50;
 
 export interface SimSummary {
   id: string;
@@ -20,8 +20,15 @@ function randomDelay(): number {
   return 2000 + Math.random() * 6000;
 }
 
+const SIM_ID_PREFIX = 'sim-';
+
 function newSimId(): string {
-  return `sim-${Math.random().toString(36).slice(2, 10)}`;
+  return `${SIM_ID_PREFIX}${Math.random().toString(36).slice(2, 10)}`;
+}
+
+/** Whether a participant id is a simulated one, from this page or any other. */
+export function isSimId(id: string): boolean {
+  return id.startsWith(SIM_ID_PREFIX);
 }
 
 /**

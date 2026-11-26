@@ -1,39 +1,29 @@
 import { random } from './random.ts';
 import type { Rng } from './rng.ts';
+import { groupSizes } from './split.ts';
 
 export type Algorithm = 'random';
 
-/** How to split people up: into groups of about `size`, or into `count` groups. */
-export type Grouping = { by: 'size'; size: number } | { by: 'count'; count: number };
+/**
+ * How people per group handles people who don't divide evenly: `smart` aims for the average closest
+ * to it, `min` makes groups of at least it, `max` groups of at most it. See `groupSizes`.
+ */
+export type Fit = 'smart' | 'min' | 'max';
+export const FITS: ReadonlyArray<Fit> = ['smart', 'min', 'max'];
+
+/** How to split people up: into groups of about `groupSize` people, or into `groupCount` groups. */
+export type Grouping = { by: 'groupSize'; groupSize: number; fit: Fit } | { by: 'groupCount'; groupCount: number };
 
 /**
- * Each algorithm orders the ids so that neighbours suit each other; `match` deals them out from there.
- * Adding an algorithm is a file that exports one of these, plus a line here.
+ * Each algorithm orders the ids so that neighbours suit each other; `match` cuts that order into
+ * groups, so neighbours end up together. Adding an algorithm is a file that exports one of these,
+ * plus a line here.
  */
 const ALGORITHMS: Record<Algorithm, (ids: ReadonlyArray<string>, rng: Rng) => Array<string>> = { random };
 
 /**
- * How many groups `n` people make. By size `k`, `floor(n / k)`, and at least one; by count `c`, no
- * more groups than people. No people, no groups.
- */
-export function groupCount(n: number, grouping: Grouping): number {
-  if (n === 0) {
-    return 0;
-  }
-  return grouping.by === 'size' ? Math.max(1, Math.floor(n / grouping.size)) : Math.min(grouping.count, n);
-}
-
-/** No one is matched into a group smaller than this: a group of one has no one to find. */
-export const MIN_GROUP_SIZE = 2;
-
-/** The size of the smallest group `n` people make (sizes differ by at most one), or 0 with no people. */
-export function smallestGroupSize(n: number, grouping: Grouping): number {
-  return n === 0 ? 0 : Math.floor(n / groupCount(n, grouping));
-}
-
-/**
- * Splits `ids` into groups as `grouping` asks. Dealt round-robin, so sizes differ by at most one:
- * by size, leftovers join existing groups one each.
+ * Splits `ids` into groups of exactly the sizes `groupSizes` gives, so a round's groups are the ones
+ * the emcee's bar showed. Only called once `startBlocker` allows the start.
  */
 export function match(
   ids: ReadonlyArray<string>,
@@ -41,6 +31,7 @@ export function match(
   rng: Rng,
 ): Array<Array<string>> {
   const ordered = ALGORITHMS[algorithm](ids, rng);
-  const count = groupCount(ordered.length, grouping);
-  return Array.from({ length: count }, (_, g) => ordered.filter((_, i) => i % count === g));
+  const sizes = groupSizes(ordered.length, grouping);
+  const starts = sizes.map((_, g) => sizes.slice(0, g).reduce((a, b) => a + b, 0));
+  return sizes.map((size, g) => ordered.slice(starts[g], (starts[g] ?? 0) + size));
 }

@@ -32,10 +32,13 @@ describe('parseHostMessage', () => {
 
   it('rejects a config with a bad grouping, algorithm, cue or found-count switch', () => {
     const bad = [
-      { ...DEFAULT_CONFIG, grouping: { by: 'size', size: 1 } },
-      { ...DEFAULT_CONFIG, grouping: { by: 'count', count: 2.5 } },
-      { ...DEFAULT_CONFIG, grouping: { by: 'size', size: 1000 } },
+      { ...DEFAULT_CONFIG, grouping: { by: 'groupSize', fit: 'smart', groupSize: 1 } },
+      { ...DEFAULT_CONFIG, grouping: { by: 'groupCount', groupCount: 2.5 } },
+      { ...DEFAULT_CONFIG, grouping: { by: 'groupSize', fit: 'smart', groupSize: 1000 } },
       { ...DEFAULT_CONFIG, grouping: { by: 'bogus' } },
+      { ...DEFAULT_CONFIG, grouping: { by: 'groupSize', groupSize: 3 } },
+      { ...DEFAULT_CONFIG, grouping: { by: 'groupSize', fit: 'nearest', groupSize: 3 } },
+      { ...DEFAULT_CONFIG, grouping: { by: 'size', fit: 'smart', size: 3 } },
       { ...DEFAULT_CONFIG, algorithm: 'smart' },
       { ...DEFAULT_CONFIG, cue: 'smell' },
       { ...DEFAULT_CONFIG, cue: 'toString' },
@@ -44,6 +47,13 @@ describe('parseHostMessage', () => {
     for (const config of bad) {
       expect(parseHostMessage(json({ config, type: 'config' }))).toBeNull();
     }
+  });
+
+  it('reads a list of ids to remove, and rejects anything else', () => {
+    expect(parseHostMessage(json({ ids: ['sim-a', 'sim-b'], type: 'remove' }))).toEqual({ ids: ['sim-a', 'sim-b'], type: 'remove' });
+    expect(parseHostMessage(json({ ids: 'sim-a', type: 'remove' }))).toBeNull();
+    expect(parseHostMessage(json({ ids: ['sim-a', 3], type: 'remove' }))).toBeNull();
+    expect(parseHostMessage(json({ type: 'remove' }))).toBeNull();
   });
 });
 

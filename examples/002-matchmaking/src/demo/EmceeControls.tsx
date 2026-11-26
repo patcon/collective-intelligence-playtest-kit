@@ -20,8 +20,8 @@ const STEPS: Record<Phase, { forward: RoundCommand; label: string; back: string 
 };
 
 /**
- * Back and forward through the phases. Back is disabled in the lobby; Start says why when it's
- * disabled. Reset sits apart, in the pane's header (see `ResetButton`).
+ * Back and forward through the phases. Back is disabled in the lobby, and so is Start while it
+ * would be refused. Reset sits apart, in the pane's header (see `ResetButton`).
  */
 export function EmceeControls({ phase, blocker, onCommand }: EmceeControlsProps) {
   const step = STEPS[phase];
@@ -42,7 +42,6 @@ export function EmceeControls({ phase, blocker, onCommand }: EmceeControlsProps)
           {step.label}
         </Button>
       </div>
-      {inLobby && blocker && <p className="text-sm text-kumo-subtle">{blocker}</p>}
     </div>
   );
 }
