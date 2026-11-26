@@ -27,9 +27,9 @@ function Message({ title, detail, note, notice }: { title: string; detail?: stri
   );
 }
 
-/** "x of N found", for everyone in a group to watch go up. */
-function foundCount({ found, size }: { found: number; size: number }): string {
-  return `${found} of ${size} found`;
+/** "x found": how many in the group have ticked "Found them", for everyone in it to watch go up. */
+function foundCount({ found }: { found: number }): string {
+  return `${found} found`;
 }
 
 /** What a participant sees once past the start screen, for each status the room gives them. */

@@ -229,9 +229,10 @@ people past the start screen get matched.
 What each screen shows:
 
 - `waiting`: "Waiting for the emcee…"
-- `matched`: the cue, full-screen, with a "Found them" checkbox and "x of N found" in the group. (It
-  was a one-way button; since the build it's a checkbox that can be unticked during the round.)
-- `found`: "You're a group of N · x of N found", which updates live as others in the group tap. Showing
+- `matched`: the cue, full-screen, with a "Found them" checkbox and "x found" in the group. (It
+  was a one-way button reading "x of N found"; since the build it's a checkbox that can be unticked
+  during the round, and the count leaves out N.)
+- `found`: "You're a group of N · x found", which updates live as others in the group tap. Showing
   the count is meant to nudge everyone to tap.
 - `late`: "You'll be matched next round".
 
