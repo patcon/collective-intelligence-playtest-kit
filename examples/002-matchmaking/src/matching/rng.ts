@@ -22,3 +22,12 @@ export function shuffle<T>(items: ReadonlyArray<T>, rng: Rng): Array<T> {
   }
   return out;
 }
+
+/** `count` items: each of `items` once in a random order, then again in a new order, and so on. */
+export function deal<T>(items: ReadonlyArray<T>, count: number, rng: Rng): Array<T> {
+  const out: Array<T> = [];
+  while (out.length < count && items.length > 0) {
+    out.push(...shuffle(items, rng).slice(0, count - out.length));
+  }
+  return out;
+}

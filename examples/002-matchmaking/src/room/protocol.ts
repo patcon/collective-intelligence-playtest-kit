@@ -23,13 +23,15 @@ export type ParticipantMessage = { type: 'ready' } | { type: 'found'; found: boo
 export type HostMessage = { type: 'config'; config: MatchConfig } | { type: 'start' | 'moveOn' | 'back' | 'reset' };
 
 /**
- * The room → one participant, on joining and after every change: what their screen shows, and the
- * cue type the next round will use, so a waiting screen can say to turn the sound up before it's needed.
+ * The room → one participant, on joining and after every change: what their screen shows, the cue
+ * type the next round will use (so a waiting screen can say to turn the sound up before it's needed),
+ * and whether to show how many in their group have found each other.
  */
 export interface ToParticipant {
   type: 'view';
   view: ParticipantView;
   nextCue: CueTypeId;
+  showFoundCount: boolean;
 }
 
 /** The room → the host, on joining and after every change. */
@@ -49,6 +51,7 @@ interface RawMessage {
   config?: unknown;
   view?: unknown;
   nextCue?: unknown;
+  showFoundCount?: unknown;
   snapshot?: unknown;
 }
 
@@ -73,8 +76,8 @@ export function parseHostMessage(raw: string): HostMessage | null {
 /** The room's message to a participant, from raw socket text, or null if it isn't one. */
 export function parseToParticipant(raw: string): ToParticipant | null {
   const msg: RawMessage = parseJsonObject(raw) ?? {};
-  return msg.type === 'view' && isParticipantView(msg.view) && isCueTypeId(msg.nextCue)
-    ? { nextCue: msg.nextCue, type: 'view', view: msg.view }
+  return msg.type === 'view' && isParticipantView(msg.view) && isCueTypeId(msg.nextCue) && typeof msg.showFoundCount === 'boolean'
+    ? { nextCue: msg.nextCue, showFoundCount: msg.showFoundCount, type: 'view', view: msg.view }
     : null;
 }
 

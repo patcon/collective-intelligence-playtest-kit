@@ -2,6 +2,7 @@ import { roleFromUrl, roleOf, sendToRole } from '@playtest-kit/common/server';
 import { Agent } from 'agents';
 import type { Connection, ConnectionContext, WSMessage } from 'agents';
 import { assignCues } from '../src/cues/cueTypes.ts';
+import { DEFAULT_CONFIG, isMatchConfig } from '../src/room/matchConfig.ts';
 import { INITIAL_ROOM_STATE, reduce } from '../src/room/matchRoom.ts';
 import type { RoomEvent, RoomState } from '../src/room/matchRoom.ts';
 import { isRole, parseHostMessage, parseParticipantMessage } from '../src/room/protocol.ts';
@@ -33,9 +34,13 @@ export class MatchRoom extends Agent<RoomEnv, RoomState> {
 
   /**
    * After hibernation the sockets are still here, but after a restart they're gone without a close:
-   * anyone the state still thinks is connected, and isn't, has left.
+   * anyone the state still thinks is connected, and isn't, has left. A config kept by an older build
+   * that this one can't read (a field added since, a cue type renamed) goes back to the defaults.
    */
   onStart(): void {
+    if (!isMatchConfig(this.state.config)) {
+      this.setState({ ...this.state, config: DEFAULT_CONFIG });
+    }
     const live = new Set(this.participantIds());
     for (const p of this.state.participants) {
       if (p.connected && !live.has(p.id)) {
@@ -94,7 +99,7 @@ export class MatchRoom extends Agent<RoomEnv, RoomState> {
   private sendTo(connection: Connection): void {
     const msg: ToParticipant | ToHost =
       roleOfConnection(connection) === 'participant'
-        ? { nextCue: this.state.config.cue, type: 'view', view: viewFor(this.state, connection.id) }
+        ? { nextCue: this.state.config.cue, showFoundCount: this.state.config.showFoundCount, type: 'view', view: viewFor(this.state, connection.id) }
         : { snapshot: snapshotOf(this.state), type: 'snapshot' };
     connection.send(JSON.stringify(msg));
   }

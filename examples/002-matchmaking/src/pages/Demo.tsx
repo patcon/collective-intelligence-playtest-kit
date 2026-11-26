@@ -53,9 +53,15 @@ function HostView({ room }: { room: string }) {
   const snapshot = useRoomSnapshot();
 
   const header = (
-    <header className="flex items-center gap-3">
-      <h1 className="text-xl font-semibold">Matchmaking</h1>
-      <RoomStatusBadge status={status} />
+    <header className="flex flex-col gap-1">
+      <div className="flex items-center gap-3">
+        <h1 className="text-xl font-semibold">Matchmaking</h1>
+        <RoomStatusBadge status={status} />
+      </div>
+      <p className="max-w-2xl text-sm text-kumo-subtle">
+        Splits a room into small groups at random. Each group gets a cue (a colour, an avatar, a birdsong or a vibration), and people find
+        everyone else with the same cue, then tick “Found them” to start an activity.
+      </p>
     </header>
   );
 

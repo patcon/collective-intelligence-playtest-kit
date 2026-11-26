@@ -5,8 +5,8 @@ import type { RoomSnapshot } from './protocol.ts';
 
 const json = (value: unknown) => JSON.stringify(value);
 const cue = { hex: '#e6194b', name: 'Red', type: 'colour' } as const;
-/** A `view` message, as the room sends it, for the next round's cue type `nextCue`. */
-const view = (v: unknown, nextCue = 'colour') => json({ nextCue, type: 'view', view: v });
+/** A `view` message, as the room sends it, for the next round's cue type `nextCue`, with the found count hidden. */
+const view = (v: unknown, nextCue = 'colour') => json({ nextCue, showFoundCount: false, type: 'view', view: v });
 
 describe('parseParticipantMessage', () => {
   it('reads ready, and found ticked or unticked', () => {
@@ -30,7 +30,7 @@ describe('parseHostMessage', () => {
     expect(parseHostMessage(json({ config: DEFAULT_CONFIG, type: 'config' }))).toEqual({ config: DEFAULT_CONFIG, type: 'config' });
   });
 
-  it('rejects a config with a bad grouping, algorithm or cue', () => {
+  it('rejects a config with a bad grouping, algorithm, cue or found-count switch', () => {
     const bad = [
       { ...DEFAULT_CONFIG, grouping: { by: 'size', size: 1 } },
       { ...DEFAULT_CONFIG, grouping: { by: 'count', count: 2.5 } },
@@ -39,6 +39,7 @@ describe('parseHostMessage', () => {
       { ...DEFAULT_CONFIG, algorithm: 'smart' },
       { ...DEFAULT_CONFIG, cue: 'smell' },
       { ...DEFAULT_CONFIG, cue: 'toString' },
+      { ...DEFAULT_CONFIG, showFoundCount: 'yes' },
     ];
     for (const config of bad) {
       expect(parseHostMessage(json({ config, type: 'config' }))).toBeNull();
@@ -49,13 +50,13 @@ describe('parseHostMessage', () => {
 describe('parseToParticipant', () => {
   it('reads a view with and without a group', () => {
     const matched = { cue, group: { found: 1, size: 3 }, status: 'matched' };
-    expect(parseToParticipant(view(matched))).toEqual({ nextCue: 'colour', type: 'view', view: matched });
-    expect(parseToParticipant(view({ status: 'late' }))).toEqual({ nextCue: 'colour', type: 'view', view: { status: 'late' } });
+    expect(parseToParticipant(view(matched))).toEqual({ nextCue: 'colour', showFoundCount: false, type: 'view', view: matched });
+    expect(parseToParticipant(view({ status: 'late' }))).toEqual({ nextCue: 'colour', showFoundCount: false, type: 'view', view: { status: 'late' } });
   });
 
   it('reads an activity view, which carries the group like a matched one', () => {
     const activity = { cue, group: { found: 0, size: 2 }, status: 'activity' };
-    expect(parseToParticipant(view(activity))).toEqual({ nextCue: 'colour', type: 'view', view: activity });
+    expect(parseToParticipant(view(activity))).toEqual({ nextCue: 'colour', showFoundCount: false, type: 'view', view: activity });
   });
 
   it('rejects a grouped view with no cue, and an unknown status', () => {
@@ -67,6 +68,10 @@ describe('parseToParticipant', () => {
   it("rejects a view without the next round's cue type, or with an unknown one", () => {
     expect(parseToParticipant(json({ type: 'view', view: { status: 'waiting' } }))).toBeNull();
     expect(parseToParticipant(view({ status: 'waiting' }, 'smell'))).toBeNull();
+  });
+
+  it('rejects a view without a yes or no on showing the found count', () => {
+    expect(parseToParticipant(json({ nextCue: 'colour', type: 'view', view: { status: 'waiting' } }))).toBeNull();
   });
 });
 

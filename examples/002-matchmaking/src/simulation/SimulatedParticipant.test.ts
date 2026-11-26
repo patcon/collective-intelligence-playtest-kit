@@ -22,7 +22,7 @@ function simulated(autoConfirm = true) {
     open: () => handlers?.onOpen(),
     sent,
     sim,
-    view: (view: ParticipantView) => handlers?.onMessage(JSON.stringify({ nextCue: 'colour', type: 'view', view })),
+    view: (view: ParticipantView) => handlers?.onMessage(JSON.stringify({ nextCue: 'colour', showFoundCount: false, type: 'view', view })),
   };
 }
 

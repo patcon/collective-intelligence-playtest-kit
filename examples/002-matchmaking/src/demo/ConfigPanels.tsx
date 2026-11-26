@@ -1,7 +1,7 @@
-import { Banner, Select, Surface } from '@cloudflare/kumo';
-import { CUE_TYPE_IDS, CUE_TYPES, cueLabel, isCueTypeId } from '../cues/cueTypes.ts';
+import { Banner, Select, Surface, Switch } from '@cloudflare/kumo';
 import type { Grouping } from '../matching/match.ts';
 import type { MatchConfig } from '../room/protocol.ts';
+import { CueSelect } from './CueSelect.tsx';
 
 interface ConfigPanelsProps {
   config: MatchConfig;
@@ -12,14 +12,6 @@ interface ConfigPanelsProps {
 
 const ALGORITHMS = { random: 'Random' };
 const GROUP_BY = { count: 'Number of groups', size: 'Group size' };
-
-/** Each cue by name and how many groups it can tell apart, "Visual: Colour (12)", sorted so each sense's cues sit together. */
-const CUES = Object.fromEntries(
-  CUE_TYPE_IDS.map((id) => {
-    const { maxDistinct } = CUE_TYPES[id];
-    return [id, `${cueLabel(id)} (${Number.isFinite(maxDistinct) ? maxDistinct : 'no limit'})`] as const;
-  }).toSorted(([, a], [, b]) => a.localeCompare(b)),
-);
 
 /** The choices for each way of grouping: sizes from 2, counts from 1. */
 const NUMBERS: Record<Grouping['by'], Record<string, string>> = {
@@ -42,7 +34,7 @@ function groupingOf(by: string, amount: number): Grouping | null {
   return by === 'count' && amount >= 1 ? { by, count: amount } : null;
 }
 
-/** How the next round is matched and cued. Shows the room's config, and sends any change straight back. */
+/** How the next round is matched and cued, and whether phones show the found count. Shows the room's config, and sends any change straight back. */
 export function ConfigPanels({ config, onConfig, warning }: ConfigPanelsProps) {
   const setGrouping = (by: string, amount: number) => {
     const grouping = groupingOf(by, amount) ?? groupingOf(by, 3);
@@ -54,7 +46,7 @@ export function ConfigPanels({ config, onConfig, warning }: ConfigPanelsProps) {
   return (
     <Surface className="flex flex-col gap-3 rounded-lg p-5">
       <h2 className="text-lg font-semibold">Next round</h2>
-      <Select className="w-full" items={ALGORITHMS} label="Algorithm" value={config.algorithm} />
+      <Select className="w-full" items={ALGORITHMS} label="Matching algorithm" value={config.algorithm} />
       <Select
         className="w-full"
         items={GROUP_BY}
@@ -70,15 +62,15 @@ export function ConfigPanels({ config, onConfig, warning }: ConfigPanelsProps) {
         onValueChange={(amount) => setGrouping(config.grouping.by, Number(amount))}
         value={String(amountOf(config.grouping))}
       />
-      <Select
-        className="w-full"
-        items={CUES}
-        label="Cue (max groups)"
-        onValueChange={(cue) => isCueTypeId(cue) && onConfig({ ...config, cue })}
-        value={config.cue}
-      />
+      <CueSelect onChange={(cue) => onConfig({ ...config, cue })} value={config.cue} />
       {warning && <Banner description={warning} variant="alert" />}
       <p className="text-sm text-kumo-subtle">Changes made during a round apply to the next one.</p>
+      {/* Unlike the rest, this shows on phones straight away. */}
+      <Switch
+        checked={config.showFoundCount}
+        label="Display found count"
+        onCheckedChange={(showFoundCount) => onConfig({ ...config, showFoundCount })}
+      />
     </Surface>
   );
 }

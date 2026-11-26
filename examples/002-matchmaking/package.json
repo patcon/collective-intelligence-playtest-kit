@@ -26,7 +26,8 @@
     "@playtest-kit/ui": "workspace:*",
     "agents": "0.34.0",
     "react": "19.3.1",
-    "react-dom": "19.3.1"
+    "react-dom": "19.3.1",
+    "web-haptics": "0.0.6"
   },
   "devDependencies": {
     "@alchemy.run/cloudflare": "2.0.0-beta.87",

@@ -134,7 +134,7 @@ Rooms are small (≤ ~50 connections), so after every change the room sends:
 - **to each participant:** their own `ParticipantView` (status, cue, group size, and how many in the group
   have marked found). A `found` from anyone in a group sends a new view to everyone in that group.
   It also carries the next round's cue type, so the start and waiting screens can say to turn the sound
-  up before an audio round (added after the build).
+  up before an audio round (or turn off Do Not Disturb before a haptics one), and whether to show the group's found count (both added after the build).
 
 Late joiners and reconnects get the same message as everyone else, so `001`'s catch-up logic isn't
 needed. `001` keeps its event stream, because it streams high-rate valence and snapshots would be the
@@ -147,13 +147,14 @@ type ParticipantMessage = { type: 'ready' } | { type: 'found'; found: boolean };
 type HostMessage =
   | { type: 'config'; config: MatchConfig }
   | { type: 'start' | 'moveOn' | 'back' | 'reset' }; // back added after the build
-type ToParticipant = { type: 'view'; view: ParticipantView; nextCue: CueTypeId }; // nextCue added after the build
+type ToParticipant = { type: 'view'; view: ParticipantView; nextCue: CueTypeId; showFoundCount: boolean }; // nextCue and showFoundCount added after the build
 type ToHost = { type: 'snapshot'; snapshot: RoomSnapshot };
 
 interface MatchConfig {
   algorithm: 'random';
   grouping: { by: 'size'; size: number } | { by: 'count'; count: number };
-  cue: CueTypeId; // 'colour' | 'avatar' | 'birdsong'
+  cue: CueTypeId; // 'colour' | 'avatarMixed' | 'avatarShapes' | 'avatarThumbs' | 'birdsong' | 'haptic'
+  showFoundCount: boolean; // added after the build; off by default, and applies straight away, not next round
 }
 ```
 
@@ -189,8 +190,9 @@ If there are more groups than `maxDistinct`, cues repeat and the demo page shows
 | Cue | Payload | Render | maxDistinct |
 |---|---|---|---|
 | `colour` | `{ name, hex }` from a fixed named palette | Full-screen colour with its name as text, so it still works for colour-blind people | 12 |
-| `avatar` | `{ style, seed }` | DiceBear avatar, large, rendered locally with `@dicebear/core` + `@dicebear/collection` so it works offline and phones make no third-party requests | effectively unlimited |
+| `avatar` | `{ style, seed }` | DiceBear avatar, large, rendered locally with `@dicebear/core` + `@dicebear/collection` so it works offline and phones make no third-party requests. Since the build, three cue types send it: Shapes only, Thumbs only, or a random set (the two styles in turn) | effectively unlimited |
 | `birdsong` | `{ species }` | Plays that species' recording on a loop, each phone starting after its own random delay of up to 3 s so a group isn't in unison. Sound-only: the species is named, small, only when the sound can't play (changed after the build; it first showed the name as well). About 6 short CC0 or CC-BY clips (for example from xeno-canto), bundled with their attribution in `public/birdsong/ATTRIBUTION.md` | number of bundled recordings (~6) |
+| `haptic` (added after the build) | `{ rhythm }` | Vibrates one of 6 rhythms (heartbeat, long buzz, long-short, short-long, triple tap, two long) every 2.5 s, lined up on the phone's clock so a group's phones buzz in step, through `web-haptics`. Touch-only: people hold each other's phones, or press phones together. Without the Vibration API (iPhones), the phone plays the sound of the buzzing instead, as a rattle of clicks; the rhythm is named, small, only when it can do neither | 6 |
 
 Ship order inside this module: `colour` → `avatar` → `birdsong`.
 
@@ -233,7 +235,8 @@ What each screen shows:
 - `waiting`: "Waiting for the emcee…"
 - `matched`: the cue, full-screen, with a "Found them" checkbox and "x found" in the group. (It
   was a one-way button reading "x of N found"; since the build it's a checkbox that can be unticked
-  during the round, and the count leaves out N.)
+  during the round, and the count leaves out N. The count is now hidden unless the host turns on
+  "Display found count" on `/demo`.)
 - `found`: "You're a group of N · x found", which updates live as others in the group tap. Showing
   the count is meant to nudge everyone to tap.
 - `late`: "You'll be matched next round".

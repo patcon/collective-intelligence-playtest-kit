@@ -2,14 +2,19 @@ import { isCueTypeId } from '../cues/cueTypes.ts';
 import type { CueTypeId } from '../cues/cueTypes.ts';
 import type { Algorithm, Grouping } from '../matching/match.ts';
 
-/** How the next round is matched and cued. Set from the host; a change mid-round applies to the next one. */
+/**
+ * How the next round is matched and cued, and what phones show. Set from the host; a change mid-round
+ * applies to the next one, except `showFoundCount`, which phones pick up straight away.
+ */
 export interface MatchConfig {
   algorithm: Algorithm;
   grouping: Grouping;
   cue: CueTypeId;
+  /** Whether a phone with a cue shows "x found" in its group. */
+  showFoundCount: boolean;
 }
 
-export const DEFAULT_CONFIG: MatchConfig = { algorithm: 'random', cue: 'colour', grouping: { by: 'size', size: 3 } };
+export const DEFAULT_CONFIG: MatchConfig = { algorithm: 'random', cue: 'colour', grouping: { by: 'size', size: 3 }, showFoundCount: false };
 
 /** The most people a room expects, and so the largest group size or count worth asking for. */
 export const MAX_GROUPING = 50;
@@ -37,6 +42,8 @@ export function isMatchConfig(value: unknown): value is MatchConfig {
     'grouping' in value &&
     isGrouping(value.grouping) &&
     'cue' in value &&
-    isCueTypeId(value.cue)
+    isCueTypeId(value.cue) &&
+    'showFoundCount' in value &&
+    typeof value.showFoundCount === 'boolean'
   );
 }

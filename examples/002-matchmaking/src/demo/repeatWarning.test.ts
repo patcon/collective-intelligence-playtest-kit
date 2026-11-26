@@ -6,7 +6,7 @@ import { repeatWarning } from './repeatWarning.ts';
 
 function lobbyOf(n: number, size: number, status: ParticipantStatus = 'waiting'): RoomSnapshot {
   return {
-    config: { algorithm: 'random', cue: 'colour', grouping: { by: 'size', size } },
+    config: { algorithm: 'random', cue: 'colour', grouping: { by: 'size', size }, showFoundCount: false },
     groups: [],
     participants: Array.from({ length: n }, (_, i) => ({ group: null, id: `p${i}`, status })),
     phase: 'lobby',

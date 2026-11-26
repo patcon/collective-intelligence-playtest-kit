@@ -1,11 +1,18 @@
 import { describe, expect, it } from 'vitest';
 import { seededRng } from '../../matching/rng.ts';
-import { AVATAR_STYLES, assignAvatars, isAvatarCue } from './avatarCue.ts';
+import { AVATAR_STYLES, avatarAssigner, isAvatarCue } from './avatarCue.ts';
 
-describe('assignAvatars', () => {
+const assignAvatars = avatarAssigner(AVATAR_STYLES);
+
+describe('avatarAssigner', () => {
   it('gives every group a different avatar, however many groups there are', () => {
     const avatars = assignAvatars(50, seededRng(1));
     expect(new Set(avatars.map((a) => `${a.style}/${a.seed}`)).size).toBe(50);
+  });
+
+  it('sticks to one style when given one', () => {
+    const styles = new Set(avatarAssigner(['shapes'])(10, seededRng(1)).map((a) => a.style));
+    expect(styles).toEqual(new Set(['shapes']));
   });
 
   it('alternates styles, so neighbouring groups look different', () => {

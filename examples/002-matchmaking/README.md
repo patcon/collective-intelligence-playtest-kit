@@ -1,7 +1,7 @@
 # 002-matchmaking
 
 A realtime matchmaking demo: participants tap Start on their phones, the host starts a round, each
-group gets a cue (a colour, an avatar, or a birdsong every phone in the group plays), and people find the others with the same cue and tap
+group gets a cue (a colour, an avatar, a birdsong every phone in the group plays, or a rhythm every phone in the group vibrates), and people find the others with the same cue and tap
 "found them". Built from [`000-template`](../000-template) on the shared room pieces in
 [`@playtest-kit/common`](../../packages/common) and [`@playtest-kit/ui`](../../packages/ui).
 The design is in [`docs/specs/matchmaking.md`](../../docs/specs/matchmaking.md).
@@ -9,7 +9,7 @@ The design is in [`docs/specs/matchmaking.md`](../../docs/specs/matchmaking.md).
 ## Pages
 
 - `/` redirects to `/demo`.
-- `/demo`: the host. Config for the next round, the emcee's pane (counts; Start matchmaking, Start activity and End activity, each with a back arrow; a small red Reset, top left), a QR code to
+- `/demo`: the host. Config for the next round (with the cues grouped by Audio and Visual, and a "Display found count" switch, off by default, that shows each phone "x found" in its group), the emcee's pane (counts; Start matchmaking, Start activity and End activity, each with a back arrow; a small red Reset, top left), a QR code to
   `/participate`, up to 20 simulated participants, and a card for everyone in the room.
 - `/emcee`: the emcee's pane on its own, for running the room from a phone. It's a host too, so it can be
   open alongside `/demo`.
@@ -24,7 +24,7 @@ The design is in [`docs/specs/matchmaking.md`](../../docs/specs/matchmaking.md).
 | Path | What it is |
 | --- | --- |
 | `src/matching/` | Pure matching engine: `match(ids, { algorithm, grouping }, rng)`, one file per algorithm |
-| `src/cues/` | Cue types (`colour/`, `avatar/`, `birdsong/`): `cueTypes.ts` (assign, `maxDistinct`, sense and name; no React, so the Worker can use it), `CueView.tsx` (full screen) and `CueChip.tsx` (on cards) |
+| `src/cues/` | Cue types (`colour/`, `avatar/`, `birdsong/`, `haptic/`): `cueTypes.ts` (assign, `maxDistinct`, sense and name; no React, so the Worker can use it), `CueView.tsx` (full screen) and `CueChip.tsx` (on cards) |
 | `src/room/matchRoom.ts` | The room as a pure reducer over join, leave, ready, found, config, start, move on, back and reset |
 | `src/room/roomSelectors.ts` | `viewFor` (one participant's screen) and `snapshotOf` (the host's view of the room) |
 | `src/room/protocol.ts` | Socket messages, validated at the boundary by `parse*` functions |
@@ -119,7 +119,14 @@ simulation code. So whatever works for 20 sims works for 20 phones.
 ## Credits
 
 Avatars are drawn on each device with [DiceBear](https://www.dicebear.com) (`@dicebear/core` and
-`@dicebear/collection` 9.4.3), using two styles that are both CC0 1.0: "Thumbs" and "Shapes", by DiceBear.
+`@dicebear/collection` 9.4.3), using two styles that are both CC0 1.0: "Thumbs" and "Shapes", by DiceBear. The emcee picks either one, or both in turn ("Random set").
+
+Vibration goes through [WebHaptics](https://haptics.lochie.me) (`web-haptics` 0.0.6, MIT, by Lochie Axon),
+which uses the Vibration API where there is one (Android). iPhones don't have it, so they play the sound
+of the buzzing out loud instead: the rattle of clicks `web-haptics` plays in its `debug` mode (as in
+`polislike-partykit-reaction-canvas`), rebuilt in `src/cues/haptic/buzzSound.ts` on the audio the start
+screen's tap unlocked. A phone that can do neither is told its group's rhythm. To hear the sound on any phone, open
+`/participate?haptics=sound`.
 
 The birdsong recordings are CC0, public domain or CC BY, from Wikimedia Commons; each is credited, with
 how it was cut and encoded, in [`public/birdsong/ATTRIBUTION.md`](public/birdsong/ATTRIBUTION.md).

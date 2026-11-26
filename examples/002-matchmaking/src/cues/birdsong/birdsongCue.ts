@@ -1,4 +1,4 @@
-import { shuffle } from '../../matching/rng.ts';
+import { deal } from '../../matching/rng.ts';
 import type { Rng } from '../../matching/rng.ts';
 
 /**
@@ -36,12 +36,7 @@ export function birdsongUrl(species: Species): string {
 
 /** One species per group, all different while there are enough; past that, they repeat in a new order. */
 export function assignBirdsongs(groupCount: number, rng: Rng): Array<BirdsongCue> {
-  const out: Array<BirdsongCue> = [];
-  while (out.length < groupCount) {
-    const species = shuffle(SPECIES_IDS, rng).slice(0, groupCount - out.length);
-    out.push(...species.map((s): BirdsongCue => ({ species: s, type: 'birdsong' })));
-  }
-  return out;
+  return deal(SPECIES_IDS, groupCount, rng).map((species) => ({ species, type: 'birdsong' }));
 }
 
 export const BIRDSONG_COUNT = SPECIES_IDS.length;
