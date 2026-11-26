@@ -21,9 +21,9 @@ function plural(n: number, one: string, many: string): string {
   return `${n} ${n === 1 ? one : many}`;
 }
 
-function describeConfig({ grouping, cue }: MatchConfig): string {
-  const groups = grouping.by === 'groupSize' ? `groups of ${grouping.groupSize}` : plural(grouping.groupCount, 'group', 'groups');
-  return `Random · ${groups} · ${cueLabel(cue)}`;
+/** The algorithm and cue. Not the grouping: in the lobby the wizard shows the split, and in a round the stages show the groups. */
+function describeConfig({ cue }: MatchConfig): string {
+  return `Random · ${cueLabel(cue)}`;
 }
 
 /**
