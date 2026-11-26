@@ -72,9 +72,9 @@ Plan: [`plan.md`](plan.md). Spec: [`docs/specs/group-segment-wizard.md`](../docs
 **Estimated scope:** Small
 
 ## Checkpoint A: grouping model done
-- [ ] `pnpm test`, `pnpm typecheck` and `pnpm lint` pass.
-- [ ] Manual: `pnpm dev`, then on `/demo` with 20 sims and the old selects, Start makes groups and they confirm.
-- [ ] Commit. Brief review with Patrick before Phase 2.
+- [x] `pnpm test`, `pnpm typecheck` and `pnpm lint` pass.
+- [x] Manual: `pnpm dev`, then on `/demo` with 20 sims and the old selects, Start makes groups and they confirm.
+- [x] Commit. Brief review with Patrick before Phase 2.
 
 ## Phase 2: The wizard drives the room
 

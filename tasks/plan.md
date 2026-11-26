@@ -39,7 +39,7 @@ T4 depends only on T1, so it can run alongside T2 and T3. T8 (50 sims) depends o
 - [x] T3: `match` deals into `groupSizes`
 
 ### Checkpoint A
-- [ ] `pnpm test`, `pnpm typecheck` and `pnpm lint` pass. A 20-sim round on `/demo` still works through the old selects.
+- [x] `pnpm test`, `pnpm typecheck` and `pnpm lint` pass. A 20-sim round on `/demo` still works through the old selects.
 
 ### Phase 2: The wizard drives the room (`emcee-control`)
 - [ ] T4: `nextGrouping`, the wizard's logic as a pure function
