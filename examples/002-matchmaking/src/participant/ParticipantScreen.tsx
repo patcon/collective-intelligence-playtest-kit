@@ -57,7 +57,8 @@ export function ParticipantScreen({ view, onFound, note, notice }: ParticipantSc
     case 'found':
       return (
         <CueView cue={view.cue}>
-          {view.status === 'found' && <p className="text-2xl font-semibold">{`You're a group of ${view.group.size}`}</p>}
+          {/* Always laid out, and only shown once ticked, so ticking doesn't move the checkbox. */}
+          <p className={`text-2xl font-semibold ${view.status === 'found' ? '' : 'invisible'}`}>{`You're a group of ${view.group.size}`}</p>
           {/* On a light card, so it reads over any cue. The label is part of the tap target. */}
           <div className="rounded-lg bg-kumo-base px-5 py-3 text-kumo-default shadow-md">
             <Checkbox checked={view.status === 'found'} label="Found them" onCheckedChange={(checked) => onFound(checked)} />
