@@ -7,7 +7,7 @@ const red = { hex: '#e6194b', name: 'Red', type: 'colour' } as const;
 const blue = { hex: '#4363d8', name: 'Blue', type: 'colour' } as const;
 
 describe('progressOf', () => {
-  it('counts who is ready and who is still starting in the lobby', () => {
+  it('counts who is ready in the lobby', () => {
     const snapshot: RoomSnapshot = {
       config: DEFAULT_CONFIG,
       groups: [],
@@ -18,11 +18,12 @@ describe('progressOf', () => {
       ],
       phase: 'lobby',
       round: 0,
+      roundConfig: null,
     };
-    expect(progressOf(snapshot)).toMatchObject({ groups: 0, nextRound: 2, people: 0, ready: 2, starting: 1 });
+    expect(progressOf(snapshot)).toMatchObject({ groups: 0, nextRound: 2, people: 0, ready: 2 });
   });
 
-  it('counts people found one by one, and anyone late', () => {
+  it('counts people found one by one', () => {
     const snapshot: RoomSnapshot = {
       config: DEFAULT_CONFIG,
       groups: [
@@ -32,7 +33,8 @@ describe('progressOf', () => {
       participants: [{ group: null, id: 'z', status: 'late' }],
       phase: 'round',
       round: 1,
+      roundConfig: null,
     };
-    expect(progressOf(snapshot)).toEqual({ groups: 2, late: 1, nextRound: 1, people: 5, peopleFound: 2, ready: 0, starting: 0 });
+    expect(progressOf(snapshot)).toEqual({ groups: 2, nextRound: 1, people: 5, peopleFound: 2, ready: 0 });
   });
 });

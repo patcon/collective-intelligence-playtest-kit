@@ -21,6 +21,8 @@ export interface RoomState {
   phase: Phase;
   round: number;
   config: MatchConfig;
+  /** The config this round's groups were made with, or null in the lobby. `config` may have changed since. */
+  roundConfig: MatchConfig | null;
   participants: Array<Participant>;
   /** This round's groups, by their cue. Who's in each is on `participants`. */
   groups: Array<Cue>;
@@ -38,7 +40,7 @@ export interface RoomDeps {
   assignCues: (type: CueTypeId, groupCount: number, rng: Rng) => Array<Cue>;
 }
 
-export const INITIAL_ROOM_STATE: RoomState = { config: DEFAULT_CONFIG, groups: [], participants: [], phase: 'lobby', round: 0 };
+export const INITIAL_ROOM_STATE: RoomState = { config: DEFAULT_CONFIG, groups: [], participants: [], phase: 'lobby', round: 0, roundConfig: null };
 
 function withParticipant(state: RoomState, id: string, change: (p: Participant) => Participant): RoomState {
   if (!state.participants.some((p) => p.id === id)) {
@@ -93,6 +95,7 @@ function start(state: RoomState, { assignCues, rng }: RoomDeps): RoomState {
     participants: state.participants.filter((p) => p.connected).map((p) => ({ ...p, found: false, group: groupOf.get(p.id) ?? null })),
     phase: 'round',
     round: state.round + 1,
+    roundConfig: state.config,
   };
 }
 
@@ -104,6 +107,7 @@ function toLobby(state: RoomState, round: number): RoomState {
     participants: state.participants.filter((p) => p.connected).map((p) => ({ ...p, found: false, group: null })),
     phase: 'lobby',
     round,
+    roundConfig: null,
   };
 }
 

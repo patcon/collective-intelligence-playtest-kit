@@ -11,6 +11,7 @@ function lobbyOf(n: number, size: number, status: ParticipantStatus = 'waiting')
     participants: Array.from({ length: n }, (_, i) => ({ group: null, id: `p${i}`, status })),
     phase: 'lobby',
     round: 0,
+    roundConfig: null,
   };
 }
 

@@ -48,5 +48,7 @@ export function snapshotOf(state: RoomState): RoomSnapshot {
       .map((p) => ({ group: p.group, id: p.id, status: statusOf(state, p) })),
     phase: state.phase,
     round: state.round,
+    // A room kept by an older build has no `roundConfig`.
+    roundConfig: state.roundConfig ?? null,
   };
 }

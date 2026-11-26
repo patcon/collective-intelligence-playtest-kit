@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { assignCues } from '../cues/cueTypes.ts';
 import { seededRng } from '../matching/rng.ts';
+import { DEFAULT_CONFIG } from './matchConfig.ts';
 import { INITIAL_ROOM_STATE, reduce } from './matchRoom.ts';
 import type { RoomEvent, RoomState } from './matchRoom.ts';
 import { snapshotOf, viewFor } from './roomSelectors.ts';
@@ -53,6 +54,15 @@ describe('reduce', () => {
     expect(state.groups).toHaveLength(2);
     expect(new Set(state.groups.map((cue) => JSON.stringify(cue))).size).toBe(2);
     expect(viewFor(state, 'a')).toMatchObject({ group: { found: 0, size: 2 }, status: 'matched' });
+  });
+
+  it('remembers the config a round started with, through config changes and the activity, until the lobby', () => {
+    const started = run([pairs, ...readied('a', 'b'), { type: 'start' }]);
+    const avatars: RoomEvent = { config: { ...DEFAULT_CONFIG, cue: 'avatarShapes' }, type: 'config' };
+    const changed = run([avatars, { type: 'moveOn' }], started);
+    expect(snapshotOf(changed).roundConfig).toEqual(started.config);
+    expect(snapshotOf(changed).config.cue).toBe('avatarShapes');
+    expect(snapshotOf(run([{ type: 'moveOn' }], changed)).roundConfig).toBeNull();
   });
 
   it('leaves out anyone still on the start screen', () => {

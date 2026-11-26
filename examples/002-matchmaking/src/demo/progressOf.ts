@@ -4,12 +4,8 @@ import type { RoomSnapshot } from '../room/protocol.ts';
 export interface RoomProgress {
   /** Past the start screen and waiting for a round. */
   ready: number;
-  /** Connected, but still on the start screen. */
-  starting: number;
   /** Everyone the next round would match: past the start screen, in a group or not. */
   nextRound: number;
-  /** Ready after this round's groups were made. */
-  late: number;
   groups: number;
   /** Everyone in a group this round, still connected. */
   people: number;
@@ -24,11 +20,9 @@ function countStatus(snapshot: RoomSnapshot, status: RoomSnapshot['participants'
 export function progressOf(snapshot: RoomSnapshot): RoomProgress {
   return {
     groups: snapshot.groups.length,
-    late: countStatus(snapshot, 'late'),
     nextRound: snapshot.participants.filter((p) => p.status !== 'joined').length,
     people: snapshot.groups.reduce((sum, g) => sum + g.size, 0),
     peopleFound: snapshot.groups.reduce((sum, g) => sum + g.found, 0),
     ready: countStatus(snapshot, 'waiting'),
-    starting: countStatus(snapshot, 'joined'),
   };
 }

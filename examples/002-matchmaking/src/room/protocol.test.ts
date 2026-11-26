@@ -82,6 +82,7 @@ describe('parseToHost', () => {
     participants: [{ group: 0, id: 'a', status: 'matched' }],
     phase: 'round',
     round: 1,
+    roundConfig: null,
   };
 
   it('reads a snapshot, in a round or the activity', () => {

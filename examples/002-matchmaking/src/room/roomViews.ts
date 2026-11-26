@@ -51,6 +51,8 @@ export interface RoomSnapshot {
   /** Rounds started so far. A round undone with Back doesn't count. */
   round: number;
   config: MatchConfig;
+  /** The config this round was made with, or null in the lobby. */
+  roundConfig: MatchConfig | null;
   participants: Array<ParticipantSummary>;
   groups: Array<GroupSummary>;
 }
@@ -103,15 +105,18 @@ function isListOf<T>(value: unknown, isItem: (item: unknown) => item is T): valu
   return Array.isArray(value) && value.every((item) => isItem(item));
 }
 
-function hasRoomHeader(value: unknown): value is Pick<RoomSnapshot, 'phase' | 'round' | 'config'> {
+function hasConfigs(value: unknown): value is Pick<RoomSnapshot, 'config' | 'roundConfig'> {
+  return isObject(value) && 'config' in value && isMatchConfig(value.config) && 'roundConfig' in value && (value.roundConfig === null || isMatchConfig(value.roundConfig));
+}
+
+function hasRoomHeader(value: unknown): value is Pick<RoomSnapshot, 'phase' | 'round' | 'config' | 'roundConfig'> {
   return (
     isObject(value) &&
     'phase' in value &&
     (value.phase === 'lobby' || value.phase === 'round' || value.phase === 'activity') &&
     'round' in value &&
     isCount(value.round) &&
-    'config' in value &&
-    isMatchConfig(value.config)
+    hasConfigs(value)
   );
 }
 

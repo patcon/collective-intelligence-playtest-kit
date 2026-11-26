@@ -4,6 +4,7 @@ import { cueLabel } from '../cues/cueTypes.ts';
 import type { MatchConfig, RoomSnapshot } from '../room/protocol.ts';
 import { EmceeControls, ResetButton } from './EmceeControls.tsx';
 import type { RoundCommand } from './EmceeControls.tsx';
+import { PhaseFlow } from './PhaseFlow.tsx';
 import { progressOf } from './progressOf.ts';
 import { startBlocker } from './startBlocker.ts';
 import type { RoomProgress } from './progressOf.ts';
@@ -22,25 +23,23 @@ function describeConfig({ grouping, cue }: MatchConfig): string {
   return `Random · ${groups} · ${cueLabel(cue)}`;
 }
 
-function LobbyStatus({ progress }: { progress: RoomProgress }) {
+/**
+ * How many are ready, in the lobby; how many have found their group, in a round and the activity.
+ * Always the same height, so the stages below don't move as the phase changes.
+ */
+function Status({ phase, progress }: { phase: RoomSnapshot['phase']; progress: RoomProgress }) {
   return (
-    <div className="flex flex-col gap-1">
-      <p className="text-3xl font-semibold">{progress.ready} ready</p>
-      {progress.starting > 0 && <p className="text-sm text-kumo-subtle">{plural(progress.starting, 'more is', 'more are')} on the start screen</p>}
-    </div>
-  );
-}
-
-function RoundStatus({ progress }: { progress: RoomProgress }) {
-  return (
-    <div className="flex flex-col gap-2">
-      <Meter
-        customValue={`${progress.peopleFound} of ${progress.people}`}
-        label="People found"
-        max={Math.max(1, progress.people)}
-        value={progress.peopleFound}
-      />
-      {progress.late > 0 && <p className="text-sm text-kumo-subtle">{`${progress.late} waiting for the next round`}</p>}
+    <div className="flex h-10 flex-col justify-center">
+      {phase === 'lobby' ? (
+        <p className="text-3xl font-semibold">{progress.ready} ready</p>
+      ) : (
+        <Meter
+          customValue={`${progress.peopleFound} of ${progress.people}`}
+          label="People found"
+          max={Math.max(1, progress.people)}
+          value={progress.peopleFound}
+        />
+      )}
     </div>
   );
 }
@@ -81,10 +80,12 @@ export function EmceePane({ snapshot, onCommand }: EmceePaneProps) {
           <Badge variant={badge.variant}>{badge.label(snapshot.round)}</Badge>
         </div>
       </div>
-      {snapshot.phase === 'lobby' && <LobbyStatus progress={progress} />}
-      {snapshot.phase === 'round' && <RoundStatus progress={progress} />}
+      <Status phase={snapshot.phase} progress={progress} />
+      <PhaseFlow snapshot={snapshot} />
+      {/* Below the stages, so it doesn't push them down when the activity starts. */}
       {snapshot.phase === 'activity' && <ActivityStatus progress={progress} />}
-      <p className="text-sm text-kumo-subtle">Next round: {describeConfig(snapshot.config)}</p>
+      {/* The round being played, or in the lobby, the one about to start. */}
+      <p className="text-sm text-kumo-subtle">This round: {describeConfig(snapshot.roundConfig ?? snapshot.config)}</p>
       {/* At the bottom of the screen, where a thumb reaches. */}
       <div className="mt-auto">
         <EmceeControls {...controls} />
