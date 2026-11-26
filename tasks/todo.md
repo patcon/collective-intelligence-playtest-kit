@@ -452,7 +452,8 @@ Raised after Phase 4 (2026-11-25):
 - [ ] **Audio playback modes.** Choose how a group's sound plays: *loop* (continuous, as now),
   *staggered start* (each phone starts after its own random delay, then loops, so the group isn't in
   unison), or *intermittent* (each phone plays the clip once, then waits a random interval before
-  playing it again, so calls come and go like real birds).
+  playing it again, so calls come and go like real birds). Every loop now starts after a random delay
+  of up to 3 s (2026-11-26), so a staggered start is the default; choosing a mode is still to do.
 - [ ] **Choose the avatar style** (from the CC0 DiceBear styles, or "mixed" as now).
 - [ ] **Choose the colour palette** (ties in with "More colours, kept far apart" above).
 - [ ] **Combine cues**: a group gets several at once (for example sound, colour and avatar), for

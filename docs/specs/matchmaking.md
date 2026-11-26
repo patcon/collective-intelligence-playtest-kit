@@ -189,7 +189,7 @@ If there are more groups than `maxDistinct`, cues repeat and the demo page shows
 |---|---|---|---|
 | `colour` | `{ name, hex }` from a fixed named palette | Full-screen colour with its name as text, so it still works for colour-blind people | 12 |
 | `avatar` | `{ style, seed }` | DiceBear avatar, large, rendered locally with `@dicebear/core` + `@dicebear/collection` so it works offline and phones make no third-party requests | effectively unlimited |
-| `birdsong` | `{ species }` | Plays that species' recording on a loop. Sound-only: the species is named, small, only when the sound can't play (changed after the build; it first showed the name as well). About 6 short CC0 or CC-BY clips (for example from xeno-canto), bundled with their attribution in `public/birdsong/ATTRIBUTION.md` | number of bundled recordings (~6) |
+| `birdsong` | `{ species }` | Plays that species' recording on a loop, each phone starting after its own random delay of up to 3 s so a group isn't in unison. Sound-only: the species is named, small, only when the sound can't play (changed after the build; it first showed the name as well). About 6 short CC0 or CC-BY clips (for example from xeno-canto), bundled with their attribution in `public/birdsong/ATTRIBUTION.md` | number of bundled recordings (~6) |
 
 Ship order inside this module: `colour` → `avatar` → `birdsong`.
 

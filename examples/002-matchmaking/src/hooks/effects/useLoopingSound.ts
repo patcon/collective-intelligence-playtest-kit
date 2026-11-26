@@ -9,6 +9,12 @@ export type SoundStatus = 'loading' | 'playing' | 'unavailable';
 
 const buffers = new Map<string, Promise<AudioBuffer>>();
 
+/**
+ * Each phone waits a random time, up to this many seconds, before its loop starts, so a group's
+ * phones play out of step rather than in near unison.
+ */
+const MAX_START_DELAY_S = 3;
+
 /** The decoded file at `url`, fetched once per page however often it plays. */
 function load(context: AudioContext, url: string): Promise<AudioBuffer> {
   let buffer = buffers.get(url);
@@ -29,7 +35,8 @@ function load(context: AudioContext, url: string): Promise<AudioBuffer> {
 
 /**
  * Plays the sound at `url` on a loop while mounted, through the AudioContext a tap unlocked (see
- * `unlockAudio`), so it starts with no tap of its own, on iOS too. Stops on unmount or when `url` changes.
+ * `unlockAudio`), so it starts with no tap of its own, on iOS too. It starts after a random delay
+ * (see `MAX_START_DELAY_S`). Stops on unmount or when `url` changes.
  */
 export function useLoopingSound(url: string): SoundStatus {
   const [outcome, setOutcome] = useState<{ url: string; status: SoundStatus } | null>(null);
@@ -51,7 +58,7 @@ export function useLoopingSound(url: string): SoundStatus {
         source.loop = true;
         source.connect(context.destination);
         void context.resume();
-        source.start();
+        source.start(context.currentTime + Math.random() * MAX_START_DELAY_S);
         setOutcome({ status: 'playing', url });
       },
       () => setOutcome({ status: 'unavailable', url }),
