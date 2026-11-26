@@ -1,4 +1,4 @@
-// PROTOTYPE (throwaway): a one-option window styled like Kumo's segmented tabs. The pill stays put
+// A one-option window styled like Kumo's segmented tabs. The pill stays put
 // and the labels slide up or down through it, so cycling reads as rolling to the next option.
 import type { ReactNode } from 'react';
 

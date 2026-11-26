@@ -2,7 +2,7 @@
 // first, are the earlier tries, each layering one idea on the last.
 import { Tabs } from '@cloudflare/kumo';
 import { ArrowsDownUpIcon, LockSimpleIcon } from '@phosphor-icons/react';
-import { CycleTrack } from './CycleTrack.tsx';
+import { CycleTrack } from '../GroupSegmentWizard/CycleTrack.tsx';
 import { sizeLabel } from './divideMaths.ts';
 import type { Leftovers, Locked } from './divideMaths.ts';
 import { SplitPreview, Stepper } from './parts.tsx';

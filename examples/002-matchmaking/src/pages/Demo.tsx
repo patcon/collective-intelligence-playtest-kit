@@ -47,7 +47,7 @@ function Dashboard({ header, snapshot, simulation }: { header: ReactNode; snapsh
       {/* Kept in view while the participant cards scroll, since it's what the emcee is using. */}
       <div className="shrink-0 md:sticky md:top-4 md:w-92">
         <PhoneFrame label="The emcee's phone" url={`${window.location.origin}/emcee`}>
-          <EmceePane onCommand={send} snapshot={snapshot} />
+          <EmceePane onCommand={send} onConfig={(config) => send({ config, type: 'config' })} snapshot={snapshot} />
         </PhoneFrame>
       </div>
     </div>

@@ -100,9 +100,9 @@ Plan: [`plan.md`](plan.md). Spec: [`docs/specs/group-segment-wizard.md`](../docs
 **Description:** Move the compact layout, `CycleTrack` and the bar/stepper parts into `src/demo/GroupSegmentWizard/`. Props: `grouping`, `ready`, `maxDistinct`, `onChange`, with no layout prop. It renders `groupSizes` and `groupConcerns`, and steps through `nextGrouping`. `EmceePane` passes `snapshot.config.grouping` and sends `{ type: 'config', config: { ...config, grouping } }`. Start's blocker is only the shared `startBlocker`. Remove `prototypeBlocker`, `useDivision`'s use in `EmceePane`, and the dev-only gate.
 
 **Acceptance criteria:**
-- [ ] Setting the wizard on `/emcee` changes `snapshot.config.grouping`. It's still set after a reload, and the same in a second host tab.
-- [ ] With 17 sims at Min 12, the bar shows `12·5` with the 5 in orange, and Start is disabled.
-- [ ] After Start, the round's group sizes match the bar (checked at 20 sims, Smart 3 and count 4).
+- [x] Setting the wizard on `/emcee` changes `snapshot.config.grouping`. It's still set after a reload, and the same in a second host tab.
+- [x] With 17 sims at Min 12, the bar shows `12·5` with the 5 in orange, and Start is disabled.
+- [x] After Start, the round's group sizes match the bar (checked at 20 sims, Smart 3 and count 4).
 
 **Verification:** `pnpm test` · `pnpm typecheck` · `pnpm lint` · browser check of the three criteria above
 

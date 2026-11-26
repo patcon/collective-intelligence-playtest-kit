@@ -7,14 +7,14 @@ import { EmceeControls, ResetButton } from './EmceeControls.tsx';
 import type { RoundCommand } from './EmceeControls.tsx';
 import { PhaseFlow } from './PhaseFlow.tsx';
 import { progressOf } from './progressOf.ts';
-import { GroupSegmentWizard, familyOf } from './prototype-group-segment-wizard/GroupSegmentWizard.tsx';
-import { LayoutSwitcher, useLayoutChoice } from './prototype-group-segment-wizard/LayoutSwitcher.tsx';
-import { useDivision } from './prototype-group-segment-wizard/useDivision.ts';
+import { GroupSegmentWizard } from './GroupSegmentWizard/GroupSegmentWizard.tsx';
 import type { RoomProgress } from './progressOf.ts';
 
 interface EmceePaneProps {
   snapshot: RoomSnapshot;
   onCommand: (command: RoundCommand) => void;
+  /** Sends the room a new config, as the wizard changes the grouping. */
+  onConfig: (config: MatchConfig) => void;
 }
 
 function plural(n: number, one: string, many: string): string {
@@ -63,17 +63,14 @@ const PHASE_BADGE: Record<RoomSnapshot['phase'], { variant: 'primary' | 'seconda
 
 /**
  * The emcee's pane, phone-width and filling its screen: how many are ready and how the round is going
- * at the top, and the controls to move back and forward at the bottom (see `EmceeControls`). Start activity never waits for every group. The config
- * shows here read-only; it's set elsewhere. It has no frame of its own: `/demo` puts it in a `PhoneFrame`.
+ * at the top, and the controls to move back and forward at the bottom (see `EmceeControls`). Start activity never waits for every group. In the
+ * lobby, `GroupSegmentWizard` sets how the room divides. It has no frame of its own: `/demo` puts it in a `PhoneFrame`.
  */
-export function EmceePane({ snapshot, onCommand }: EmceePaneProps) {
+export function EmceePane({ snapshot, onCommand, onConfig }: EmceePaneProps) {
   const progress = progressOf(snapshot);
   const badge = PHASE_BADGE[snapshot.phase];
-  // PROTOTYPE (throwaway): a split the people ready can't make blocks Start too.
-  const { layout, select } = useLayoutChoice();
-  const division = useDivision(progress.ready, CUE_TYPES[snapshot.config.cue].maxDistinct, familyOf(layout));
-  const prototypeBlocker = import.meta.env.DEV ? division.problem : null;
-  const controls = { blocker: startBlocker(progress.nextRound, snapshot.config.grouping, CUE_TYPES[snapshot.config.cue].maxDistinct) ?? prototypeBlocker, onCommand, phase: snapshot.phase };
+  const { maxDistinct } = CUE_TYPES[snapshot.config.cue];
+  const controls = { blocker: startBlocker(progress.nextRound, snapshot.config.grouping, maxDistinct), onCommand, phase: snapshot.phase };
 
   return (
     <div className="flex min-h-full w-full flex-1 flex-col gap-5 p-5">
@@ -95,13 +92,14 @@ export function EmceePane({ snapshot, onCommand }: EmceePaneProps) {
       <p className="text-sm text-kumo-subtle">This round: {describeConfig(snapshot.roundConfig ?? snapshot.config)}</p>
       {/* At the bottom of the screen, where a thumb reaches. */}
       <div className="mt-auto flex flex-col gap-5">
-        {/* PROTOTYPE (throwaway): `GroupSegmentWizard`, in the layout ?variant= names (compact by default). Pinned
-            above Start, so people arriving (more dots in the stages) doesn't move it. See docs/intent/group-segment-wizard.md. */}
-        {import.meta.env.DEV && snapshot.phase === 'lobby' && (
-          <>
-            <GroupSegmentWizard division={division} layout={layout} />
-            <LayoutSwitcher layout={layout} onLayout={select} />
-          </>
+        {/* Pinned above Start, so people arriving (more dots in the stages) doesn't move it. */}
+        {snapshot.phase === 'lobby' && (
+          <GroupSegmentWizard
+            grouping={snapshot.config.grouping}
+            maxDistinct={maxDistinct}
+            onChange={(grouping) => onConfig({ ...snapshot.config, grouping })}
+            ready={progress.nextRound}
+          />
         )}
         <EmceeControls {...controls} />
       </div>
