@@ -439,3 +439,29 @@ Raised at Checkpoint C (2026-11-25):
   so it reads as what the emcee holds.
 - [ ] **Yellow Start until everyone's ready.** While anyone connected is still on the start screen,
   show Start in a warning colour, so the emcee doesn't leave them behind (it still works).
+
+Raised after Phase 4 (2026-11-25):
+
+- [ ] **Bug: avatars are always Thumbs in small rounds.** `assignAvatars` alternates styles by group
+  number starting from Thumbs, so group 1 is always Thumbs, and a one-group round never shows Shapes.
+  Fix: start the alternation at a random style each round (from `rng`), or pick styles per round.
+- [ ] **A placeholder activity card on "Move on".** After a round, show participants (and the emcee)
+  a card standing in for the activity that would follow matching, instead of going straight back to waiting.
+- [ ] **Show how many each cue can tell apart**, in the Cue picker: "(12)", or "(no limit)".
+- [ ] **Name cues by sense**: "Audio: Birds", "Visual: Colour", "Visual: Avatars".
+- [ ] **Audio playback modes.** Choose how a group's sound plays: *loop* (continuous, as now),
+  *staggered start* (each phone starts after its own random delay, then loops, so the group isn't in
+  unison), or *intermittent* (each phone plays the clip once, then waits a random interval before
+  playing it again, so calls come and go like real birds).
+- [ ] **Choose the avatar style** (from the CC0 DiceBear styles, or "mixed" as now).
+- [ ] **Choose the colour palette** (ties in with "More colours, kept far apart" above).
+- [ ] **Combine cues**: a group gets several at once (for example sound, colour and avatar), for
+  easier or redundant matching. The payload becomes a list of cues, one per chosen type.
+- [ ] **Other audio sets** besides birds (for example instruments, animals or tones), as their own
+  cue types or as sets within one audio cue.
+- [ ] **Sound-only birdsong by default.** The point of an audio cue is finding people by ear alone, so
+  don't show the species name or icon. For now, call it "Audio: Birds (sound-only)". (Today the name
+  shows as a fallback for when sound can't play; keep a smaller fallback for that case only.)
+- [ ] **Warn about sound before it's needed.** When the next round's cue is audio, the start and
+  waiting screens show the same notice: sound is part of this activity, so turn the volume all the
+  way up (and silent mode off). Warn too when audio wasn't unlocked (no `AudioContext`, or it's suspended).
