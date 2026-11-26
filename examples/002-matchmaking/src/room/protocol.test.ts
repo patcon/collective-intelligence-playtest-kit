@@ -32,9 +32,9 @@ describe('parseHostMessage', () => {
 
   it('rejects a config with a bad grouping, algorithm, cue or found-count switch', () => {
     const bad = [
-      { ...DEFAULT_CONFIG, grouping: { by: 'size', size: 1 } },
-      { ...DEFAULT_CONFIG, grouping: { by: 'count', count: 2.5 } },
-      { ...DEFAULT_CONFIG, grouping: { by: 'size', size: 1000 } },
+      { ...DEFAULT_CONFIG, grouping: { by: 'groupSize', groupSize: 1 } },
+      { ...DEFAULT_CONFIG, grouping: { by: 'groupCount', groupCount: 2.5 } },
+      { ...DEFAULT_CONFIG, grouping: { by: 'groupSize', groupSize: 1000 } },
       { ...DEFAULT_CONFIG, grouping: { by: 'bogus' } },
       { ...DEFAULT_CONFIG, algorithm: 'smart' },
       { ...DEFAULT_CONFIG, cue: 'smell' },

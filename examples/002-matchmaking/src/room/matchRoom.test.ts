@@ -22,7 +22,7 @@ const readied = (...ids: Array<string>): Array<RoomEvent> =>
 /** Move on twice: from the round to the activity, then back to the lobby. */
 const toLobby: Array<RoomEvent> = [{ type: 'moveOn' }, { type: 'moveOn' }];
 
-const pairs: RoomEvent = { config: { algorithm: 'random', cue: 'colour', grouping: { by: 'size', size: 2 }, showFoundCount: false }, type: 'config' };
+const pairs: RoomEvent = { config: { algorithm: 'random', cue: 'colour', grouping: { by: 'groupSize', groupSize: 2 }, showFoundCount: false }, type: 'config' };
 
 /** Someone else in `id`'s group. */
 function partnerOf(state: RoomState, id: string): string {
@@ -43,7 +43,7 @@ describe('reduce', () => {
   it('rejects a start that would leave anyone in a group of one', () => {
     const alone = run(readied('a'));
     expect(run([{ type: 'start' }], alone)).toBe(alone);
-    const threeIntoTwo = run([{ config: { algorithm: 'random', cue: 'colour', grouping: { by: 'count', count: 2 }, showFoundCount: false }, type: 'config' }, ...readied('a', 'b', 'c')]);
+    const threeIntoTwo = run([{ config: { algorithm: 'random', cue: 'colour', grouping: { by: 'groupCount', groupCount: 2 }, showFoundCount: false }, type: 'config' }, ...readied('a', 'b', 'c')]);
     expect(run([{ type: 'start' }], threeIntoTwo)).toBe(threeIntoTwo);
   });
 
@@ -189,7 +189,7 @@ describe('reduce', () => {
 
   it('applies a config change made mid-round to the next round', () => {
     const started = run([pairs, ...readied('a', 'b', 'c', 'd'), { type: 'start' }]);
-    const changed = run([{ config: { ...started.config, grouping: { by: 'count', count: 1 } }, type: 'config' }], started);
+    const changed = run([{ config: { ...started.config, grouping: { by: 'groupCount', groupCount: 1 } }, type: 'config' }], started);
     expect(changed.groups).toEqual(started.groups);
     expect(run([...toLobby, { type: 'start' }], changed).groups).toHaveLength(1);
   });

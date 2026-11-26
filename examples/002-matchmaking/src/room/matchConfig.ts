@@ -14,7 +14,7 @@ export interface MatchConfig {
   showFoundCount: boolean;
 }
 
-export const DEFAULT_CONFIG: MatchConfig = { algorithm: 'random', cue: 'colour', grouping: { by: 'size', size: 3 }, showFoundCount: false };
+export const DEFAULT_CONFIG: MatchConfig = { algorithm: 'random', cue: 'colour', grouping: { by: 'groupSize', groupSize: 3 }, showFoundCount: false };
 
 /** The most people a room expects, and so the largest group size or count worth asking for. */
 export const MAX_GROUPING = 50;
@@ -27,10 +27,10 @@ function isGrouping(value: unknown): value is Grouping {
   if (typeof value !== 'object' || value === null || !('by' in value)) {
     return false;
   }
-  if (value.by === 'size') {
-    return 'size' in value && isWhole(value.size, 2);
+  if (value.by === 'groupSize') {
+    return 'groupSize' in value && isWhole(value.groupSize, 2);
   }
-  return value.by === 'count' && 'count' in value && isWhole(value.count, 1);
+  return value.by === 'groupCount' && 'groupCount' in value && isWhole(value.groupCount, 1);
 }
 
 export function isMatchConfig(value: unknown): value is MatchConfig {

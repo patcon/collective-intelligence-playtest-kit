@@ -22,7 +22,7 @@ function plural(n: number, one: string, many: string): string {
 }
 
 function describeConfig({ grouping, cue }: MatchConfig): string {
-  const groups = grouping.by === 'size' ? `groups of ${grouping.size}` : plural(grouping.count, 'group', 'groups');
+  const groups = grouping.by === 'groupSize' ? `groups of ${grouping.groupSize}` : plural(grouping.groupCount, 'group', 'groups');
   return `Random · ${groups} · ${cueLabel(cue)}`;
 }
 

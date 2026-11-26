@@ -9,8 +9,8 @@ Plan: [`plan.md`](plan.md). Spec: [`docs/specs/group-segment-wizard.md`](../docs
 **Description:** A rename only, with no change in behaviour: `{ by: 'size'; size }` becomes `{ by: 'groupSize'; groupSize }` and `{ by: 'count'; count }` becomes `{ by: 'groupCount'; groupCount }`, in the type, the validation, the default, and every reader and test. The prototype's own `Locked = 'groups' | 'size'` is UI state, not this type, so it's left alone.
 
 **Acceptance criteria:**
-- [ ] No `by: 'size'` / `by: 'count'` / `grouping.size` / `grouping.count` left anywhere in `src` or `worker`.
-- [ ] The existing tests pass, changed only to use the new names.
+- [x] No `by: 'size'` / `by: 'count'` / `grouping.size` / `grouping.count` left anywhere in `src` or `worker`.
+- [x] The existing tests pass, changed only to use the new names.
 
 **Verification:** `pnpm test` · `pnpm typecheck` · `pnpm lint`
 

@@ -3,8 +3,8 @@ import type { Rng } from './rng.ts';
 
 export type Algorithm = 'random';
 
-/** How to split people up: into groups of about `size`, or into `count` groups. */
-export type Grouping = { by: 'size'; size: number } | { by: 'count'; count: number };
+/** How to split people up: into groups of about `groupSize` people, or into `groupCount` groups. */
+export type Grouping = { by: 'groupSize'; groupSize: number } | { by: 'groupCount'; groupCount: number };
 
 /**
  * Each algorithm orders the ids so that neighbours suit each other; `match` deals them out from there.
@@ -20,7 +20,7 @@ export function groupCount(n: number, grouping: Grouping): number {
   if (n === 0) {
     return 0;
   }
-  return grouping.by === 'size' ? Math.max(1, Math.floor(n / grouping.size)) : Math.min(grouping.count, n);
+  return grouping.by === 'groupSize' ? Math.max(1, Math.floor(n / grouping.groupSize)) : Math.min(grouping.groupCount, n);
 }
 
 /** No one is matched into a group smaller than this: a group of one has no one to find. */

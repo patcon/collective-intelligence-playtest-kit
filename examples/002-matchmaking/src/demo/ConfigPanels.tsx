@@ -16,12 +16,12 @@ const ALGORITHMS = {
   maxDiversity: { disabled: true, label: 'Perspective Diversity (Max)' },
   minDiversity: { disabled: true, label: 'Perspective Diversity (Min)' },
 };
-const GROUP_BY = { count: 'Number of groups', size: 'Group size' };
+const GROUP_BY = { groupCount: 'Number of groups', groupSize: 'Group size' };
 
 /** The choices for each way of grouping: sizes from 2, counts from 1. */
 const NUMBERS: Record<Grouping['by'], Record<string, string>> = {
-  count: numberItems(1, 20),
-  size: numberItems(2, 10),
+  groupCount: numberItems(1, 20),
+  groupSize: numberItems(2, 10),
 };
 
 function numberItems(from: number, to: number): Record<string, string> {
@@ -29,14 +29,14 @@ function numberItems(from: number, to: number): Record<string, string> {
 }
 
 function amountOf(grouping: Grouping): number {
-  return grouping.by === 'size' ? grouping.size : grouping.count;
+  return grouping.by === 'groupSize' ? grouping.groupSize : grouping.groupCount;
 }
 
 function groupingOf(by: string, amount: number): Grouping | null {
-  if (by === 'size' && amount >= 2) {
-    return { by, size: amount };
+  if (by === 'groupSize' && amount >= 2) {
+    return { by, groupSize: amount };
   }
-  return by === 'count' && amount >= 1 ? { by, count: amount } : null;
+  return by === 'groupCount' && amount >= 1 ? { by, groupCount: amount } : null;
 }
 
 /** How the next round is matched and cued, and whether phones show the found count. Shows the room's config, and sends any change straight back. */
@@ -63,7 +63,7 @@ export function ConfigPanels({ config, onConfig, warning }: ConfigPanelsProps) {
         className="w-full"
         items={NUMBERS[config.grouping.by]}
         // Fewer people make fewer groups, and leftovers make some groups bigger.
-        label={config.grouping.by === 'size' ? 'People per group (min)' : 'Groups (max)'}
+        label={config.grouping.by === 'groupSize' ? 'People per group (min)' : 'Groups (max)'}
         onValueChange={(amount) => setGrouping(config.grouping.by, Number(amount))}
         value={String(amountOf(config.grouping))}
       />
