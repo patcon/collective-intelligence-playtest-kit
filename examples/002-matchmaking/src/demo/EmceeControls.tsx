@@ -3,11 +3,11 @@ import { CaretLeftIcon } from '@phosphor-icons/react';
 import type { Phase } from '../room/roomViews.ts';
 
 /** What the emcee can tell the room to do. */
-export type RoundCommand = { type: 'start' | 'moveOn' | 'back' | 'reshuffle' };
+export type RoundCommand = { type: 'start' | 'moveOn' | 'back' | 'reset' };
 
 interface EmceeControlsProps {
   phase: Phase;
-  /** Why a new match (a start or a reshuffle) would be refused, or null. See `startBlocker`. */
+  /** Why Start would be refused, or null. See `startBlocker`. */
   blocker: string | null;
   onCommand: (command: RoundCommand) => void;
 }
@@ -47,13 +47,10 @@ export function EmceeControls({ phase, blocker, onCommand }: EmceeControlsProps)
   );
 }
 
-/**
- * A small red Reset: throws this round's groups away and matches everyone ready again (the room's
- * `reshuffle`). Disabled until there are groups, or when a new match would be refused.
- */
-export function ResetButton({ phase, blocker, onCommand }: EmceeControlsProps) {
+/** A small red Reset: back to the lobby from any phase, groups gone, and the round count back to 0. */
+export function ResetButton({ onCommand }: Pick<EmceeControlsProps, 'onCommand'>) {
   return (
-    <Button disabled={phase === 'lobby' || blocker !== null} onClick={() => onCommand({ type: 'reshuffle' })} size="xs" variant="destructive">
+    <Button onClick={() => onCommand({ type: 'reset' })} size="xs" variant="destructive">
       Reset
     </Button>
   );

@@ -6,7 +6,7 @@ export interface RoomProgress {
   ready: number;
   /** Connected, but still on the start screen. */
   starting: number;
-  /** Everyone the next match (a start or a reshuffle) would take: past the start screen, in a group or not. */
+  /** Everyone the next round would match: past the start screen, in a group or not. */
   nextRound: number;
   /** Ready after this round's groups were made. */
   late: number;

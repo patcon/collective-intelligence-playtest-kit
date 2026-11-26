@@ -103,8 +103,7 @@ packages/ui/                          # existing
   - **Start** (from `lobby`) goes to `round`. It's refused, and the emcee's button disabled with the reason, if anyone would be in a group of 1: fewer than 2 ready, or more groups asked for than the ready people can fill in twos (added after the build).
   - **Move on** goes from `round` to `activity`, then from `activity` back to `lobby`, and the next Start makes new groups. (Since the activity was added, the emcee's buttons read "Start matchmaking", "Start activity" and "End activity"; the messages are still `start` and `moveOn`.)
   - **Back** (added after the build) undoes a step: from `round` to `lobby`, as if the round hadn't started; from `activity` to `round`, keeping groups and ticks.
-  - **Reset** (added after the build; the room's `reshuffle`, a small red button top left of `EmceePane`) re-matches everyone ready into new groups and cues, as the same round, from `round` or `activity`. It follows Start's group-of-1 rule.
-  - The original build's Reset was different: it cleared groups from any phase and restarted the round count. Back and the new Reset replaced it.
+  - **Reset** clears groups and sends everyone back to waiting, from any phase, and starts the round count again. Since the build it's a small red button top left of `EmceePane`. (For a while it reshuffled groups instead; that's gone.)
 - What each participant sees:
   - `start`: on the device only, before they tap Start. The room calls this status `joined`: connected, not yet ready, so not matched.
   - `waiting`
@@ -112,7 +111,7 @@ packages/ui/                          # existing
   - `found`: shows the same count, live.
   - `late`: joined during a round. Their screen says they'll be matched next round.
   - `activity`: the placeholder activity card, with their group's cue and size.
-- Someone who leaves mid-round or during the activity is kept, out of the counts, so they come back to the same group and cue. Anyone who leaves the lobby, and anyone still gone at Move on, Back or Reshuffle, is forgotten.
+- Someone who leaves mid-round or during the activity is kept, out of the counts, so they come back to the same group and cue. Anyone who leaves the lobby, and anyone still gone at Move on, Back or Reset, is forgotten.
 
 ### Pattern: pure room reducer, thin Agent
 
@@ -147,7 +146,7 @@ wrong choice there. The README records when to use which.
 type ParticipantMessage = { type: 'ready' } | { type: 'found'; found: boolean }; // found: boolean added after the build
 type HostMessage =
   | { type: 'config'; config: MatchConfig }
-  | { type: 'start' | 'moveOn' | 'back' | 'reshuffle' }; // back and reshuffle replaced reset after the build
+  | { type: 'start' | 'moveOn' | 'back' | 'reset' }; // back added after the build
 type ToParticipant = { type: 'view'; view: ParticipantView; nextCue: CueTypeId }; // nextCue added after the build
 type ToHost = { type: 'snapshot'; snapshot: RoomSnapshot };
 

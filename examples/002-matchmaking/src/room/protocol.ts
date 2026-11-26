@@ -20,7 +20,7 @@ export type Role = 'participant' | 'host';
 export type ParticipantMessage = { type: 'ready' } | { type: 'found'; found: boolean };
 
 /** The host → the room. */
-export type HostMessage = { type: 'config'; config: MatchConfig } | { type: 'start' | 'moveOn' | 'back' | 'reshuffle' };
+export type HostMessage = { type: 'config'; config: MatchConfig } | { type: 'start' | 'moveOn' | 'back' | 'reset' };
 
 /**
  * The room → one participant, on joining and after every change: what their screen shows, and the
@@ -64,7 +64,7 @@ export function parseParticipantMessage(raw: string): ParticipantMessage | null 
 /** The host's message from raw socket text, or null if it isn't one. */
 export function parseHostMessage(raw: string): HostMessage | null {
   const msg: RawMessage = parseJsonObject(raw) ?? {};
-  if (msg.type === 'start' || msg.type === 'moveOn' || msg.type === 'back' || msg.type === 'reshuffle') {
+  if (msg.type === 'start' || msg.type === 'moveOn' || msg.type === 'back' || msg.type === 'reset') {
     return { type: msg.type };
   }
   return msg.type === 'config' && isMatchConfig(msg.config) ? { config: msg.config, type: 'config' } : null;

@@ -162,23 +162,14 @@ describe('reduce', () => {
     expect(run([{ type: 'back' }], lobby)).toBe(lobby);
   });
 
-  it('reshuffles into new groups for the same round, from a round or the activity, with ticks cleared', () => {
-    const round = run([pairs, ...readied('a', 'b', 'c', 'd', 'e', 'f'), { type: 'start' }, { found: true, id: 'a', type: 'found' }]);
-    const reshuffled = run([{ type: 'reshuffle' }], round);
-    expect(reshuffled.phase).toBe('round');
-    expect(reshuffled.round).toBe(1);
-    expect(reshuffled.groups).toHaveLength(3);
-    expect(reshuffled.participants.every((p) => !p.found && p.group !== null)).toBe(true);
-    expect(reshuffled.participants.map((p) => p.group)).not.toEqual(round.participants.map((p) => p.group));
-    expect(run([{ type: 'moveOn' }, { type: 'reshuffle' }], round).phase).toBe('round');
-  });
-
-  it('ignores reshuffle in the lobby, and one that would leave someone on their own', () => {
-    const lobby = run(readied('a', 'b'));
-    expect(run([{ type: 'reshuffle' }], lobby)).toBe(lobby);
-    const round = run([{ type: 'start' }], lobby);
-    const alone = run([{ id: 'b', type: 'leave' }], round);
-    expect(run([{ type: 'reshuffle' }], alone)).toBe(alone);
+  it('returns everyone to waiting on reset, from any phase, and starts the round count again', () => {
+    const round = run([...readied('a', 'b'), { type: 'start' }]);
+    for (const from of [round, run([{ type: 'moveOn' }], round)]) {
+      const state = run([{ type: 'reset' }], from);
+      expect(state.phase).toBe('lobby');
+      expect(state.round).toBe(0);
+      expect(viewFor(state, 'a')).toEqual({ status: 'waiting' });
+    }
   });
 
   it('forgets anyone gone at the end of a round', () => {

@@ -30,7 +30,7 @@ export type RoomEvent =
   | { type: 'join' | 'leave' | 'ready'; id: string }
   | { type: 'found'; id: string; found: boolean }
   | { type: 'config'; config: MatchConfig }
-  | { type: 'start' | 'moveOn' | 'back' | 'reshuffle' };
+  | { type: 'start' | 'moveOn' | 'back' | 'reset' };
 
 /** What the reducer needs from outside: randomness, and how to cue each group. */
 export interface RoomDeps {
@@ -76,23 +76,13 @@ function setFound(state: RoomState, id: string, found: boolean): RoomState {
     : state;
 }
 
-/** Matches everyone connected and ready into the next round. Lobby only (see `matchReady`). */
-function start(state: RoomState, deps: RoomDeps): RoomState {
-  return state.phase === 'lobby' ? matchReady(state, state.round + 1, deps) : state;
-}
-
-/** New groups and cues for everyone ready, as the same round, from a round or the activity. */
-function reshuffle(state: RoomState, deps: RoomDeps): RoomState {
-  return state.phase === 'lobby' ? state : matchReady(state, state.round, deps);
-}
-
 /**
- * Round `round`, with new groups for everyone connected and ready, each group with its own cue, and
- * anyone gone forgotten. Returns `state` itself if anyone would be in a group of one.
+ * The next round: new groups for everyone connected and ready, each group with its own cue, and anyone
+ * gone forgotten. Lobby only, and does nothing if anyone would be in a group of one.
  */
-function matchReady(state: RoomState, round: number, { assignCues, rng }: RoomDeps): RoomState {
+function start(state: RoomState, { assignCues, rng }: RoomDeps): RoomState {
   const ids = state.participants.filter((p) => p.connected && p.ready).map((p) => p.id);
-  if (smallestGroupSize(ids.length, state.config.grouping) < MIN_GROUP_SIZE) {
+  if (state.phase !== 'lobby' || smallestGroupSize(ids.length, state.config.grouping) < MIN_GROUP_SIZE) {
     return state;
   }
   const groups = match(ids, state.config, rng);
@@ -102,7 +92,7 @@ function matchReady(state: RoomState, round: number, { assignCues, rng }: RoomDe
     groups: assignCues(state.config.cue, groups.length, rng),
     participants: state.participants.filter((p) => p.connected).map((p) => ({ ...p, found: false, group: groupOf.get(p.id) ?? null })),
     phase: 'round',
-    round,
+    round: state.round + 1,
   };
 }
 
@@ -163,7 +153,7 @@ export function reduce(state: RoomState, event: RoomEvent, deps: RoomDeps): Room
       return moveOn(state);
     case 'back':
       return back(state);
-    case 'reshuffle':
-      return reshuffle(state, deps);
+    case 'reset':
+      return toLobby(state, 0);
   }
 }

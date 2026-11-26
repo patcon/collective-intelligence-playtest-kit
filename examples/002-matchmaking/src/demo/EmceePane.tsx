@@ -74,7 +74,7 @@ export function EmceePane({ snapshot, onCommand }: EmceePaneProps) {
       {/* Like a phone app's top bar: Reset on the left, the title in the middle, the phase on the right. */}
       <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
         <div className="justify-self-start">
-          <ResetButton {...controls} />
+          <ResetButton onCommand={onCommand} />
         </div>
         <h2 className="text-lg font-semibold">Emcee</h2>
         <div className="justify-self-end">
