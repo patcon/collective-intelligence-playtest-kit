@@ -4,6 +4,7 @@ import { ActivityCard } from '../activity/ActivityCard.tsx';
 import { CueChip } from '../cues/CueChip.tsx';
 import { CueView } from '../cues/CueView.tsx';
 import type { ParticipantView } from '../room/protocol.ts';
+import { foundCount } from './foundCount.ts';
 
 interface ParticipantScreenProps {
   /** Null until the room's first message. */
@@ -24,11 +25,6 @@ function Message({ title, detail, note, notice }: { title: string; detail?: stri
       {note && <p className="max-w-sm text-sm text-kumo-subtle">{note}</p>}
     </main>
   );
-}
-
-/** "x of N found", for everyone in a group to watch go up. */
-function foundCount({ found, size }: { found: number; size: number }): string {
-  return `${found} of ${size} found`;
 }
 
 /** What a participant sees once past the start screen, for each status the room gives them. */
@@ -58,14 +54,14 @@ export function ParticipantScreen({ view, onFound, note, notice }: ParticipantSc
           <Button onClick={onFound} size="lg" variant="secondary">
             Found them
           </Button>
-          <p className="text-lg">{foundCount(view.group)}</p>
+          <p className="text-lg">{foundCount(view.group, false)}</p>
         </CueView>
       );
     case 'found':
       return (
         <CueView cue={view.cue}>
           <p className="text-2xl font-semibold">{`You're a group of ${view.group.size}`}</p>
-          <p className="text-lg">{foundCount(view.group)}</p>
+          <p className="text-lg">{foundCount(view.group, true)}</p>
         </CueView>
       );
     case 'activity':
