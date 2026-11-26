@@ -46,10 +46,10 @@ T4 depends only on T1, so it can run alongside T2 and T3. T8 (50 sims) depends o
 - [x] T5: Graduate `GroupSegmentWizard` and wire it to the room
 - [x] T6: Variants kept as code, not shown
 - [x] T7: Remove `/demo`'s grouping selects, and update the docs
-- [ ] T8: Up to 50 simulated participants (independent, any time)
+- [x] T8: Up to 50 simulated participants (independent, any time)
 
 ### Checkpoint B: complete
-- [ ] All 7 spec success criteria pass. Review before PR.
+- [x] All 7 spec success criteria pass. Review before PR.
 
 ## Risks and mitigations
 

@@ -2,7 +2,7 @@ import { SimulatedParticipant } from './SimulatedParticipant.ts';
 import type { ConnectSim } from './SimulatedParticipant.ts';
 
 /** The most simulated participants a page runs at once. */
-export const MAX_SIMS = 20;
+export const MAX_SIMS = 50;
 
 export interface SimSummary {
   id: string;

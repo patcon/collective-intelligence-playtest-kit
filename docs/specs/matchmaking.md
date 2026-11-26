@@ -25,7 +25,7 @@ follow, without generalizing past two examples.
   ("4 of 6 groups found"), and move on whenever it's clear everyone has found each other.
 - As a participant in a round, I see (or hear) my cue, find the people with the same cue, tap
   "found them", and see "You're a group of 3".
-- As an evaluator, I add or remove simulated participants (0 to 20), set them to confirm automatically
+- As an evaluator, I add or remove simulated participants (0 to 50; raised from 20 on 2026-11-26), set them to confirm automatically
   after a random delay, or tap "found them" on one of their cards myself.
 
 ## Capability map

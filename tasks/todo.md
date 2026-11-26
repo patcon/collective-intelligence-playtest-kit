@@ -151,9 +151,9 @@ Plan: [`plan.md`](plan.md). Spec: [`docs/specs/group-segment-wizard.md`](../docs
 **Description:** Raise `MAX_SIMS` from 20 to 50. It's independent of the other tasks and can land any time. Check that `/demo`'s sim cards and the emcee's bar still read well at 50 (up to 25 pairs, so 25 bar segments).
 
 **Acceptance criteria:**
-- [ ] `/demo` adds sims up to 50 and no further (`SimulatedCrowd.test.ts` uses `MAX_SIMS`, so it covers this unchanged).
-- [ ] A 50-sim round on `/demo` starts, and every group confirms.
-- [ ] The matchmaking spec's "up to ~20" / "0 to 20" lines say 50.
+- [x] `/demo` adds sims up to 50 and no further (`SimulatedCrowd.test.ts` uses `MAX_SIMS`, so it covers this unchanged).
+- [x] A 50-sim round on `/demo` starts, and every group confirms.
+- [x] The matchmaking spec's "up to ~20" / "0 to 20" lines say 50.
 
 **Verification:** `pnpm test` · browser check of a 50-sim round, with the bar at group size 2
 
@@ -164,6 +164,6 @@ Plan: [`plan.md`](plan.md). Spec: [`docs/specs/group-segment-wizard.md`](../docs
 **Estimated scope:** XS
 
 ## Checkpoint B: complete
-- [ ] All 7 success criteria in the spec pass.
-- [ ] `pnpm test`, `pnpm typecheck` and `pnpm lint` pass.
+- [x] All 7 success criteria in the spec pass.
+- [x] `pnpm test`, `pnpm typecheck` and `pnpm lint` pass.
 - [ ] Review with Patrick, then PR (regular merge commit).
