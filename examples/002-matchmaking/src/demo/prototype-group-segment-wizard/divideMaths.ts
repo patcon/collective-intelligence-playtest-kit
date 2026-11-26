@@ -1,4 +1,4 @@
-// PROTOTYPE (throwaway): the maths behind `GroupSegmentWizard`. See docs/intent/group-segment-wizard.md.
+// PROTOTYPE (kept, not rendered; see GroupSegmentWizardVariants): the maths behind `GroupSegmentWizard`. See docs/intent/group-segment-wizard.md.
 import { MIN_GROUP_SIZE } from '../../matching/split.ts';
 
 export type Locked = 'groups' | 'size';

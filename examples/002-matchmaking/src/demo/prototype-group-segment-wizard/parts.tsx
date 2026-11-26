@@ -1,4 +1,4 @@
-// PROTOTYPE (throwaway): the split bar and −/+ stepper from `GroupSegmentWizard`, fed from a `Division`.
+// PROTOTYPE (kept, not rendered; see GroupSegmentWizardVariants): the split bar and −/+ stepper from `GroupSegmentWizard`, fed from a `Division`.
 import type { ReactNode } from 'react';
 import { SplitBar, Stepper as WizardStepper } from '../GroupSegmentWizard/parts.tsx';
 import type { Locked } from './divideMaths.ts';

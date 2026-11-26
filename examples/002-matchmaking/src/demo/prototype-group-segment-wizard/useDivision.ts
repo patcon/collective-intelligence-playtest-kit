@@ -1,4 +1,4 @@
-// PROTOTYPE (throwaway): one number set by the emcee, the other calculated from who's ready.
+// PROTOTYPE (kept, not rendered; see GroupSegmentWizardVariants): one number set by the emcee, the other calculated from who's ready.
 // The −/+ only stop at 2 groups (one group isn't a split) and 2 per group, so the emcee can set things before people arrive;
 // a setting the people ready can't make is reported as `problem`, which blocks Start.
 import { useState } from 'react';

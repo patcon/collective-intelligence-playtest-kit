@@ -117,9 +117,9 @@ Plan: [`plan.md`](plan.md). Spec: [`docs/specs/group-segment-wizard.md`](../docs
 **Description:** In `prototype-group-segment-wizard/`, rename the component to `GroupSegmentWizardVariants` with a required `layout` prop over `groupsOnly | modeTabs | linkedPair | linkedPairWithFit`, and drop `compact` from it. Delete `LayoutSwitcher.tsx`, `useLayoutChoice` and the `?variant=` handling. Import `CycleTrack` and the parts from the graduated folder. Add a header comment saying it's kept unrendered on purpose (spec, 2026-11-26).
 
 **Acceptance criteria:**
-- [ ] Nothing outside `prototype-group-segment-wizard/` imports it, and `?variant=compact` on `/emcee` changes nothing.
-- [ ] The folder still typechecks and lints.
-- [ ] Neither `LayoutSwitcher` nor `useLayoutChoice` is left anywhere in the code.
+- [x] Nothing outside `prototype-group-segment-wizard/` imports it, and `?variant=compact` on `/emcee` changes nothing.
+- [x] The folder still typechecks and lints.
+- [x] Neither `LayoutSwitcher` nor `useLayoutChoice` is left anywhere in the code.
 
 **Verification:** `pnpm typecheck` · `pnpm lint`
 
