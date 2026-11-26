@@ -20,7 +20,7 @@ describe('repeatWarning', () => {
   });
 
   it('warns once there are more groups than colours', () => {
-    expect(repeatWarning(lobbyOf(PALETTE.length * 2 + 2, 2))).toMatch(/13 groups, but only 12/);
+    expect(repeatWarning(lobbyOf(PALETTE.length * 2 + 2, 2))).toBe('13 groups, but Visual: Colour can only tell 12 apart, so some groups will share a cue.');
   });
 
   it('counts everyone ready, but not anyone still on the start screen', () => {

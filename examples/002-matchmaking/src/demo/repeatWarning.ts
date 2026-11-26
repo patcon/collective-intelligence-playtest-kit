@@ -14,8 +14,6 @@ function nextRoundSize(snapshot: RoomSnapshot): number {
 export function repeatWarning(snapshot: RoomSnapshot): string | null {
   const { cue, grouping } = snapshot.config;
   const groups = groupCount(nextRoundSize(snapshot), grouping);
-  const { maxDistinct } = CUE_TYPES[cue];
-  return groups > maxDistinct
-    ? `${groups} groups, but only ${maxDistinct} different ${cue} cues: some groups will share one.`
-    : null;
+  const { label, maxDistinct } = CUE_TYPES[cue];
+  return groups > maxDistinct ? `${groups} groups, but ${label} can only tell ${maxDistinct} apart, so some groups will share a cue.` : null;
 }
