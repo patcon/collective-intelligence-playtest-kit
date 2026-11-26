@@ -1,6 +1,7 @@
 import { Loader } from '@cloudflare/kumo';
 import { RoomStatusBadge } from '@playtest-kit/ui';
 import { useState } from 'react';
+import type { ReactNode } from 'react';
 import { ConfigPanels } from '../demo/ConfigPanels.tsx';
 import { EmceePane } from '../demo/EmceePane.tsx';
 import { JoinPanel } from '../demo/JoinPanel.tsx';
@@ -15,11 +16,13 @@ import type { Simulation } from '../simulation/useSimulation.ts';
 
 const { RoomProvider, useRoomMessages, useRoomSend, useRoomStatus } = hostRoom;
 
-function Dashboard({ snapshot, simulation }: { snapshot: RoomSnapshot; simulation: Simulation }) {
+/** The page's panels, with `header` above those on the left, so the phone's column reaches the top. */
+function Dashboard({ header, snapshot, simulation }: { header: ReactNode; snapshot: RoomSnapshot; simulation: Simulation }) {
   const send = useRoomSend();
   return (
     <div className="flex flex-col gap-4 md:flex-row md:items-start">
       <div className="flex min-w-0 flex-1 flex-col gap-4">
+        {header}
         <div className="grid items-start gap-4 lg:grid-cols-2">
           <ConfigPanels config={snapshot.config} onConfig={(config) => send({ config, type: 'config' })} warning={repeatWarning(snapshot)} />
           <div className="flex flex-col gap-4">
@@ -50,13 +53,23 @@ function HostView({ room }: { room: string }) {
   const [snapshot, setSnapshot] = useState<RoomSnapshot | null>(null);
   useRoomMessages((msg) => setSnapshot(msg.snapshot));
 
+  const header = (
+    <header className="flex items-center gap-3">
+      <h1 className="text-xl font-semibold">Matchmaking</h1>
+      <RoomStatusBadge status={status} />
+    </header>
+  );
+
   return (
     <main className="mx-auto flex min-h-screen max-w-400 flex-col gap-4 p-4">
-      <header className="flex items-center gap-3">
-        <h1 className="text-xl font-semibold">Matchmaking</h1>
-        <RoomStatusBadge status={status} />
-      </header>
-      {snapshot ? <Dashboard simulation={simulation} snapshot={snapshot} /> : <Loader />}
+      {snapshot ? (
+        <Dashboard header={header} simulation={simulation} snapshot={snapshot} />
+      ) : (
+        <>
+          {header}
+          <Loader />
+        </>
+      )}
     </main>
   );
 }
