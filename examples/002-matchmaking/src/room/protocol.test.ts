@@ -5,6 +5,8 @@ import type { RoomSnapshot } from './protocol.ts';
 
 const json = (value: unknown) => JSON.stringify(value);
 const cue = { hex: '#e6194b', name: 'Red', type: 'colour' } as const;
+/** A `view` message, as the room sends it, for the next round's cue type `nextCue`. */
+const view = (v: unknown, nextCue = 'colour') => json({ nextCue, type: 'view', view: v });
 
 describe('parseParticipantMessage', () => {
   it('reads ready and found', () => {
@@ -44,19 +46,24 @@ describe('parseHostMessage', () => {
 describe('parseToParticipant', () => {
   it('reads a view with and without a group', () => {
     const matched = { cue, group: { found: 1, size: 3 }, status: 'matched' };
-    expect(parseToParticipant(json({ type: 'view', view: matched }))).toEqual({ type: 'view', view: matched });
-    expect(parseToParticipant(json({ type: 'view', view: { status: 'late' } }))).toEqual({ type: 'view', view: { status: 'late' } });
+    expect(parseToParticipant(view(matched))).toEqual({ nextCue: 'colour', type: 'view', view: matched });
+    expect(parseToParticipant(view({ status: 'late' }))).toEqual({ nextCue: 'colour', type: 'view', view: { status: 'late' } });
   });
 
   it('reads an activity view, which carries the group like a matched one', () => {
     const activity = { cue, group: { found: 0, size: 2 }, status: 'activity' };
-    expect(parseToParticipant(json({ type: 'view', view: activity }))).toEqual({ type: 'view', view: activity });
+    expect(parseToParticipant(view(activity))).toEqual({ nextCue: 'colour', type: 'view', view: activity });
   });
 
   it('rejects a grouped view with no cue, and an unknown status', () => {
-    expect(parseToParticipant(json({ type: 'view', view: { group: { found: 0, size: 2 }, status: 'matched' } }))).toBeNull();
-    expect(parseToParticipant(json({ type: 'view', view: { group: { found: 0, size: 2 }, status: 'activity' } }))).toBeNull();
-    expect(parseToParticipant(json({ type: 'view', view: { status: 'dancing' } }))).toBeNull();
+    expect(parseToParticipant(view({ group: { found: 0, size: 2 }, status: 'matched' }))).toBeNull();
+    expect(parseToParticipant(view({ group: { found: 0, size: 2 }, status: 'activity' }))).toBeNull();
+    expect(parseToParticipant(view({ status: 'dancing' }))).toBeNull();
+  });
+
+  it("rejects a view without the next round's cue type, or with an unknown one", () => {
+    expect(parseToParticipant(json({ type: 'view', view: { status: 'waiting' } }))).toBeNull();
+    expect(parseToParticipant(view({ status: 'waiting' }, 'smell'))).toBeNull();
   });
 });
 

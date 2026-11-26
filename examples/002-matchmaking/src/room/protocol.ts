@@ -1,5 +1,7 @@
 // From `/server`, which has nothing that needs a browser, since the Worker reads messages with this too.
 import { parseJsonObject } from '@playtest-kit/common/server';
+import { isCueTypeId } from '../cues/cueTypes.ts';
+import type { CueTypeId } from '../cues/cueTypes.ts';
 import { isMatchConfig } from './matchConfig.ts';
 import type { MatchConfig } from './matchConfig.ts';
 import { isParticipantView, isRoomSnapshot } from './roomViews.ts';
@@ -20,10 +22,14 @@ export type ParticipantMessage = { type: 'ready' } | { type: 'found' };
 /** The host → the room. */
 export type HostMessage = { type: 'config'; config: MatchConfig } | { type: 'start' } | { type: 'moveOn' } | { type: 'reset' };
 
-/** The room → one participant, on joining and after every change: what their screen shows. */
+/**
+ * The room → one participant, on joining and after every change: what their screen shows, and the
+ * cue type the next round will use, so a waiting screen can say to turn the sound up before it's needed.
+ */
 export interface ToParticipant {
   type: 'view';
   view: ParticipantView;
+  nextCue: CueTypeId;
 }
 
 /** The room → the host, on joining and after every change. */
@@ -41,6 +47,7 @@ interface RawMessage {
   type?: unknown;
   config?: unknown;
   view?: unknown;
+  nextCue?: unknown;
   snapshot?: unknown;
 }
 
@@ -62,7 +69,9 @@ export function parseHostMessage(raw: string): HostMessage | null {
 /** The room's message to a participant, from raw socket text, or null if it isn't one. */
 export function parseToParticipant(raw: string): ToParticipant | null {
   const msg: RawMessage = parseJsonObject(raw) ?? {};
-  return msg.type === 'view' && isParticipantView(msg.view) ? { type: 'view', view: msg.view } : null;
+  return msg.type === 'view' && isParticipantView(msg.view) && isCueTypeId(msg.nextCue)
+    ? { nextCue: msg.nextCue, type: 'view', view: msg.view }
+    : null;
 }
 
 /** The room's message to the host, from raw socket text, or null if it isn't one. */

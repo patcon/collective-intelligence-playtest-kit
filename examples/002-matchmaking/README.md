@@ -16,6 +16,8 @@ The design is in [`docs/specs/matchmaking.md`](../../docs/specs/matchmaking.md).
 - `/participate`: a participant. Start screen → "Waiting for the emcee…" → the group's cue → "You're a group of N"
   → after Start activity, a placeholder card for the activity that matching is for → back to waiting when the emcee ends it.
   Its connection id is kept per tab (`sessionId`), so a reload comes back to the same group and cue.
+  Before an audio round, the start and waiting screens say to turn the sound up, and offer a tap to turn
+  it on if the browser isn't playing sound for the page.
 
 ## Layout
 

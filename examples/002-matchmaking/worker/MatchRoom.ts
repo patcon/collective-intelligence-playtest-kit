@@ -94,7 +94,7 @@ export class MatchRoom extends Agent<RoomEnv, RoomState> {
   private sendTo(connection: Connection): void {
     const msg: ToParticipant | ToHost =
       roleOfConnection(connection) === 'participant'
-        ? { type: 'view', view: viewFor(this.state, connection.id) }
+        ? { nextCue: this.state.config.cue, type: 'view', view: viewFor(this.state, connection.id) }
         : { snapshot: snapshotOf(this.state), type: 'snapshot' };
     connection.send(JSON.stringify(msg));
   }

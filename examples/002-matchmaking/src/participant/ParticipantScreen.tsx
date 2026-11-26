@@ -1,4 +1,5 @@
 import { Button, Loader } from '@cloudflare/kumo';
+import type { ReactNode } from 'react';
 import { ActivityCard } from '../activity/ActivityCard.tsx';
 import { CueChip } from '../cues/CueChip.tsx';
 import { CueView } from '../cues/CueView.tsx';
@@ -10,13 +11,16 @@ interface ParticipantScreenProps {
   onFound: () => void;
   /** Something to know while waiting, such as the screen may sleep, or null. */
   note: string | null;
+  /** Something to get ready for the next round, such as turning the sound up, or null. */
+  notice: ReactNode;
 }
 
-function Message({ title, detail, note }: { title: string; detail?: string; note?: string | null }) {
+function Message({ title, detail, note, notice }: { title: string; detail?: string; note?: string | null; notice?: ReactNode }) {
   return (
     <main className="fixed inset-0 flex flex-col items-center justify-center gap-4 bg-kumo-base p-8 text-center">
       <h1 className="text-2xl font-semibold">{title}</h1>
       {detail && <p className="max-w-sm text-kumo-subtle">{detail}</p>}
+      {notice}
       {note && <p className="max-w-sm text-sm text-kumo-subtle">{note}</p>}
     </main>
   );
@@ -28,7 +32,7 @@ function foundCount({ found, size }: { found: number; size: number }): string {
 }
 
 /** What a participant sees once past the start screen, for each status the room gives them. */
-export function ParticipantScreen({ view, onFound, note }: ParticipantScreenProps) {
+export function ParticipantScreen({ view, onFound, note, notice }: ParticipantScreenProps) {
   switch (view?.status) {
     case undefined:
       return (
@@ -38,9 +42,16 @@ export function ParticipantScreen({ view, onFound, note }: ParticipantScreenProp
       );
     case 'joined':
     case 'waiting':
-      return <Message detail="You'll get a cue when the round starts. Find everyone with the same one." note={note} title="Waiting for the emcee…" />;
+      return (
+        <Message
+          detail="You'll get a cue when the round starts. Find everyone with the same one."
+          note={note}
+          notice={notice}
+          title="Waiting for the emcee…"
+        />
+      );
     case 'late':
-      return <Message detail="This round has already started." note={note} title="You'll be matched next round" />;
+      return <Message detail="This round has already started." note={note} notice={notice} title="You'll be matched next round" />;
     case 'matched':
       return (
         <CueView cue={view.cue}>

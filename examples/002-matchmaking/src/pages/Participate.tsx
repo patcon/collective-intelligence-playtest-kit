@@ -1,7 +1,10 @@
 import { sessionId, unlockAudio, useWakeLock } from '@playtest-kit/common';
 import { RoomStatusBadge, StartScreen } from '@playtest-kit/ui';
 import { useState } from 'react';
+import { CUE_TYPES } from '../cues/cueTypes.ts';
+import type { CueTypeId } from '../cues/cueTypes.ts';
 import { ParticipantScreen } from '../participant/ParticipantScreen.tsx';
+import { SOUND_NOTICE, SoundNotice } from '../participant/SoundNotice.tsx';
 import { participantRoom } from '../room/client.ts';
 import type { ParticipantView } from '../room/protocol.ts';
 
@@ -10,13 +13,24 @@ const { RoomProvider, useRoomMessages, useRoomSend, useRoomStatus, useSendOnOpen
 const NO_WAKE_LOCK = "This browser can't keep the screen awake, so it may sleep while you wait. Tap it now and then.";
 const LOST_WAKE_LOCK = 'Your screen may sleep while you wait. Tap it now and then.';
 
+/** Everything the start screen should warn about, as one line, or null. */
+function startWarning(soundNext: boolean, canKeepAwake: boolean): string | null {
+  const warnings = [soundNext ? SOUND_NOTICE : null, canKeepAwake ? null : NO_WAKE_LOCK].filter((w) => w !== null);
+  return warnings.length > 0 ? warnings.join(' ') : null;
+}
+
 function ParticipantFlow() {
   const [started, setStarted] = useState(false);
   const [view, setView] = useState<ParticipantView | null>(null);
+  const [nextCue, setNextCue] = useState<CueTypeId | null>(null);
   const status = useRoomStatus();
   const send = useRoomSend();
   const wakeLock = useWakeLock(started);
-  useRoomMessages((msg) => setView(msg.view));
+  useRoomMessages((msg) => {
+    setView(msg.view);
+    setNextCue(msg.nextCue);
+  });
+  const soundNext = nextCue !== null && CUE_TYPES[nextCue].sense === 'audio';
   // Sent again on every reconnect, so a room that restarted still knows this participant is ready.
   useSendOnOpen(started ? { type: 'ready' } : null);
 
@@ -29,14 +43,19 @@ function ParticipantFlow() {
           setStarted(true);
         }}
         title="Matchmaking"
-        warning={wakeLock.supported ? null : NO_WAKE_LOCK}
+        warning={startWarning(soundNext, wakeLock.supported)}
       />
     );
   }
 
   return (
     <>
-      <ParticipantScreen note={wakeLock.supported && !wakeLock.acquired ? LOST_WAKE_LOCK : null} onFound={() => send({ type: 'found' })} view={view} />
+      <ParticipantScreen
+        note={wakeLock.supported && !wakeLock.acquired ? LOST_WAKE_LOCK : null}
+        notice={soundNext ? <SoundNotice /> : null}
+        onFound={() => send({ type: 'found' })}
+        view={view}
+      />
       {status === 'open' ? null : (
         <div className="fixed top-4 right-4">
           <RoomStatusBadge status={status} />

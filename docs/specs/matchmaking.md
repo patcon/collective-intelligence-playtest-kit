@@ -132,6 +132,8 @@ Rooms are small (≤ ~50 connections), so after every change the room sends:
   with confirmation counts).
 - **to each participant:** their own `ParticipantView` (status, cue, group size, and how many in the group
   have marked found). A `found` from anyone in a group sends a new view to everyone in that group.
+  It also carries the next round's cue type, so the start and waiting screens can say to turn the sound
+  up before an audio round (added after the build).
 
 Late joiners and reconnects get the same message as everyone else, so `001`'s catch-up logic isn't
 needed. `001` keeps its event stream, because it streams high-rate valence and snapshots would be the
@@ -144,7 +146,7 @@ type ParticipantMessage = { type: 'ready' } | { type: 'found' };
 type HostMessage =
   | { type: 'config'; config: MatchConfig }
   | { type: 'start' } | { type: 'moveOn' } | { type: 'reset' };
-type ToParticipant = { type: 'view'; view: ParticipantView };
+type ToParticipant = { type: 'view'; view: ParticipantView; nextCue: CueTypeId }; // nextCue added after the build
 type ToHost = { type: 'snapshot'; snapshot: RoomSnapshot };
 
 interface MatchConfig {

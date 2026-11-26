@@ -462,6 +462,6 @@ Raised after Phase 4 (2026-11-25):
 - [x] **Sound-only birdsong by default.** The point of an audio cue is finding people by ear alone, so
   don't show the species name or icon. For now, call it "Audio: Birds (sound-only)". (Today the name
   shows as a fallback for when sound can't play; keep a smaller fallback for that case only.)
-- [ ] **Warn about sound before it's needed.** When the next round's cue is audio, the start and
+- [x] **Warn about sound before it's needed.** When the next round's cue is audio, the start and
   waiting screens show the same notice: sound is part of this activity, so turn the volume all the
   way up (and silent mode off). Warn too when audio wasn't unlocked (no `AudioContext`, or it's suspended).
