@@ -36,7 +36,7 @@ T4 depends only on T1, so it can run alongside T2 and T3. T8 (50 sims) depends o
 - [x] T0: Rename `Grouping`'s fields to `groupSize` / `groupCount`
 - [x] T1: `Grouping` gains `fit`; `groupSizes` in `split.ts`
 - [x] T2: One `startBlocker` for the UI and the room
-- [ ] T3: `match` deals into `groupSizes`
+- [x] T3: `match` deals into `groupSizes`
 
 ### Checkpoint A
 - [ ] `pnpm test`, `pnpm typecheck` and `pnpm lint` pass. A 20-sim round on `/demo` still works through the old selects.

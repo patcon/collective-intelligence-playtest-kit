@@ -2,7 +2,7 @@
 // The −/+ only stop at 2 groups (one group isn't a split) and 2 per group, so the emcee can set things before people arrive;
 // a setting the people ready can't make is reported as `problem`, which blocks Start.
 import { useState } from 'react';
-import { MIN_GROUP_SIZE } from '../../matching/match.ts';
+import { MIN_GROUP_SIZE } from '../../matching/split.ts';
 import { MIN_GROUPS, sizesForSize, sizesOf } from './divideMaths.ts';
 import type { Leftovers, Locked } from './divideMaths.ts';
 

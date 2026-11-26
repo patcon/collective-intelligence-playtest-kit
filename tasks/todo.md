@@ -59,9 +59,9 @@ Plan: [`plan.md`](plan.md). Spec: [`docs/specs/group-segment-wizard.md`](../docs
 **Description:** `match` splits the algorithm's ordered ids into chunks of `groupSizes(n, grouping)` instead of dealing round-robin. Delete `groupCount` and `smallestGroupSize`. Update the doc comments on `match` and `ALGORITHMS`: neighbours now share a group.
 
 **Acceptance criteria:**
-- [ ] `match.test.ts`: the group sizes `match` returns equal `groupSizes` across the T1 table. Every id is in exactly one group.
-- [ ] `matchRoom.test.ts`: a started round's group sizes follow `groupSizes`, e.g. 32 at Min 15 → `16·16` and 13 at Min 3 → `4·3·3·3`. (20 at Min 15 is blocked by T2, so it can't start.)
-- [ ] Neither `groupCount` nor `smallestGroupSize` is left anywhere in the code.
+- [x] `match.test.ts`: the group sizes `match` returns equal `groupSizes` across the T1 table. Every id is in exactly one group.
+- [x] `matchRoom.test.ts`: a started round's group sizes follow `groupSizes`, e.g. 32 at Min 15 → `16·16` and 13 at Min 3 → `4·3·3·3`. (20 at Min 15 is blocked by T2, so it can't start.)
+- [x] Neither `groupCount` nor `smallestGroupSize` is left anywhere in the code.
 
 **Verification:** `pnpm test` · `pnpm typecheck` · `pnpm lint`
 

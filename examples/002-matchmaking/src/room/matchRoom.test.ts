@@ -35,6 +35,14 @@ function partnerOf(state: RoomState, id: string): string {
   return partner.id;
 }
 
+const minOf = (groupSize: number): RoomEvent => ({ config: { ...DEFAULT_CONFIG, grouping: { by: 'groupSize', fit: 'min', groupSize } }, type: 'config' });
+
+/** The group sizes of a round started with `n` people ready under `config`. */
+function sizesAt(n: number, config: RoomEvent): Array<number> {
+  const state = run([config, ...readied(...Array.from({ length: n }, (_, i) => `p${i}`)), { type: 'start' }]);
+  return snapshotOf(state).groups.map((g) => g.size);
+}
+
 describe('reduce', () => {
   it('rejects a start with no one ready', () => {
     const state = run([{ id: 'a', type: 'join' }]);
@@ -57,6 +65,11 @@ describe('reduce', () => {
     const ids = Array.from({ length: 2 * (PALETTE.length + 1) }, (_, i) => `p${i}`);
     const tooMany = run([pairs, ...readied(...ids)]);
     expect(run([{ type: 'start' }], tooMany)).toBe(tooMany);
+  });
+
+  it('starts a round with exactly the group sizes groupSizes gives', () => {
+    expect(sizesAt(32, minOf(15))).toEqual([16, 16]);
+    expect(sizesAt(13, minOf(3))).toEqual([4, 3, 3, 3]);
   });
 
   it('rejects a start with a group short of a Min', () => {

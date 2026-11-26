@@ -1,5 +1,5 @@
 // PROTOTYPE (throwaway): the maths behind `GroupSegmentWizard`. See docs/intent/group-segment-wizard.md.
-import { MIN_GROUP_SIZE } from '../../matching/match.ts';
+import { MIN_GROUP_SIZE } from '../../matching/split.ts';
 
 export type Locked = 'groups' | 'size';
 /** Fewest groups there ever are: one group isn't a split. */

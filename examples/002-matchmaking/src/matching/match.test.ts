@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { match, smallestGroupSize } from './match.ts';
+import { FITS, match } from './match.ts';
 import type { Grouping } from './match.ts';
 import { seededRng } from './rng.ts';
+import { groupSizes } from './split.ts';
 
 const ids = (n: number) => Array.from({ length: n }, (_, i) => `p${i}`);
 
@@ -16,37 +17,31 @@ describe('match', () => {
     expect(sizes(20, { by: 'groupSize', fit: 'smart', groupSize: 2 })).toEqual(Array.from({ length: 10 }, () => 2));
   });
 
-  it('spreads leftovers one per group: 20 by size 3 is two groups of 4 and four of 3', () => {
-    expect(sizes(20, { by: 'groupSize', fit: 'smart', groupSize: 3 })).toEqual([4, 4, 3, 3, 3, 3]);
+  it('makes 20 by size 3 Smart into six groups of 3 and one of 2', () => {
+    expect(sizes(20, { by: 'groupSize', fit: 'smart', groupSize: 3 })).toEqual([3, 3, 3, 3, 3, 3, 2]);
   });
 
   it('makes 4 groups of 5 from 20 people by count 4', () => {
     expect(sizes(20, { by: 'groupCount', groupCount: 4 })).toEqual([5, 5, 5, 5]);
   });
 
-  it('keeps sizes within one of each other by count', () => {
-    expect(sizes(11, { by: 'groupCount', groupCount: 3 })).toEqual([4, 4, 3]);
+  it('fills groups first under Min: 32 at 15 is 16·16, and 20 at 15 is 15·5', () => {
+    expect(sizes(32, { by: 'groupSize', fit: 'min', groupSize: 15 })).toEqual([16, 16]);
+    expect(sizes(20, { by: 'groupSize', fit: 'min', groupSize: 15 })).toEqual([15, 5]);
   });
 
-  it('puts everyone in one group when there are fewer people than the size', () => {
-    expect(sizes(2, { by: 'groupSize', fit: 'smart', groupSize: 3 })).toEqual([2]);
-  });
+  const groupings: Array<Grouping> = [
+    ...[2, 3, 4, 5, 6].map((groupCount): Grouping => ({ by: 'groupCount', groupCount })),
+    ...[2, 3, 4, 5].flatMap((groupSize) => FITS.map((fit): Grouping => ({ by: 'groupSize', fit, groupSize }))),
+  ];
 
-  it('makes no more groups than people by count', () => {
-    expect(sizes(2, { by: 'groupCount', groupCount: 5 })).toEqual([1, 1]);
-  });
-
-  it('knows the smallest group it will make', () => {
-    expect(smallestGroupSize(0, { by: 'groupSize', fit: 'smart', groupSize: 3 })).toBe(0);
-    expect(smallestGroupSize(1, { by: 'groupSize', fit: 'smart', groupSize: 3 })).toBe(1);
-    expect(smallestGroupSize(20, { by: 'groupSize', fit: 'smart', groupSize: 3 })).toBe(3);
-    expect(smallestGroupSize(3, { by: 'groupCount', groupCount: 2 })).toBe(1);
-    expect(smallestGroupSize(20, { by: 'groupCount', groupCount: 4 })).toBe(5);
-  });
-
-  it('makes no groups from no one, and one group of one from one person', () => {
-    expect(match([], { algorithm: 'random', grouping: { by: 'groupSize', fit: 'smart', groupSize: 2 } }, seededRng(1))).toEqual([]);
-    expect(match(['a'], { algorithm: 'random', grouping: { by: 'groupCount', groupCount: 3 } }, seededRng(1))).toEqual([['a']]);
+  it('deals exactly the sizes groupSizes gives, for every headcount up to 50', () => {
+    for (let n = 2; n <= 50; n += 1) {
+      for (const grouping of groupings) {
+        const groups = match(ids(n), { algorithm: 'random', grouping }, seededRng(n));
+        expect(groups.map((g) => g.length)).toEqual(groupSizes(n, grouping));
+      }
+    }
   });
 
   it('places everyone exactly once', () => {

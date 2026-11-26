@@ -1,5 +1,7 @@
-import { MIN_GROUP_SIZE } from './match.ts';
 import type { Fit, Grouping } from './match.ts';
+
+/** No one is matched into a group smaller than this: a group of one has no one to find. */
+export const MIN_GROUP_SIZE = 2;
 
 /** Fewest groups a split ever has: one group isn't a split. */
 export const MIN_GROUPS = 2;
