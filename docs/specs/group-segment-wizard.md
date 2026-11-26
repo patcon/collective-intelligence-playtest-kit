@@ -58,7 +58,7 @@ Build order: `grouping-model` → `room-grouping` → `emcee-control`.
 ```ts
 // src/matching/match.ts
 export type Fit = 'smart' | 'min' | 'max';
-export type Grouping = { by: 'size'; size: number; fit: Fit } | { by: 'count'; count: number };
+export type Grouping = { by: 'groupSize'; groupSize: number; fit: Fit } | { by: 'groupCount'; groupCount: number };
 
 // src/matching/split.ts (from the prototype's divideMaths.ts)
 export function groupSizes(n: number, grouping: Grouping): Array<number>;
@@ -79,7 +79,7 @@ export function groupConcerns(sizes: ReadonlyArray<number>, grouping: Grouping, 
 
 Vitest (`pnpm test` in `examples/002-matchmaking`). The tests sit next to the code, as they do now.
 
-- `split.test.ts`: every worked example above, and a table over *n* = 0..20 × count 2..6 and size 2..5 × each fit, checking that sizes sum to *n*, there are at least 2 groups, and the sizes are largest first.
+- `split.test.ts`: every worked example above, and a table over *n* = 0..50 × count 2..6 and size 2..5 × each fit, checking that sizes sum to *n*, there are at least 2 groups, and the sizes are largest first.
 - `match.test.ts`: the group sizes `match` returns equal `groupSizes`. Every id ends up in exactly one group.
 - `matchRoom.test.ts`: the reducer refuses Start for each blocker (including 17 ready at Min 12), and 32 ready at Min 15 makes `16·16`.
 - `protocol.test.ts`: a `config` whose size grouping has no `fit`, or an unknown `fit`, is rejected.
