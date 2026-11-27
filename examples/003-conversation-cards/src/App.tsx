@@ -15,7 +15,13 @@ export default function App() {
   );
   return (
     <main className="mx-auto flex min-h-screen max-w-2xl flex-col gap-4 p-4">
-      <h1 className="text-xl font-semibold">003 · Conversation cards</h1>
+      <header className="flex flex-col gap-1">
+        <h1 className="text-xl font-semibold">003 · Conversation cards</h1>
+        <p className="text-sm text-kumo-subtle">
+          Draws conversation prompts from a deck through a small card service that keeps no state of its own. The page sends the cards
+          it’s already seen, so nothing repeats, and to show one card to a whole group, each phone fetches it by id.
+        </p>
+      </header>
       <Surface className="flex flex-col gap-4 rounded-lg p-6">
         <h2 className="text-lg font-semibold">Draw</h2>
         <LoadFailure>
