@@ -1,0 +1,14 @@
+{
+  "extends": "@playtest-kit/config/tsconfig.json",
+  "include": [
+    "src",
+    "vite.config.ts",
+    "oxlint.config.ts",
+    "alchemy.run.ts",
+    "port.ts",
+    "offline.ts"
+  ],
+  "compilerOptions": {
+    "resolveJsonModule": true
+  }
+}

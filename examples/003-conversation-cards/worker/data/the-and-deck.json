@@ -1,0 +1,917 @@
+[
+  {
+    "id": "1",
+    "text": "What am I secretly not telling myself?",
+    "type": "ear"
+  },
+  {
+    "id": "2",
+    "text": "What would be the strategic approach to it?",
+    "type": "gem"
+  },
+  {
+    "id": "3",
+    "text": "What am I doing daily to become the person I want to be?",
+    "type": "gem"
+  },
+  {
+    "id": "4",
+    "text": "What complementary skills do I need?",
+    "type": "gem"
+  },
+  {
+    "id": "5",
+    "text": "Describe what it would feel like to accomplish a lifelong dream of mine.",
+    "type": "gem"
+  },
+  {
+    "id": "6",
+    "text": "Describe in detail how I want my life to look five years from now.",
+    "type": "gem"
+  },
+  {
+    "id": "7",
+    "text": "When was the last time I did something that surprised me? Describe the moments leading up to it. Why'd I do it?",
+    "type": "rewind"
+  },
+  {
+    "id": "8",
+    "text": "What are the three biggest differences between who I am now and who I will be?",
+    "type": "rewind"
+  },
+  {
+    "id": "9",
+    "text": "What do I fear regretting?",
+    "type": "heart"
+  },
+  {
+    "id": "10",
+    "text": "What's stopping me really?",
+    "type": "heart"
+  },
+  {
+    "id": "11",
+    "text": "What do I think I have yet to learn about myself?",
+    "type": "gem"
+  },
+  {
+    "id": "12",
+    "text": "Describe what you want to enter into your life. Be as detailed as possible.",
+    "type": "gem"
+  },
+  {
+    "id": "13",
+    "text": "Are my greatest achievements ahead or behind me and how does that make me feel?",
+    "type": "gem"
+  },
+  {
+    "id": "14",
+    "text": "What am I excited to lose?",
+    "type": "gem"
+  },
+  {
+    "id": "15",
+    "text": "What's the best, most ideal thing that could happen?",
+    "type": "gem"
+  },
+  {
+    "id": "16",
+    "text": "Describe your mountain.",
+    "type": "gem"
+  },
+  {
+    "id": "17",
+    "text": "Describe the last great thing you did. What makes it so great?",
+    "type": "rewind"
+  },
+  {
+    "id": "18",
+    "text": "What's the most important thing I didn't do that I should have done? Why?",
+    "type": "rewind"
+  },
+  {
+    "id": "19",
+    "text": "What do I fear is coming up?",
+    "type": "heart"
+  },
+  {
+    "id": "20",
+    "text": "What possibility is the most tempting but I'm most scared to try?",
+    "type": "heart"
+  },
+  {
+    "id": "21",
+    "text": "What do I need to learn right now?",
+    "type": "ear"
+  },
+  {
+    "id": "22",
+    "text": "What's the best gift I have ever given myself?",
+    "type": "gem"
+  },
+  {
+    "id": "23",
+    "text": "List my five greatest accomplishments thus far.",
+    "type": "gem"
+  },
+  {
+    "id": "24",
+    "text": "What do I value most now that wasn't the case before? What's changed?",
+    "type": "gem"
+  },
+  {
+    "id": "25",
+    "text": "Where do I feel I offer the most value?",
+    "type": "gem"
+  },
+  {
+    "id": "26",
+    "text": "What excites me the most about it?",
+    "type": "gem"
+  },
+  {
+    "id": "27",
+    "text": "When was the first time I lied to myself?",
+    "type": "rewind"
+  },
+  {
+    "id": "28",
+    "text": "What are my three biggest mistakes and what did I learn from them?",
+    "type": "rewind"
+  },
+  {
+    "id": "29",
+    "text": "What am I hiding?",
+    "type": "heart"
+  },
+  {
+    "id": "30",
+    "text": "How do I wish others would describe me to a vision impaired person?",
+    "type": "faces"
+  },
+  {
+    "id": "31",
+    "text": "List five experiences I must have before I die.",
+    "type": "infinity"
+  },
+  {
+    "id": "32",
+    "text": "What's the one most impactful thing I could do right now to change my reality/situation?",
+    "type": "ear"
+  },
+  {
+    "id": "33",
+    "text": "Why am I?",
+    "type": "gem"
+  },
+  {
+    "id": "34",
+    "text": "When was the last time I told myself how great I am?",
+    "type": "gem"
+  },
+  {
+    "id": "35",
+    "text": "What do I find most gratifying in my life right now?",
+    "type": "gem"
+  },
+  {
+    "id": "36",
+    "text": "What do I love about my current reality/situation?",
+    "type": "gem"
+  },
+  {
+    "id": "37",
+    "text": "If this was the last thing I did, what would I do differently?",
+    "type": "rewind"
+  },
+  {
+    "id": "38",
+    "text": "When was the last time I lied to myself? What was that lie protecting?",
+    "type": "rewind"
+  },
+  {
+    "id": "39",
+    "text": "What mistake do I wish I could stop making? What would I lose by correcting this mistake?",
+    "type": "rewind"
+  },
+  {
+    "id": "40",
+    "text": "How will my decision affect the relationships in my life?",
+    "type": "heart"
+  },
+  {
+    "id": "41",
+    "text": "How would I describe myself to a vision impaired person?",
+    "type": "faces"
+  },
+  {
+    "id": "42",
+    "text": "What do you think is your first impression on others and why do you think this is the case?",
+    "type": "faces"
+  },
+  {
+    "id": "43",
+    "text": "Who do I feel is judging me? And how does that limit me?",
+    "type": "ear"
+  },
+  {
+    "id": "44",
+    "text": "What do I really want to say but am hesitant to? Why am I hesitant?",
+    "type": "megaphone"
+  },
+  {
+    "id": "45",
+    "text": "What is the opportunity I am preparing for?",
+    "type": "gem"
+  },
+  {
+    "id": "46",
+    "text": "What would have to happen in order for me to feel I've succeeded?",
+    "type": "gem"
+  },
+  {
+    "id": "47",
+    "text": "What do I hate about my current reality/situation?",
+    "type": "gem"
+  },
+  {
+    "id": "48",
+    "text": "What do I miss about myself?",
+    "type": "rewind"
+  },
+  {
+    "id": "49",
+    "text": "What will happen if I miss the boat?",
+    "type": "rewind"
+  },
+  {
+    "id": "50",
+    "text": "What's different about me now than then?",
+    "type": "rewind"
+  },
+  {
+    "id": "51",
+    "text": "What relationship in my life is informing my decision right now? Why?",
+    "type": "heart"
+  },
+  {
+    "id": "52",
+    "text": "What is the one greatest thing I can do to improve the relationships in my life today?",
+    "type": "infinity"
+  },
+  {
+    "id": "53",
+    "text": "What do others do that annoys me the most and what does that reveal about me?",
+    "type": "faces"
+  },
+  {
+    "id": "54",
+    "text": "Define success three times. Do the definitions change or remain the same? How and why?",
+    "type": "ear"
+  },
+  {
+    "id": "55",
+    "text": "What do I really want to say and how will that change things?",
+    "type": "megaphone"
+  },
+  {
+    "id": "56",
+    "text": "What is life about for me right now?",
+    "type": "gem"
+  },
+  {
+    "id": "57",
+    "text": "List what I am willing to lose to get what I want.",
+    "type": "gem"
+  },
+  {
+    "id": "58",
+    "text": "How can I learn from this right now?",
+    "type": "gem"
+  },
+  {
+    "id": "59",
+    "text": "What do I wish to be forgiven for?",
+    "type": "rewind"
+  },
+  {
+    "id": "60",
+    "text": "Looking forward five years from now, what would my future self advise me to do?",
+    "type": "rewind"
+  },
+  {
+    "id": "61",
+    "text": "How have I grown most in the last year?",
+    "type": "rewind"
+  },
+  {
+    "id": "62",
+    "text": "What do I need to do to let go of it?",
+    "type": "heart"
+  },
+  {
+    "id": "63",
+    "text": "What's the worst that could happen?",
+    "type": "heart"
+  },
+  {
+    "id": "64",
+    "text": "How honest am I being right now?",
+    "type": "faces"
+  },
+  {
+    "id": "65",
+    "text": "How am I most like my father and how does that scare me?",
+    "type": "megaphone"
+  },
+  {
+    "id": "66",
+    "text": "How does this reinforce my purpose?",
+    "type": "gem"
+  },
+  {
+    "id": "67",
+    "text": "What's working great in my life right now?",
+    "type": "gem"
+  },
+  {
+    "id": "68",
+    "text": "What am I most grateful for in this period of my life?",
+    "type": "gem"
+  },
+  {
+    "id": "69",
+    "text": "How can this be the best thing that has ever happened to me?",
+    "type": "gem"
+  },
+  {
+    "id": "70",
+    "text": "Who do I need to forgive but haven't yet?",
+    "type": "rewind"
+  },
+  {
+    "id": "71",
+    "text": "What is something I never want to forget?",
+    "type": "rewind"
+  },
+  {
+    "id": "72",
+    "text": "What three experiences from the past shape my current perception?",
+    "type": "rewind"
+  },
+  {
+    "id": "73",
+    "text": "What would it look like if I fully stepped in and took it on?",
+    "type": "heart"
+  },
+  {
+    "id": "74",
+    "text": "What example am I leaving for others?",
+    "type": "infinity"
+  },
+  {
+    "id": "75",
+    "text": "What am I always carrying with me? Why?",
+    "type": "infinity"
+  },
+  {
+    "id": "76",
+    "text": "What would my father say about it?",
+    "type": "ear"
+  },
+  {
+    "id": "77",
+    "text": "What has been my greatest test thus far, and what did I learn from it?",
+    "type": "gem"
+  },
+  {
+    "id": "78",
+    "text": "How did I overcome my greatest challenge?",
+    "type": "gem"
+  },
+  {
+    "id": "79",
+    "text": "Close your eyes. Take three deep breaths. What image/memory comes to mind and what is it telling you?",
+    "type": "gem"
+  },
+  {
+    "id": "80",
+    "text": "Where do I feel the most capable? What about it makes me feel so capable?",
+    "type": "gem"
+  },
+  {
+    "id": "81",
+    "text": "What could life possibly be trying to teach me right now?",
+    "type": "gem"
+  },
+  {
+    "id": "82",
+    "text": "What memory do I never want to forget?",
+    "type": "rewind"
+  },
+  {
+    "id": "83",
+    "text": "What's the best use of my time right now?",
+    "type": "rewind"
+  },
+  {
+    "id": "84",
+    "text": "What's really holding me back?",
+    "type": "heart"
+  },
+  {
+    "id": "85",
+    "text": "What dictates my decisions and how has that helped me?",
+    "type": "faces"
+  },
+  {
+    "id": "86",
+    "text": "When was the last time I had to make a similar decision and what did I learn from that?",
+    "type": "rewind"
+  },
+  {
+    "id": "87",
+    "text": "What if...",
+    "type": "gem"
+  },
+  {
+    "id": "88",
+    "text": "What makes me think it will be this way for much longer?",
+    "type": "infinity"
+  },
+  {
+    "id": "89",
+    "text": "What more can I learn in order to make a more informed decision?",
+    "type": "megaphone"
+  },
+  {
+    "id": "90",
+    "text": "Is there a faster way?",
+    "type": "rewind"
+  },
+  {
+    "id": "91",
+    "text": "What is my greatest weakness?",
+    "type": "gem"
+  },
+  {
+    "id": "92",
+    "text": "Who am I envious of and why?",
+    "type": "tear"
+  },
+  {
+    "id": "93",
+    "text": "What will remain after I die?",
+    "type": "infinity"
+  },
+  {
+    "id": "94",
+    "text": "What's the one change I could make today that would have the greatest impact on my future?",
+    "type": "infinity"
+  },
+  {
+    "id": "95",
+    "text": "What am I most embarrassed to share?",
+    "type": "faces"
+  },
+  {
+    "id": "96",
+    "text": "When was the last time I looked someone deep into the center of their eyes?",
+    "type": "faces"
+  },
+  {
+    "id": "97",
+    "text": "How do I know when I am on the wrong path?",
+    "type": "infinity"
+  },
+  {
+    "id": "98",
+    "text": "Is this about me or about being worried about others?",
+    "type": "faces"
+  },
+  {
+    "id": "99",
+    "text": "Am I settling for less? How?",
+    "type": "megaphone"
+  },
+  {
+    "id": "100",
+    "text": "What am I going to miss out on by choosing this?",
+    "type": "gem"
+  },
+  {
+    "id": "101",
+    "text": "Why not try it out and see where it goes?",
+    "type": "gem"
+  },
+  {
+    "id": "102",
+    "text": "Honestly, what is my superpower?",
+    "type": "gem"
+  },
+  {
+    "id": "103",
+    "text": "What do I yearn for that I haven't fully acknowledged yet?",
+    "type": "tear"
+  },
+  {
+    "id": "104",
+    "text": "Is there only one solution? How do I know?",
+    "type": "infinity"
+  },
+  {
+    "id": "105",
+    "text": "What's the rush?",
+    "type": "infinity"
+  },
+  {
+    "id": "106",
+    "text": "Who is most similiar to me and what do I wish I could change about them?",
+    "type": "faces"
+  },
+  {
+    "id": "107",
+    "text": "When do I lie to people and why?",
+    "type": "faces"
+  },
+  {
+    "id": "108",
+    "text": "What am I afraid of?",
+    "type": "heart"
+  },
+  {
+    "id": "109",
+    "text": "How will doing this change me?",
+    "type": "not-equal"
+  },
+  {
+    "id": "110",
+    "text": "What is the price for waiting before making a decision?",
+    "type": "not-equal"
+  },
+  {
+    "id": "111",
+    "text": "Do I want it or do I need it? Why?",
+    "type": "gem"
+  },
+  {
+    "id": "112",
+    "text": "What about it makes me feel like it's real?",
+    "type": "gem"
+  },
+  {
+    "id": "113",
+    "text": "What is the current judgement I am holding onto and why?",
+    "type": "gem"
+  },
+  {
+    "id": "114",
+    "text": "When was the last time I cried and why?",
+    "type": "tear"
+  },
+  {
+    "id": "115",
+    "text": "What story/meaning can I give this situation to make it better?",
+    "type": "megaphone"
+  },
+  {
+    "id": "116",
+    "text": "What is the one lesson or value that I want to pass on to my grandchildren?",
+    "type": "infinity"
+  },
+  {
+    "id": "117",
+    "text": "Is it me or them? Or am I just refusing to see myself through them?",
+    "type": "faces"
+  },
+  {
+    "id": "118",
+    "text": "Is it my ego or theirs?",
+    "type": "faces"
+  },
+  {
+    "id": "119",
+    "text": "What do I have to let go of to get what I want?",
+    "type": "infinity"
+  },
+  {
+    "id": "120",
+    "text": "How will doing this change me for the better?",
+    "type": "not-equal"
+  },
+  {
+    "id": "121",
+    "text": "What is the third and fourth option?",
+    "type": "gem"
+  },
+  {
+    "id": "122",
+    "text": "Have I really, truly, tried everything?",
+    "type": "gem"
+  },
+  {
+    "id": "123",
+    "text": "Where is my blind spot?",
+    "type": "gem"
+  },
+  {
+    "id": "124",
+    "text": "How am I most like my mother and how does that scare me?",
+    "type": "megaphone"
+  },
+  {
+    "id": "125",
+    "text": "How is my ego involved in this?",
+    "type": "tear"
+  },
+  {
+    "id": "126",
+    "text": "How does this live up to the best version of me?",
+    "type": "megaphone"
+  },
+  {
+    "id": "127",
+    "text": "If I were to die right now, who would be the first three people I'd like to meet in an afterlife? Why?",
+    "type": "infinity"
+  },
+  {
+    "id": "128",
+    "text": "Why ask why?",
+    "type": "faces"
+  },
+  {
+    "id": "129",
+    "text": "What is the most important thing to me right now? Why?",
+    "type": "infinity"
+  },
+  {
+    "id": "130",
+    "text": "What emotional weight am I carrying and why am I carrying it?",
+    "type": "infinity"
+  },
+  {
+    "id": "131",
+    "text": "Am I asking the right questions?",
+    "type": "not-equal"
+  },
+  {
+    "id": "132",
+    "text": "Is this how it should be, I want it to be, or is this really how it is?",
+    "type": "infinity"
+  },
+  {
+    "id": "133",
+    "text": "What can I do to better inform myself?",
+    "type": "gem"
+  },
+  {
+    "id": "134",
+    "text": "What's the big picture that I suspect is there but I can't see clearly yet?",
+    "type": "gem"
+  },
+  {
+    "id": "135",
+    "text": "What was I born to do?",
+    "type": "baby"
+  },
+  {
+    "id": "136",
+    "text": "How do I know I'm not lying to myself?",
+    "type": "tear"
+  },
+  {
+    "id": "137",
+    "text": "List three possibilities.",
+    "type": "megaphone"
+  },
+  {
+    "id": "138",
+    "text": "How does my body feel right now? What is it telling me?",
+    "type": "infinity"
+  },
+  {
+    "id": "139",
+    "text": "What is the lesson life is teaching me at this point in time?",
+    "type": "infinity"
+  },
+  {
+    "id": "140",
+    "text": "What mental state(s) do I find myself in often and what will I lose by letting them go?",
+    "type": "infinity"
+  },
+  {
+    "id": "141",
+    "text": "How do I know when I am on the right path?",
+    "type": "infinity"
+  },
+  {
+    "id": "142",
+    "text": "What is the best question to ask that will serve me the most right now?",
+    "type": "gem"
+  },
+  {
+    "id": "143",
+    "text": "What is something I'm taking for granted?",
+    "type": "gem"
+  },
+  {
+    "id": "144",
+    "text": "If I am the average of the five people I spend the most time with, describe who I am.",
+    "type": "faces"
+  },
+  {
+    "id": "145",
+    "text": "What are others learning from my mistakes?",
+    "type": "faces"
+  },
+  {
+    "id": "146",
+    "text": "What's the hardest thing I didn't do?",
+    "type": "not-equal"
+  },
+  {
+    "id": "147",
+    "text": "How does my fear serve me?",
+    "type": "tear"
+  },
+  {
+    "id": "148",
+    "text": "List three potential outcomes.",
+    "type": "megaphone"
+  },
+  {
+    "id": "149",
+    "text": "Who do I want to help?",
+    "type": "faces"
+  },
+  {
+    "id": "150",
+    "text": "When was the last time I felt my heart explode? What happened?",
+    "type": "heart"
+  },
+  {
+    "id": "151",
+    "text": "How am I inspiring others?",
+    "type": "infinity"
+  },
+  {
+    "id": "152",
+    "text": "What do I find most challenging in my life right now?",
+    "type": "infinity"
+  },
+  {
+    "id": "153",
+    "text": "If I do this, how will it change my eulogy?",
+    "type": "infinity"
+  },
+  {
+    "id": "154",
+    "text": "State my personal philosophy in one sentence.",
+    "type": "gem"
+  },
+  {
+    "id": "155",
+    "text": "Who are my best friends? What do they all have in common?",
+    "type": "faces"
+  },
+  {
+    "id": "156",
+    "text": "Who can I help the least?",
+    "type": "faces"
+  },
+  {
+    "id": "157",
+    "text": "What's an impression I make which I know is false? So why do I make it?",
+    "type": "not-equal"
+  },
+  {
+    "id": "158",
+    "text": "What am I jealous or envious of and how is that affecting my decision right now?",
+    "type": "tear"
+  },
+  {
+    "id": "159",
+    "text": "If finances weren't an issue, what would I be doing differently?",
+    "type": "dollar"
+  },
+  {
+    "id": "160",
+    "text": "Who inspires me most right now? What is it about them that resonates so deeply?",
+    "type": "faces"
+  },
+  {
+    "id": "161",
+    "text": "When do I feel most alive and what about it makes me feel that way?",
+    "type": "infinity"
+  },
+  {
+    "id": "162",
+    "text": "What are the three biggest differences between who I am now and who I was then?",
+    "type": "infinity"
+  },
+  {
+    "id": "163",
+    "text": "What would I like written on my tombstone?",
+    "type": "ear"
+  },
+  {
+    "id": "164",
+    "text": "What would my eulogy be if I was gone tomorrow?",
+    "type": "infinity"
+  },
+  {
+    "id": "165",
+    "text": "What's something new I can try right now?",
+    "type": "gem"
+  },
+  {
+    "id": "166",
+    "text": "What is the most ambitious vision for this?",
+    "type": "rewind"
+  },
+  {
+    "id": "167",
+    "text": "For whom do I do what I do?",
+    "type": "faces"
+  },
+  {
+    "id": "168",
+    "text": "Am I running faster than others or am I running away from others?",
+    "type": "not-equal"
+  },
+  {
+    "id": "169",
+    "text": "What am I angry about?",
+    "type": "tear"
+  },
+  {
+    "id": "170",
+    "text": "What happened in the past that broke a part of me? What healed in its place?",
+    "type": "tear"
+  },
+  {
+    "id": "171",
+    "text": "What word should I use more often? What would that say about me?",
+    "type": "ear"
+  },
+  {
+    "id": "172",
+    "text": "Why do I do what I do?",
+    "type": "faces"
+  },
+  {
+    "id": "173",
+    "text": "What am I not facing?",
+    "type": "ear"
+  },
+  {
+    "id": "174",
+    "text": "What would my mother say about it?",
+    "type": "ear"
+  },
+  {
+    "id": "175",
+    "text": "Who do I wish could give me advice right now? What would they tell me?",
+    "type": "faces"
+  },
+  {
+    "id": "176",
+    "text": "How does this experience make me feel?",
+    "type": "gem"
+  },
+  {
+    "id": "177",
+    "text": "Stop. Take a deep breath. Look around until you see a sign. What is it telling you?",
+    "type": "infinity"
+  },
+  {
+    "id": "178",
+    "text": "What makes me feel love?",
+    "type": "heart"
+  },
+  {
+    "id": "179",
+    "text": "Why do I care so much?",
+    "type": "heart"
+  },
+  {
+    "id": "180",
+    "text": "List all the things I am still unsure of.",
+    "type": "infinity"
+  },
+  {
+    "id": "181",
+    "text": "What is the elephant in the room?",
+    "type": "ear"
+  },
+  {
+    "id": "182",
+    "text": "List all the things I know to be true.",
+    "type": "infinity"
+  },
+  {
+    "id": "183",
+    "text": "What gives me energy and how can I bring more of it into my life?",
+    "type": "infinity"
+  }
+]
