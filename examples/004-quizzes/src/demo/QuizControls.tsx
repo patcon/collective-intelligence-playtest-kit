@@ -49,7 +49,8 @@ export function QuizControls({ snapshot, onConfig, onStart, onReset }: QuizContr
           value={config.latecomers}
         />
       </div>
-      <p className="text-sm tabular-nums text-kumo-subtle">{progressLine(snapshot)}</p>
+      {/* Two lines kept for it, so counts growing past a wrap don't push the matrix down. */}
+      <p className="min-h-10 text-sm tabular-nums text-kumo-subtle">{progressLine(snapshot)}</p>
       <div className="flex gap-2">
         <Button className="flex-1" disabled={blocker !== null} onClick={onStart} variant="primary">
           Start

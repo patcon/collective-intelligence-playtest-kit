@@ -19,7 +19,7 @@ function thresholdOf(value: string): number | null {
 /** Why the room has fewer sims than the count, if it does. */
 function noticeOf({ short, unconnected }: Simulation): string | null {
   if (unconnected > 0) {
-    return `${unconnected} ${unconnected === 1 ? 'sim' : 'sims'} couldn't connect: this browser caps open WebSockets across all its tabs (Firefox allows 200). Close other tabs, or lower the count.`;
+    return `${unconnected} ${unconnected === 1 ? 'sim' : 'sims'} can't connect yet, most likely the browser's cap on open WebSockets, shared by all its tabs (Firefox allows 200). They keep trying: close other tabs, or lower the count.`;
   }
   return short > 0 ? `${short} fewer than asked for: no one else in the sample skipped that few.` : null;
 }

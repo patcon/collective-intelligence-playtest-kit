@@ -13,8 +13,11 @@ export interface QuizSimOptions {
   onConnectionChange?: () => void;
 }
 
-/** How long a new sim's socket has to open before it counts as unable to connect. */
-export const CONNECT_GRACE_MS = 4000;
+/**
+ * How long a new sim's socket has to open before it counts as unable to connect. Chrome opens sockets to a
+ * host one handshake at a time, so adding 150 sims at once can take several seconds.
+ */
+export const CONNECT_GRACE_MS = 10_000;
 
 /**
  * A participant with no screen, answering as one real person from the sample did: the same protocol as a
