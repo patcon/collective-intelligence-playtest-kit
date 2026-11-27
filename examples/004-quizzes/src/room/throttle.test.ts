@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { HostThrottle } from './hostThrottle.ts';
+import { Throttle } from './throttle.ts';
 
 beforeEach(() => {
   vi.useFakeTimers();
@@ -13,7 +13,7 @@ afterEach(() => {
 function throttled() {
   const room = { version: 0 };
   const sent: Array<number> = [];
-  const throttle = new HostThrottle(() => sent.push(room.version), 250);
+  const throttle = new Throttle(() => sent.push(room.version), 250);
   const change = (urgent = false) => {
     room.version++;
     throttle.changed(urgent);
@@ -21,7 +21,7 @@ function throttled() {
   return { change, sent, throttle };
 }
 
-describe('HostThrottle', () => {
+describe('Throttle', () => {
   it('sends the first change at once', () => {
     const { change, sent } = throttled();
     change();

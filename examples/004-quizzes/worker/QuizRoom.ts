@@ -1,7 +1,7 @@
 import { roleFromUrl, roleOf, sendToRole } from '@playtest-kit/common/server';
 import { Agent } from 'agents';
 import type { Connection, ConnectionContext, WSMessage } from 'agents';
-import { HostThrottle } from '../src/room/hostThrottle.ts';
+import { Throttle } from '../src/room/throttle.ts';
 import { isRole, parseHostMessage, parseParticipantMessage } from '../src/room/protocol.ts';
 import type { Role, ToHost, ToParticipant } from '../src/room/protocol.ts';
 import { DEFAULT_CONFIG, isQuizConfig } from '../src/room/quizConfig.ts';
@@ -16,12 +16,12 @@ type RoomEnv = object;
  * The quiz room. All its logic is the pure `reduce` in `src/room/quizRoom.ts`; this class turns socket
  * events into reducer events and keeps the result with `setState` (so it outlasts hibernation). After a
  * change, whoever it was about gets their own view at once (everyone, for Start, Reset and config), and the
- * host gets a snapshot through `HostThrottle`: at most every 250 ms, but at once for a phase change or the
+ * host gets a snapshot through a `Throttle`: at most every 250 ms, but at once for a phase change or the
  * host's own config change (so its controls don't lag behind it).
  */
 export class QuizRoom extends Agent<RoomEnv, RoomState> {
   initialState: RoomState = INITIAL_ROOM_STATE;
-  #host = new HostThrottle(() => this.sendHost());
+  #host = new Throttle(() => this.sendHost());
 
   getConnectionTags(_connection: Connection, ctx: ConnectionContext): Array<string> {
     return [roleFromUrl(ctx.request.url, isRole, 'participant')];
