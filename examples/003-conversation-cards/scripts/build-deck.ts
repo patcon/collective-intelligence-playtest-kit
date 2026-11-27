@@ -2,6 +2,9 @@
  * Turns `sources/the-and-cards.csv` into the deck the Worker serves (`worker/data/the-and-deck.json`).
  * Run by hand when the CSV changes (`pnpm build:deck`), and commit the output.
  *
+ * `source` says where a card's text comes from: `the-and` for the printed deck, or the person who wrote a custom card
+ * (edition `custom`). It's for record-keeping only and isn't read here.
+ *
  * Placeholder rows (no text or no icon) are kept in the CSV for record-keeping and left out of the deck.
  */
 import { readFileSync, writeFileSync } from 'node:fs';
