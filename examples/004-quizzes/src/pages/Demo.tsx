@@ -1,7 +1,10 @@
-import { Loader } from '@cloudflare/kumo';
+import { Loader, Surface } from '@cloudflare/kumo';
 import { RoomStatusBadge } from '@playtest-kit/ui';
 import { JoinPanel } from '../demo/JoinPanel.tsx';
+import { MatrixLegend } from '../demo/MatrixLegend.tsx';
+import { matrixRows } from '../demo/matrixRows.ts';
 import { QuizControls } from '../demo/QuizControls.tsx';
+import { VoteMatrix } from '../demo/VoteMatrix.tsx';
 import { hostRoom } from '../room/client.ts';
 import { ROOM } from '../room/protocol.ts';
 import { useRoomSnapshot } from '../room/useRoomSnapshot.ts';
@@ -28,16 +31,25 @@ function HostView() {
         </p>
       </header>
       {snapshot ? (
-        <div className="grid items-start gap-4 lg:grid-cols-3">
-          <SimControls simulation={simulation} />
-          <QuizControls
-            onConfig={(config) => send({ config, type: 'config' })}
-            onReset={() => send({ type: 'reset' })}
-            onStart={() => send({ type: 'start' })}
-            snapshot={snapshot}
-          />
-          <JoinPanel />
-        </div>
+        <>
+          <div className="grid items-start gap-4 lg:grid-cols-3">
+            <SimControls simulation={simulation} />
+            <QuizControls
+              onConfig={(config) => send({ config, type: 'config' })}
+              onReset={() => send({ type: 'reset' })}
+              onStart={() => send({ type: 'start' })}
+              snapshot={snapshot}
+            />
+            <JoinPanel />
+          </div>
+          <Surface className="flex flex-col gap-3 rounded-lg p-5">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <h2 className="text-lg font-semibold">Answers</h2>
+              <MatrixLegend />
+            </div>
+            <VoteMatrix rows={matrixRows(snapshot, new Map(simulation.sims.map((sim) => [sim.id, sim.name])))} statements={snapshot.statements} />
+          </Surface>
+        </>
       ) : (
         <Loader />
       )}

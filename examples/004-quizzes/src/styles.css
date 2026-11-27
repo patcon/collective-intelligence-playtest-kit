@@ -34,3 +34,78 @@
     animation: none;
   }
 }
+
+/*
+ * The vote matrix: five answers on a diverging orange–purple scale (readable with the common colour
+ * blindnesses), a skip as a cross, and "not answered yet" as a faint dot. Steps 1–2 and 4–5 carry text-free
+ * meaning by colour; skip and blank differ by shape, not only colour.
+ */
+:root {
+  --vote-cell: 1.125rem;
+  --vote-1: #b35806;
+  --vote-2: #f1a340;
+  --vote-3: #c9c9c9;
+  --vote-4: #998ec3;
+  --vote-5: #542788;
+  --vote-mark: #555;
+  --vote-blank: #e4e4e4;
+}
+
+[data-mode='dark'] {
+  --vote-1: #e08214;
+  --vote-2: #fdb863;
+  --vote-3: #6e6e6e;
+  --vote-4: #b2abd2;
+  --vote-5: #8073ac;
+  --vote-mark: #bbb;
+  --vote-blank: #333;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-mode='light']) {
+    --vote-1: #e08214;
+    --vote-2: #fdb863;
+    --vote-3: #6e6e6e;
+    --vote-4: #b2abd2;
+    --vote-5: #8073ac;
+    --vote-mark: #bbb;
+    --vote-blank: #333;
+  }
+}
+
+.vote-cell {
+  display: inline-block;
+  width: var(--vote-cell);
+  height: var(--vote-cell);
+  border-radius: 2px;
+}
+
+.vote-1 {
+  background: var(--vote-1);
+}
+.vote-2 {
+  background: var(--vote-2);
+}
+.vote-3 {
+  background: var(--vote-3);
+}
+.vote-4 {
+  background: var(--vote-4);
+}
+.vote-5 {
+  background: var(--vote-5);
+}
+
+.vote-skip {
+  background:
+    linear-gradient(45deg, transparent 43%, var(--vote-mark) 43% 57%, transparent 57%),
+    linear-gradient(-45deg, transparent 43%, var(--vote-mark) 43% 57%, transparent 57%);
+}
+
+.vote-blank {
+  background: radial-gradient(circle, var(--vote-blank) 30%, transparent 32%);
+}
+
+.vote-matrix {
+  line-height: var(--vote-cell);
+}
