@@ -2,14 +2,11 @@ import { Badge } from '@cloudflare/kumo';
 import type { ReactNode } from 'react';
 import type { ApiExchange } from './cardsApi.ts';
 
-/** The endpoint, the request and the formatted response of one call to the card service. */
+/** The request and the formatted response of one call to the card service. */
 export function ApiExchangeView({ exchange }: { exchange: ApiExchange }) {
   const ok = exchange.status >= 200 && exchange.status < 300;
   return (
     <section aria-label="API call" className="flex flex-col gap-2 rounded-md border border-kumo-fill bg-kumo-base p-3 text-sm">
-      <Row label="Endpoint">
-        <code className="font-mono">{exchange.endpoint}</code>
-      </Row>
       <Row label="Request">
         <code className="font-mono break-all">GET {exchange.request}</code>
       </Row>

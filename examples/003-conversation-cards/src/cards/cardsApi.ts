@@ -2,10 +2,8 @@ import type { Card, CardFilters, CardsResponse } from '../../worker/cards/types.
 
 const BASE = '/api/cards';
 
-/** One request to the card service and what came back, as the page shows it when "Show API calls" is on. */
+/** One request to the card service and what came back, as the page's "API call" tabs show it. */
 export interface ApiExchange {
-  /** The route, e.g. `GET /api/cards/random`. */
-  readonly endpoint: string;
   /** The URL requested, with its query. */
   readonly request: string;
   readonly status: number;
@@ -31,19 +29,19 @@ export class ApiError extends Error {
 
 /** Every card the filters allow, in deck order. */
 export async function requestCards(filters: CardFilters = {}): Promise<Exchanged<CardsResponse>> {
-  const { body, exchange } = await send(`GET ${BASE}`, `${BASE}${queryOf(filters)}`);
+  const { body, exchange } = await send(`${BASE}${queryOf(filters)}`);
   return { data: parseCardsResponse(body, exchange), exchange };
 }
 
 /** Up to `limit` cards drawn at random from the pool the filters allow. */
 export async function requestDraw(filters: CardFilters, limit: number): Promise<Exchanged<CardsResponse>> {
-  const { body, exchange } = await send(`GET ${BASE}/random`, `${BASE}/random${queryOf(filters, limit)}`);
+  const { body, exchange } = await send(`${BASE}/random${queryOf(filters, limit)}`);
   return { data: parseCardsResponse(body, exchange), exchange };
 }
 
 /** The card with `id`, or `null` if the deck has none. */
 export async function requestCard(id: string): Promise<Exchanged<Card | null>> {
-  const { body, exchange } = await send(`GET ${BASE}/:cardId`, `${BASE}/${encodeURIComponent(id)}`, [404]);
+  const { body, exchange } = await send(`${BASE}/${encodeURIComponent(id)}`, [404]);
   if (exchange.status === 404) {
     return { data: null, exchange };
   }
@@ -82,11 +80,7 @@ function queryOf({ type, ids, exclude }: CardFilters, limit?: number): string {
 }
 
 /** GETs `url` and reads its JSON body; throws an `ApiError` unless the status is OK or one of `expected`. */
-async function send(
-  endpoint: string,
-  url: string,
-  expected: ReadonlyArray<number> = [],
-): Promise<{ body: unknown; exchange: ApiExchange }> {
+async function send(url: string, expected: ReadonlyArray<number> = []): Promise<{ body: unknown; exchange: ApiExchange }> {
   const response = await fetch(url);
   const text = await response.text();
   let body: unknown;
@@ -97,7 +91,6 @@ async function send(
     body = undefined;
   }
   const exchange: ApiExchange = {
-    endpoint,
     request: url,
     status: response.status,
     response: body === undefined ? text : JSON.stringify(body, null, 2),

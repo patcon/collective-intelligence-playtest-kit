@@ -1,17 +1,17 @@
 import { Banner, Button, Input } from '@cloudflare/kumo';
 import { MagnifyingGlassIcon } from '@phosphor-icons/react';
 import { useState } from 'react';
+import type { ReactNode } from 'react';
 import type { Card } from '../../worker/cards/types.ts';
-import { ApiExchangeView } from './ApiExchangeView.tsx';
 import { exchangeOf, messageOf, requestCard } from './cardsApi.ts';
 import type { ApiExchange } from './cardsApi.ts';
 import { CardView } from './CardView.tsx';
-import type { ViewOptions } from './viewOptions.ts';
+import { ResultTabs } from './ResultTabs.tsx';
 
 type Lookup = { card: Card } | { missing: string } | { error: string } | null;
 
 /** Shows one card by id: what each phone does when a server picks a card for everyone and sends its id. */
-export function CardLookup({ view }: { view: ViewOptions }) {
+export function CardLookup({ printed }: { printed: boolean }) {
   const [id, setId] = useState('');
   const [lookup, setLookup] = useState<Lookup>(null);
   const [exchange, setExchange] = useState<ApiExchange | null>(null);
@@ -45,10 +45,24 @@ export function CardLookup({ view }: { view: ViewOptions }) {
           Show
         </Button>
       </form>
-      {view.showApi && exchange && <ApiExchangeView exchange={exchange} />}
-      {lookup && 'card' in lookup && <CardView card={lookup.card} printed={view.printed} />}
-      {lookup && 'missing' in lookup && <Banner description={`There's no card #${lookup.missing}.`} variant="secondary" />}
-      {lookup && 'error' in lookup && <Banner description={lookup.error} variant="alert" />}
+      {lookup && (
+        <LookupResult exchange={exchange}>
+          {'card' in lookup && <CardView card={lookup.card} printed={printed} />}
+          {'missing' in lookup && <Banner description={`There's no card #${lookup.missing}.`} variant="secondary" />}
+          {'error' in lookup && <Banner description={lookup.error} variant="alert" />}
+        </LookupResult>
+      )}
     </div>
+  );
+}
+
+/** The result in tabs when the request got a response; on its own when it didn't (e.g. offline). */
+function LookupResult({ exchange, children }: { exchange: ApiExchange | null; children: ReactNode }) {
+  return exchange ? (
+    <ResultTabs exchange={exchange} label="Card">
+      {children}
+    </ResultTabs>
+  ) : (
+    children
   );
 }
