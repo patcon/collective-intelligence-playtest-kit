@@ -1,0 +1,75 @@
+/*
+ * The physical card, 2.5 × 3.5 in (poker size). Everything inside scales with --w. Paper and ink are
+ * fixed colours, not theme tokens: the card looks like paper in light and dark mode alike.
+ */
+.printed-card {
+  --w: 240px;
+  --paper: #fbfaf7;
+  --ink: #2b2b2b;
+  position: relative;
+  width: var(--w);
+  aspect-ratio: 5 / 7;
+  background: var(--paper);
+  color: var(--ink);
+  border-radius: calc(var(--w) * 0.06);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.25);
+  font-family: 'Josefin Sans', 'Montserrat', system-ui, sans-serif;
+  font-size: calc(var(--w) * 0.04);
+}
+
+/* The double-line frame. */
+.printed-card::before,
+.printed-card::after {
+  content: '';
+  position: absolute;
+  border: 1px solid var(--ink);
+  pointer-events: none;
+}
+.printed-card::before {
+  inset: calc(var(--w) * 0.075);
+}
+.printed-card::after {
+  inset: calc(var(--w) * 0.095);
+}
+
+/* The glyph's badge, straddling the top of the frame. */
+.printed-card__badge {
+  position: absolute;
+  left: 50%;
+  top: calc(var(--w) * 0.085);
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: calc(var(--w) * 0.13);
+  height: calc(var(--w) * 0.13);
+  transform: translate(-50%, -50%);
+  background: var(--paper);
+  border: 1px solid var(--ink);
+}
+.printed-card__glyph {
+  width: 72%;
+  height: 72%;
+}
+
+.printed-card__text {
+  position: absolute;
+  left: 18%;
+  right: 18%;
+  top: 22%;
+  margin: 0;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  line-height: 1.9;
+}
+
+/* Under the frame, its right edge flush with the frame's outer line. */
+.printed-card__meta {
+  position: absolute;
+  bottom: calc(var(--w) * 0.03);
+  right: calc(var(--w) * 0.075);
+  line-height: 1;
+  font-size: 0.7em;
+  letter-spacing: 0.05em;
+  color: #8a857f;
+}

@@ -1,6 +1,6 @@
 *.apk
 *.xapk
-sources/images/
+examples/003-conversation-card-service/sources/images/
 node_modules/
 dist/
 .cccc.cache

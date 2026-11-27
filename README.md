@@ -8,12 +8,12 @@ My intention for this repository is to be an evolving toolkit for running a week
 
 ## Deploying
 
-Each app in `examples/` deploys as its own Cloudflare Worker (with its Durable Object), and
+Each app in `examples/` deploys as its own Cloudflare Worker (with any Durable Objects it uses), and
 [`landing/`](landing) deploys a page linking to each. From the repo root:
 
 ```sh
 pnpm deploy:setup   # once per machine: connect Alchemy to your Cloudflare account
-pnpm run deploy     # 001, then 002, then the landing page; prints each URL
+pnpm run deploy     # 001, 002, 003, then the landing page; prints each URL
 pnpm run destroy    # the reverse
 ```
 
