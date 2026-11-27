@@ -1,0 +1,386 @@
+{
+  "source": "https://openpsychometrics.org/tests/IPIP-BFFM/",
+  "origin": "IPIP 50-item Big-Five Factor Markers (Goldberg, 1992), https://ipip.ori.org/new_ipip-50-item-scale.htm",
+  "instructions": "Rate how true each statement is about you.",
+  "scale": [
+    {
+      "value": 1,
+      "label": "Disagree"
+    },
+    {
+      "value": 2,
+      "label": "Slightly disagree"
+    },
+    {
+      "value": 3,
+      "label": "Neutral"
+    },
+    {
+      "value": 4,
+      "label": "Slightly agree"
+    },
+    {
+      "value": 5,
+      "label": "Agree"
+    }
+  ],
+  "factors": {
+    "EXT": "Extraversion",
+    "AGR": "Agreeableness",
+    "CSN": "Conscientiousness",
+    "EST": "Emotional stability",
+    "OPN": "Openness"
+  },
+  "items": [
+    {
+      "id": "EXT1",
+      "order": 1,
+      "factor": "EXT",
+      "keyed": 1,
+      "text": "I am the life of the party."
+    },
+    {
+      "id": "AGR1",
+      "order": 2,
+      "factor": "AGR",
+      "keyed": -1,
+      "text": "I feel little concern for others."
+    },
+    {
+      "id": "EST1",
+      "order": 3,
+      "factor": "EST",
+      "keyed": -1,
+      "text": "I get stressed out easily."
+    },
+    {
+      "id": "CSN1",
+      "order": 4,
+      "factor": "CSN",
+      "keyed": 1,
+      "text": "I am always prepared."
+    },
+    {
+      "id": "OPN1",
+      "order": 5,
+      "factor": "OPN",
+      "keyed": 1,
+      "text": "I have a rich vocabulary."
+    },
+    {
+      "id": "EXT2",
+      "order": 6,
+      "factor": "EXT",
+      "keyed": -1,
+      "text": "I don't talk a lot."
+    },
+    {
+      "id": "AGR2",
+      "order": 7,
+      "factor": "AGR",
+      "keyed": 1,
+      "text": "I am interested in people."
+    },
+    {
+      "id": "EST2",
+      "order": 8,
+      "factor": "EST",
+      "keyed": 1,
+      "text": "I am relaxed most of the time."
+    },
+    {
+      "id": "CSN2",
+      "order": 9,
+      "factor": "CSN",
+      "keyed": -1,
+      "text": "I leave my belongings around."
+    },
+    {
+      "id": "OPN2",
+      "order": 10,
+      "factor": "OPN",
+      "keyed": -1,
+      "text": "I have difficulty understanding abstract ideas."
+    },
+    {
+      "id": "EXT3",
+      "order": 11,
+      "factor": "EXT",
+      "keyed": 1,
+      "text": "I feel comfortable around people."
+    },
+    {
+      "id": "AGR3",
+      "order": 12,
+      "factor": "AGR",
+      "keyed": -1,
+      "text": "I insult people."
+    },
+    {
+      "id": "EST3",
+      "order": 13,
+      "factor": "EST",
+      "keyed": -1,
+      "text": "I worry about things."
+    },
+    {
+      "id": "CSN3",
+      "order": 14,
+      "factor": "CSN",
+      "keyed": 1,
+      "text": "I pay attention to details."
+    },
+    {
+      "id": "OPN3",
+      "order": 15,
+      "factor": "OPN",
+      "keyed": 1,
+      "text": "I have a vivid imagination."
+    },
+    {
+      "id": "EXT4",
+      "order": 16,
+      "factor": "EXT",
+      "keyed": -1,
+      "text": "I keep in the background."
+    },
+    {
+      "id": "AGR4",
+      "order": 17,
+      "factor": "AGR",
+      "keyed": 1,
+      "text": "I sympathize with others' feelings."
+    },
+    {
+      "id": "EST4",
+      "order": 18,
+      "factor": "EST",
+      "keyed": 1,
+      "text": "I seldom feel blue."
+    },
+    {
+      "id": "CSN4",
+      "order": 19,
+      "factor": "CSN",
+      "keyed": -1,
+      "text": "I make a mess of things."
+    },
+    {
+      "id": "OPN4",
+      "order": 20,
+      "factor": "OPN",
+      "keyed": -1,
+      "text": "I am not interested in abstract ideas."
+    },
+    {
+      "id": "EXT5",
+      "order": 21,
+      "factor": "EXT",
+      "keyed": 1,
+      "text": "I start conversations."
+    },
+    {
+      "id": "AGR5",
+      "order": 22,
+      "factor": "AGR",
+      "keyed": -1,
+      "text": "I am not interested in other people's problems."
+    },
+    {
+      "id": "EST5",
+      "order": 23,
+      "factor": "EST",
+      "keyed": -1,
+      "text": "I am easily disturbed."
+    },
+    {
+      "id": "CSN5",
+      "order": 24,
+      "factor": "CSN",
+      "keyed": 1,
+      "text": "I get chores done right away."
+    },
+    {
+      "id": "OPN5",
+      "order": 25,
+      "factor": "OPN",
+      "keyed": 1,
+      "text": "I have excellent ideas."
+    },
+    {
+      "id": "EXT6",
+      "order": 26,
+      "factor": "EXT",
+      "keyed": -1,
+      "text": "I have little to say."
+    },
+    {
+      "id": "AGR6",
+      "order": 27,
+      "factor": "AGR",
+      "keyed": 1,
+      "text": "I have a soft heart."
+    },
+    {
+      "id": "EST6",
+      "order": 28,
+      "factor": "EST",
+      "keyed": -1,
+      "text": "I get upset easily."
+    },
+    {
+      "id": "CSN6",
+      "order": 29,
+      "factor": "CSN",
+      "keyed": -1,
+      "text": "I often forget to put things back in their proper place."
+    },
+    {
+      "id": "OPN6",
+      "order": 30,
+      "factor": "OPN",
+      "keyed": -1,
+      "text": "I do not have a good imagination."
+    },
+    {
+      "id": "EXT7",
+      "order": 31,
+      "factor": "EXT",
+      "keyed": 1,
+      "text": "I talk to a lot of different people at parties."
+    },
+    {
+      "id": "AGR7",
+      "order": 32,
+      "factor": "AGR",
+      "keyed": -1,
+      "text": "I am not really interested in others."
+    },
+    {
+      "id": "EST7",
+      "order": 33,
+      "factor": "EST",
+      "keyed": -1,
+      "text": "I change my mood a lot."
+    },
+    {
+      "id": "CSN7",
+      "order": 34,
+      "factor": "CSN",
+      "keyed": 1,
+      "text": "I like order."
+    },
+    {
+      "id": "OPN7",
+      "order": 35,
+      "factor": "OPN",
+      "keyed": 1,
+      "text": "I am quick to understand things."
+    },
+    {
+      "id": "EXT8",
+      "order": 36,
+      "factor": "EXT",
+      "keyed": -1,
+      "text": "I don't like to draw attention to myself."
+    },
+    {
+      "id": "AGR8",
+      "order": 37,
+      "factor": "AGR",
+      "keyed": 1,
+      "text": "I take time out for others."
+    },
+    {
+      "id": "EST8",
+      "order": 38,
+      "factor": "EST",
+      "keyed": -1,
+      "text": "I have frequent mood swings."
+    },
+    {
+      "id": "CSN8",
+      "order": 39,
+      "factor": "CSN",
+      "keyed": -1,
+      "text": "I shirk my duties."
+    },
+    {
+      "id": "OPN8",
+      "order": 40,
+      "factor": "OPN",
+      "keyed": 1,
+      "text": "I use difficult words."
+    },
+    {
+      "id": "EXT9",
+      "order": 41,
+      "factor": "EXT",
+      "keyed": 1,
+      "text": "I don't mind being the center of attention."
+    },
+    {
+      "id": "AGR9",
+      "order": 42,
+      "factor": "AGR",
+      "keyed": 1,
+      "text": "I feel others' emotions."
+    },
+    {
+      "id": "EST9",
+      "order": 43,
+      "factor": "EST",
+      "keyed": -1,
+      "text": "I get irritated easily."
+    },
+    {
+      "id": "CSN9",
+      "order": 44,
+      "factor": "CSN",
+      "keyed": 1,
+      "text": "I follow a schedule."
+    },
+    {
+      "id": "OPN9",
+      "order": 45,
+      "factor": "OPN",
+      "keyed": 1,
+      "text": "I spend time reflecting on things."
+    },
+    {
+      "id": "EXT10",
+      "order": 46,
+      "factor": "EXT",
+      "keyed": -1,
+      "text": "I am quiet around strangers."
+    },
+    {
+      "id": "AGR10",
+      "order": 47,
+      "factor": "AGR",
+      "keyed": 1,
+      "text": "I make people feel at ease."
+    },
+    {
+      "id": "EST10",
+      "order": 48,
+      "factor": "EST",
+      "keyed": -1,
+      "text": "I often feel blue."
+    },
+    {
+      "id": "CSN10",
+      "order": 49,
+      "factor": "CSN",
+      "keyed": 1,
+      "text": "I am exacting in my work."
+    },
+    {
+      "id": "OPN10",
+      "order": 50,
+      "factor": "OPN",
+      "keyed": 1,
+      "text": "I am full of ideas."
+    }
+  ]
+}
