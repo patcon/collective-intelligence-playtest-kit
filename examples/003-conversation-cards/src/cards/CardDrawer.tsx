@@ -4,6 +4,7 @@ import { use } from 'react';
 import type { CardsResponse } from '../../worker/cards/types.ts';
 import { CardView } from './CardView.tsx';
 import { DrawControls } from './DrawControls.tsx';
+import { SeenCount } from './SeenCount.tsx';
 import { useCardDraws } from './useCardDraws.ts';
 
 /** Draw controls and the cards drawn, excluding seen cards. Suspends until `deck` (every card) loads. */
@@ -18,7 +19,7 @@ export function CardDrawer({ deck, printed }: { deck: Promise<CardsResponse>; pr
       <div className="flex items-center gap-3 text-sm text-kumo-subtle">
         <span>
           {drawMeta ? `Drawn from a pool of ${drawMeta.pool} of ${drawMeta.total}` : `${meta.total} cards in the deck`} ·{' '}
-          {seen.length} seen
+          <SeenCount seen={seen} />
         </span>
         <Button className="ml-auto" disabled={seen.length === 0} icon={<ArrowCounterClockwiseIcon />} onClick={reset} size="sm">
           Reset seen
