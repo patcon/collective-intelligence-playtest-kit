@@ -99,13 +99,13 @@ function isParticipantSummary(value: unknown): value is ParticipantSummary {
   );
 }
 
+function hasRoomHeader(value: unknown): value is Pick<RoomSnapshot, 'phase' | 'config'> {
+  return isObject(value) && 'phase' in value && (value.phase === 'lobby' || value.phase === 'quiz') && 'config' in value && isQuizConfig(value.config);
+}
+
 export function isRoomSnapshot(value: unknown): value is RoomSnapshot {
   return (
-    isObject(value) &&
-    'phase' in value &&
-    (value.phase === 'lobby' || value.phase === 'quiz') &&
-    'config' in value &&
-    isQuizConfig(value.config) &&
+    hasRoomHeader(value) &&
     'statements' in value &&
     isItemIdList(value.statements) &&
     'participants' in value &&
