@@ -1,6 +1,4 @@
-import { useState, useSyncExternalStore } from 'react';
-import { useDisposeOnUnmount } from '../hooks/effects/useDisposeOnUnmount.ts';
-import { connectToRoom } from '@playtest-kit/common/simulation';
+import { connectToRoom, useSimCrowd } from '@playtest-kit/common/simulation';
 import { AGENT } from '../room/protocol.ts';
 import { SimulatedCrowd } from './SimulatedCrowd.ts';
 import type { CrowdState } from './SimulatedCrowd.ts';
@@ -13,9 +11,7 @@ export interface Simulation extends CrowdState {
 
 /** Simulated participants in `room`, for as long as the calling component is mounted. */
 export function useSimulation(room: string): Simulation {
-  const [crowd] = useState(() => new SimulatedCrowd(connectToRoom(AGENT, room)));
-  useDisposeOnUnmount(crowd);
-  const state = useSyncExternalStore(crowd.subscribe, crowd.getState);
+  const { crowd, state } = useSimCrowd(() => new SimulatedCrowd(connectToRoom(AGENT, room)));
 
   return {
     ...state,

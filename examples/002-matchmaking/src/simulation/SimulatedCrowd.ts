@@ -1,15 +1,9 @@
-import { newSimId, randomDelay } from '@playtest-kit/common/simulation';
-import type { ConnectSim } from '@playtest-kit/common/simulation';
+import { newSimId, randomDelay, SimCrowd } from '@playtest-kit/common/simulation';
+import type { ConnectSim, SimSummary } from '@playtest-kit/common/simulation';
 import { SimulatedParticipant } from './SimulatedParticipant.ts';
 
 /** The most simulated participants a page runs at once. */
 export const MAX_SIMS = 50;
-
-export interface SimSummary {
-  id: string;
-  /** "Sim 1", "Sim 2"…, by position. */
-  name: string;
-}
 
 export interface CrowdState {
   autoConfirm: boolean;
@@ -22,19 +16,22 @@ function tapDelay(): number {
 }
 
 /**
- * Every simulated participant on this page, as a store React can read (`subscribe`, `getState`).
- * Adding sims connects them; removing them closes their sockets, so the room hears them leave.
+ * Every simulated participant on this page, as a store React can read (`subscribe`, `getState`): the
+ * shared `SimCrowd`, plus auto-confirm, which applies to every sim, and tapping "found them" for one.
  */
 export class SimulatedCrowd {
-  #connect: ConnectSim;
-  #delay: () => number;
+  #autoConfirm = true;
+  #crowd: SimCrowd<SimulatedParticipant>;
   #listeners = new Set<() => void>();
-  #sims: Array<SimulatedParticipant> = [];
   #state: CrowdState = { autoConfirm: true, sims: [] };
 
   constructor(connect: ConnectSim, delay: () => number = tapDelay) {
-    this.#connect = connect;
-    this.#delay = delay;
+    this.#crowd = new SimCrowd({
+      build: (id) => new SimulatedParticipant({ autoConfirm: this.#autoConfirm, connect, delay, id }),
+      limit: MAX_SIMS,
+      newId: newSimId,
+    });
+    this.#crowd.subscribe(() => this.#publish());
   }
 
   subscribe = (listener: () => void): (() => void) => {
@@ -46,36 +43,28 @@ export class SimulatedCrowd {
 
   /** Adds or removes sims, newest first out, to make `count` (kept within 0 and `MAX_SIMS`). */
   setCount(count: number): void {
-    const target = Math.max(0, Math.min(MAX_SIMS, Math.round(count)));
-    while (this.#sims.length < target) {
-      const { autoConfirm } = this.#state;
-      this.#sims.push(new SimulatedParticipant({ autoConfirm, connect: this.#connect, delay: this.#delay, id: newSimId() }));
-    }
-    for (const sim of this.#sims.splice(target)) {
-      sim.dispose();
-    }
-    this.#publish();
+    this.#crowd.setCount(count);
   }
 
   setAutoConfirm(on: boolean): void {
-    for (const sim of this.#sims) {
+    this.#autoConfirm = on;
+    for (const sim of this.#crowd.sims) {
       sim.setAutoConfirm(on);
     }
-    this.#state = { ...this.#state, autoConfirm: on };
     this.#publish();
   }
 
   /** Taps "found them" for one sim, by id. */
   found(id: string): void {
-    this.#sims.find((sim) => sim.id === id)?.found();
+    this.#crowd.sims.find((sim) => sim.id === id)?.found();
   }
 
   dispose(): void {
-    this.setCount(0);
+    this.#crowd.dispose();
   }
 
   #publish(): void {
-    this.#state = { ...this.#state, sims: this.#sims.map((sim, i) => ({ id: sim.id, name: `Sim ${i + 1}` })) };
+    this.#state = { autoConfirm: this.#autoConfirm, sims: this.#crowd.getState().sims };
     for (const listener of this.#listeners) {
       listener();
     }

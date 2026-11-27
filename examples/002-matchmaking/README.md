@@ -31,7 +31,7 @@ The design is in [`docs/specs/matchmaking.md`](../../docs/specs/matchmaking.md).
 | `src/room/client.ts` | `participantRoom` and `hostRoom`, from `createRoomClient` |
 | `src/activity/` | `ActivityCard`: a placeholder for the activity after matching, shown to participants and the emcee |
 | `src/demo/` | `/demo`'s panels: `ConfigPanels`, `EmceePane` (shown in a `PhoneFrame`, since it's what the emcee holds), `JoinPanel`, `ParticipantCards` |
-| `src/simulation/` | Headless participants (`SimulatedParticipant`, `SimulatedCrowd`, `useSimulation`) on their own sockets. Lint lets it import only `room/protocol.ts` and effect hooks from the rest of the app, so it can only do what a phone can |
+| `src/simulation/` | Headless participants (`SimulatedParticipant`, `SimulatedCrowd`, `useSimulation`) on their own sockets, built on the shared crowd in `@playtest-kit/common/simulation`. Lint lets it import only `room/protocol.ts` and effect hooks from the rest of the app, so it can only do what a phone can |
 | `worker/MatchRoom.ts` | Thin `Agent`: socket events in, `setState`, views and snapshots out |
 
 ## Patterns
@@ -95,7 +95,7 @@ simulation code. So whatever works for 20 sims works for 20 phones.
 ### Share only what two examples use
 
 `@playtest-kit/common` (non-visual) and `@playtest-kit/ui` (components) hold only what both `001` and
-`002` use. Matching, cues, phases and the simulation stay here until another example needs them.
+`002` use. Matching, cues and phases stay here until another example needs them. The generic parts of the simulation (sim ids, sockets, the crowd) moved to `@playtest-kit/common/simulation` when `004` needed them; what a sim does stays here.
 `ui` may depend on `common`, never the reverse.
 
 ## Scripts
