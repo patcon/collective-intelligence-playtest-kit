@@ -1,177 +1,251 @@
-# Tasks: GroupSegmentWizard drives the room's grouping
+# Tasks: Personality quiz example, and shared simulation code
 
-Plan: [`plan.md`](plan.md). Spec: [`docs/specs/group-segment-wizard.md`](../docs/specs/group-segment-wizard.md). Paths are relative to `examples/002-matchmaking/`. Commands run there: `pnpm test`, `pnpm typecheck`, `pnpm lint`. Browser checks use `mise exec node@24.16.0 -- agent-browser`.
+Plan: [`plan.md`](plan.md). Spec: [`docs/specs/personality-quiz.md`](../docs/specs/personality-quiz.md). Paths are relative to the repo root. In each package, `pnpm test`, `pnpm typecheck`, `pnpm lint` and `pnpm build` (where it has one) run there. Browser checks use `mise exec node@24.16.0 -- agent-browser`.
 
-## Phase 1: Grouping model
+## Phase 1: Shared simulation (`shared-simulation`)
 
-### Task 0: Rename `Grouping`'s fields to `groupSize` / `groupCount`
+### Task 1: Sim ids, socket types, `connectToRoom`, `randomDelay` and `straySimIds` move to `common/simulation`
 
-**Description:** A rename only, with no change in behaviour: `{ by: 'size'; size }` becomes `{ by: 'groupSize'; groupSize }` and `{ by: 'count'; count }` becomes `{ by: 'groupCount'; groupCount }`, in the type, the validation, the default, and every reader and test. The prototype's own `Locked = 'groups' | 'size'` is UI state, not this type, so it's left alone.
+**Description:** Create `packages/common/src/simulation/` behind a new `./simulation` export. Move `newSimId`, `isSimId`, the `sim-` prefix, `SimSocket` and `ConnectSim` there unchanged. `connectToRoom` takes the agent name (and role, default `participant`) instead of importing `002`'s `AGENT`. `randomDelay(minMs, maxMs)` replaces `002`'s fixed 2–8 s, and `straySimIds` takes a list of participant ids and this page's sim ids instead of `002`'s snapshot. `002` imports all of them and deletes its copies. No change in `002`'s behaviour.
 
 **Acceptance criteria:**
-- [x] No `by: 'size'` / `by: 'count'` / `grouping.size` / `grouping.count` left anywhere in `src` or `worker`.
-- [x] The existing tests pass, changed only to use the new names.
+- [ ] `@playtest-kit/common/simulation` exports these; `.` and `./server` don't, and nothing under `common/src/server` imports them.
+- [ ] `isSimId`, `randomDelay` (stays in range, injected random) and `straySimIds` have tests in `common`; `002`'s `straySimIds.test.ts` moves there, adapted to ids.
+- [ ] `002` has no own copy of these; its tests pass.
 
-**Verification:** `pnpm test` · `pnpm typecheck` · `pnpm lint`
+**Verification:** `pnpm test`, `pnpm typecheck`, `pnpm lint` in `packages/common` and `examples/002-matchmaking`; `pnpm build` in `002`.
 
 **Dependencies:** None
 
-**Files likely touched:** `src/matching/match.ts`, `src/room/matchConfig.ts`, `src/demo/ConfigPanels.tsx`, `src/demo/EmceePane.tsx`, and the tests that build groupings (`match`, `matchRoom`, `protocol`, `startBlocker`, `repeatWarning`, `straySimIds`)
-
-**Estimated scope:** Medium (10 files, but mechanical)
-
-### Task 1: `Grouping` gains `fit`; `groupSizes` in `split.ts`
-
-**Description:** Add `Fit` and the `fit` field to the `groupSize` branch of `Grouping`. Port `sizesOf` / `sizesForSize` from the prototype into `src/matching/split.ts` as `groupSizes(n, grouping)`. Validation requires `fit`. The default is group size 3, Smart. `ConfigPanels` keeps working by setting `fit: 'smart'` when it builds a group-size grouping (it gets deleted in T7).
-
-**Acceptance criteria:**
-- [x] Every worked example in the spec's Behaviour section is a passing case in `split.test.ts`, including `20 at Min 15 → 15·5` and `0 at count 3 → 0·0·0`.
-- [x] Table test over n = 0..50 × count 2..6 × size 2..5 × each fit: sizes sum to n, there are at least 2 groups, and they're largest first.
-- [x] `isMatchConfig` rejects a group-size grouping with no `fit` or an unknown `fit`, and the old `{ by: 'size', size }` shape (`protocol.test.ts`).
-
-**Verification:** `pnpm test` · `pnpm typecheck` · `pnpm lint`
-
-**Dependencies:** T0
-
-**Files likely touched:** `src/matching/match.ts`, `src/matching/split.ts` (new), `src/matching/split.test.ts` (new), `src/room/matchConfig.ts`, `src/room/protocol.test.ts`, `src/demo/ConfigPanels.tsx`
+**Files likely touched:** `packages/common/package.json`, `packages/common/src/simulation/{simIds,connectToRoom,randomDelay,straySimIds}.ts` (+ tests), `packages/common/src/simulation.ts` (entry), `examples/002-matchmaking/src/simulation/{SimulatedCrowd,SimulatedParticipant,connectToRoom}.ts`, `examples/002-matchmaking/src/demo/straySimIds.ts` (deleted), `examples/002-matchmaking/src/pages/Demo.tsx`
 
 **Estimated scope:** Medium
 
-### Task 2: One `startBlocker` for the UI and the room
+### Task 2: A generic crowd and its hook move to `common/simulation`; `002`'s crowd is built on it
 
-**Description:** Move `startBlocker` to `split.ts` as `startBlocker(ready, grouping, maxDistinct)`, built on `groupSizes`, with every blocker in the spec: fewer than 2 ready, anyone alone, more groups than the cue tells apart, or a group short of a Min. Add `groupConcerns`. The reducer's `start` and `EmceePane` both call it. `EmceePane` keeps its prototype blocker until T5.
+**Description:** Add a generic crowd to `common/simulation`: a store (`subscribe` / `getState`) of sims built by a factory `(id) => Sim` (where a `Sim` has `id` and `dispose()`), with `setCount` kept within 0 and a limit given to the constructor, newest out first, and names "Sim 1"… by position. Add a hook that owns a crowd for a component's life, and move `useDisposeOnUnmount` to `common/hooks/effects/`. `002`'s `SimulatedCrowd` keeps auto-confirm and `found(id)` on top of the generic crowd (limit 50), and its `useSimulation` wraps the shared hook.
 
 **Acceptance criteria:**
-- [x] `split.test.ts` has a case for each blocker, plus "short of Min blocks" (17 at Min 12) and "Max with a small last group doesn't block" (13 at Max 3).
-- [x] `matchRoom.test.ts`: `start` leaves the state unchanged for each blocker, including too many groups for the cue.
-- [x] `src/demo/startBlocker.ts` and its test are gone. Nothing imports `smallestGroupSize`.
+- [ ] The generic crowd has tests in `common`: limit, newest out first, names, `dispose` closes every sim, listeners told on each change.
+- [ ] `002`'s `SimulatedCrowd.test.ts` and `SimulatedParticipant.test.ts` pass unchanged (apart from imports).
+- [ ] `packages/common/README.md` documents the `simulation` export.
 
-**Verification:** `pnpm test` · `pnpm typecheck` · `pnpm lint`
+**Verification:** `pnpm test`, `pnpm typecheck`, `pnpm lint` in `packages/common` and `002`; `pnpm build` in `002`.
 
 **Dependencies:** T1
 
-**Files likely touched:** `src/matching/split.ts`, `src/matching/split.test.ts`, `src/room/matchRoom.ts`, `src/room/matchRoom.test.ts`, `src/demo/EmceePane.tsx`, `src/demo/startBlocker.ts` (+ test, deleted)
+**Files likely touched:** `packages/common/src/simulation/{SimCrowd,useSimCrowd}.ts` (+ test), `packages/common/src/hooks/effects/useDisposeOnUnmount.ts`, `packages/common/src/{index,simulation}.ts`, `packages/common/README.md`, `examples/002-matchmaking/src/simulation/{SimulatedCrowd,useSimulation}.ts`, `examples/002-matchmaking/src/hooks/effects/useDisposeOnUnmount.ts` (deleted)
 
 **Estimated scope:** Medium
 
-### Task 3: `match` deals into `groupSizes`
+## Checkpoint A
 
-**Description:** `match` splits the algorithm's ordered ids into chunks of `groupSizes(n, grouping)` instead of dealing round-robin. Delete `groupCount` and `smallestGroupSize`. Update the doc comments on `match` and `ALGORITHMS`: neighbours now share a group.
+- [ ] `packages/common` and `002`: test, typecheck, lint; `002` builds.
+- [ ] Manual check of `002` on `/demo`: add and remove sims (up to 50), auto-confirm on and off, "found them" on a sim's card, clear stray sims from a second tab.
+- [ ] Review before Phase 3 builds on it.
 
-**Acceptance criteria:**
-- [x] `match.test.ts`: the group sizes `match` returns equal `groupSizes` across the T1 table. Every id is in exactly one group.
-- [x] `matchRoom.test.ts`: a started round's group sizes follow `groupSizes`, e.g. 32 at Min 15 → `16·16` and 13 at Min 3 → `4·3·3·3`. (20 at Min 15 is blocked by T2, so it can't start.)
-- [x] Neither `groupCount` nor `smallestGroupSize` is left anywhere in the code.
+## Phase 2: Quiz core (`quiz-core`)
 
-**Verification:** `pnpm test` · `pnpm typecheck` · `pnpm lint`
+### Task 3: Scaffold `004` from the template into the existing folder
 
-**Dependencies:** T2
-
-**Files likely touched:** `src/matching/match.ts`, `src/matching/match.test.ts`, `src/room/matchRoom.test.ts`
-
-**Estimated scope:** Small
-
-## Checkpoint A: grouping model done
-- [x] `pnpm test`, `pnpm typecheck` and `pnpm lint` pass.
-- [x] Manual: `pnpm dev`, then on `/demo` with 20 sims and the old selects, Start makes groups and they confirm.
-- [x] Commit. Brief review with Patrick before Phase 2.
-
-## Phase 2: The wizard drives the room
-
-### Task 4: `nextGrouping`, the wizard's logic as a pure function
-
-**Description:** `src/demo/GroupSegmentWizard/nextGrouping.ts`: `nextGrouping(grouping, action, ready, remembered)` returns the next `Grouping` and the remembered values. Actions: step groups ±1, step size ±1, switch to groups or size, and cycle the fit. Ported from `useDivision`'s `current` / `step` / `setLocked`.
+**Description:** Copy `examples/000-template` into `examples/004-personality-quiz`, doing what `scripts/new-example.mjs` does (skipping `node_modules`, `dist`, `.alchemy` and build info; replacing the template's name in `package.json`, `index.html`, `src/App.tsx`, `alchemy.run.ts`, `vite.config.ts`), but keeping the existing `README.md`, `sources/`, `scripts/` and `.gitignore`. Add `scripts/` to the typecheck as `003` does. Replace the template's counter with the routes: `/` redirects to `/demo`, and `/demo` and `/participate` are lazy placeholders. Add `004` to the root `deploy` / `destroy` scripts and `landing/apps.ts`.
 
 **Acceptance criteria:**
-- [x] Switching to groups keeps the group count (and any even split); switching to people per group keeps the split whenever a size can make it, else takes the nearest size (tested for n = 0..50).
-- [x] −/+ stop at 2 groups and 2 per group, and at `MAX_GROUPING` (50), never because of `ready`.
-- [x] Cycling the fit goes Smart → Min → Max → Smart, and the last fit comes back after switching to groups and back.
+- [ ] `pnpm --filter 004-personality-quiz dev` serves `/demo` and `/participate`; `/` lands on `/demo`.
+- [ ] No template counter code is left; `README.md`, `sources/`, `scripts/sample-responses.ts` and `.gitignore` are as they were, plus a "Run it" section in the README.
+- [ ] `004` builds, and is listed on the landing page.
 
-**Verification:** `pnpm test` · `pnpm lint`
-
-**Dependencies:** T1
-
-**Files likely touched:** `src/demo/GroupSegmentWizard/nextGrouping.ts` (new), `src/demo/GroupSegmentWizard/nextGrouping.test.ts` (new)
-
-**Estimated scope:** Small
-
-### Task 5: Graduate `GroupSegmentWizard` and wire it to the room
-
-**Description:** Move the compact layout, `CycleTrack` and the bar/stepper parts into `src/demo/GroupSegmentWizard/`. Props: `grouping`, `ready`, `maxDistinct`, `onChange`, with no layout prop. It renders `groupSizes` and `groupConcerns`, and steps through `nextGrouping`. `EmceePane` passes `snapshot.config.grouping` and sends `{ type: 'config', config: { ...config, grouping } }`. Start's blocker is only the shared `startBlocker`. Remove `prototypeBlocker`, `useDivision`'s use in `EmceePane`, and the dev-only gate.
-
-**Acceptance criteria:**
-- [x] Setting the wizard on `/emcee` changes `snapshot.config.grouping`. It's still set after a reload, and the same in a second host tab.
-- [x] With 17 sims at Min 12, the bar shows `12·5` with the 5 in orange, and Start is disabled.
-- [x] After Start, the round's group sizes match the bar (checked at 20 sims, Smart 3 and count 4).
-
-**Verification:** `pnpm test` · `pnpm typecheck` · `pnpm lint` · browser check of the three criteria above
-
-**Dependencies:** T2, T3, T4
-
-**Files likely touched:** `src/demo/GroupSegmentWizard/GroupSegmentWizard.tsx`, `src/demo/GroupSegmentWizard/CycleTrack.tsx`, `src/demo/GroupSegmentWizard/parts.tsx` (all moved from the prototype folder), `src/demo/EmceePane.tsx`
-
-**Estimated scope:** Medium
-
-### Task 6: Variants kept as code, not shown
-
-**Description:** In `prototype-group-segment-wizard/`, rename the component to `GroupSegmentWizardVariants` with a required `layout` prop over `groupsOnly | modeTabs | linkedPair | linkedPairWithFit`, and drop `compact` from it. Delete `LayoutSwitcher.tsx`, `useLayoutChoice` and the `?variant=` handling. Import `CycleTrack` and the parts from the graduated folder. Add a header comment saying it's kept unrendered on purpose (spec, 2026-11-26).
-
-**Acceptance criteria:**
-- [x] Nothing outside `prototype-group-segment-wizard/` imports it, and `?variant=compact` on `/emcee` changes nothing.
-- [x] The folder still typechecks and lints.
-- [x] Neither `LayoutSwitcher` nor `useLayoutChoice` is left anywhere in the code.
-
-**Verification:** `pnpm typecheck` · `pnpm lint`
-
-**Dependencies:** T5
-
-**Files likely touched:** `src/demo/prototype-group-segment-wizard/GroupSegmentWizard.tsx` → `GroupSegmentWizardVariants.tsx`, `variants.tsx`, `LayoutSwitcher.tsx` (deleted), `useDivision.ts`
-
-**Estimated scope:** Small
-
-### Task 7: Remove `/demo`'s grouping selects, and update the docs
-
-**Description:** Remove Group by and Groups / People per group from `ConfigPanels`, and its `warning` prop. Delete `repeatWarning`. Algorithm, Cue and Display found count stay. Update the matchmaking spec's config panel and matching engine sections to point to the new spec. Tick "Block Start when there aren't enough cues" in `tasks/matchmaking/todo.md`. Set the spec's status to built.
-
-**Acceptance criteria:**
-- [x] `/demo`'s config panel shows only Algorithm, Cue and Display found count.
-- [x] `repeatWarning` (and its test) is gone, and nothing passes `warning` to `ConfigPanels`.
-- [x] `docs/specs/matchmaking.md` no longer describes the grouping selects or round-robin dealing.
-
-**Verification:** `pnpm test` · `pnpm typecheck` · `pnpm lint` · browser check of `/demo`'s panel
-
-**Dependencies:** T5
-
-**Files likely touched:** `src/demo/ConfigPanels.tsx`, `src/pages/Demo.tsx`, `src/demo/repeatWarning.ts` (+ test, deleted), `docs/specs/matchmaking.md`, `docs/specs/group-segment-wizard.md`, `tasks/matchmaking/todo.md`
-
-**Estimated scope:** Medium
-
-### Task 8: Up to 50 simulated participants
-
-**Description:** Raise `MAX_SIMS` from 20 to 50. It's independent of the other tasks and can land any time. Check that `/demo`'s sim cards and the emcee's bar still read well at 50 (up to 25 pairs, so 25 bar segments).
-
-**Acceptance criteria:**
-- [x] `/demo` adds sims up to 50 and no further (`SimulatedCrowd.test.ts` uses `MAX_SIMS`, so it covers this unchanged).
-- [x] A 50-sim round on `/demo` starts, and every group confirms.
-- [x] The matchmaking spec's "up to ~20" / "0 to 20" lines say 50.
-
-**Verification:** `pnpm test` · browser check of a 50-sim round, with the bar at group size 2
+**Verification:** `pnpm install`; in `004`: `pnpm typecheck`, `pnpm lint`, `pnpm build`; open `/` in the dev server.
 
 **Dependencies:** None
 
-**Files likely touched:** `src/simulation/SimulatedCrowd.ts`, `docs/specs/matchmaking.md`
+**Files likely touched:** `examples/004-personality-quiz/{package.json,index.html,alchemy.run.ts,vite.config.ts,port.ts,offline.ts,tsconfig.json,oxlint.config.ts}`, `src/{App,main}.tsx`, `src/pages/{Demo,Participate}.tsx`, `worker/index.ts`, root `package.json`, `landing/apps.ts`, `pnpm-lock.yaml`
 
-**Estimated scope:** XS
+**Estimated scope:** Medium (many files, but copied)
 
-## Checkpoint B: complete
-- [x] All 7 success criteria in the spec pass.
-- [x] `pnpm test`, `pnpm typecheck` and `pnpm lint` pass.
-- [ ] Review with Patrick, then PR (regular merge commit).
+### Task 4: Typed statements, and `chooseStatements`
+
+**Description:** `src/items/items.ts` reads `sources/ipip-bffm-items.json` into typed `Item`s (id, text, trait, keyed), with `TRAITS` and lookups by id, usable in the page and the Worker. `src/room/chooseStatements.ts` picks N, as the spec's "Choosing the statements" says: `floor(N / 5)` per trait, one more for `N mod 5` random traits, random within each trait, returned in the test's order. `rng` is injected.
+
+**Acceptance criteria:**
+- [ ] For every N from 1 to 50: N distinct ids, per-trait counts differ by at most 1, in the items file's order.
+- [ ] The same seed gives the same choice; N = 50 gives every statement in order.
+- [ ] `items.ts` has 50 items, 10 per trait, and its types reject a trait or id that isn't in the file.
+
+**Verification:** `pnpm test`, `pnpm typecheck`, `pnpm lint` in `004`.
+
+**Dependencies:** T3
+
+**Files likely touched:** `src/items/items.ts` (+ test), `src/room/chooseStatements.ts` (+ test), `src/room/rng.ts` (seeded rng and `shuffle`, as in `002`)
+
+**Estimated scope:** Small
+
+### Task 5: Protocol and room reducer
+
+**Description:** `src/room/protocol.ts`: the messages, `QuizConfig`, `ParticipantView` and `RoomSnapshot` from the spec, with `parse*` functions that validate at the boundary. `src/room/quizRoom.ts`: the pure `reduce(state, event, rng)` over join, leave, ready, answer, undo, config, start and reset, with `viewFor` and `snapshotOf` selectors.
+
+**Acceptance criteria:**
+- [ ] Reducer tests cover: Start refused with no one ready; Start choosing statements (via `chooseStatements`) and moving ready people to `answering`; an answer only at the sender's position (others ignored); skip as `null`; reaching `done`; undo at the first statement, mid-quiz, and from `done` (clearing that answer); latecomers waiting (`late`, then included at the next Start) and joining (start at statement 1); leave and reconnect keeping answers; Reset clearing everything and forgetting anyone gone; config applying at the next Start.
+- [ ] Parser tests reject unknown types, unknown item ids, answers outside 1–5, and config with N outside 1–50 or an unknown latecomers value.
+
+**Verification:** `pnpm test`, `pnpm typecheck`, `pnpm lint` in `004`.
+
+**Dependencies:** T4
+
+**Files likely touched:** `src/room/protocol.ts` (+ test), `src/room/quizRoom.ts` (+ test), `src/room/roomSelectors.ts`
+
+**Estimated scope:** Medium
+
+### Task 6: `QuizRoom`, throttled host snapshots, and the quiz controls on `/demo`
+
+**Description:** `worker/QuizRoom.ts`, a thin `agents` `Agent` like `002`'s `MatchRoom`: roles from `?role=`, socket events to reducer events, `setState`, each participant's view sent at once, and the host snapshot through a throttle (the first change sends at once, later ones within 250 ms fold into one send, phase changes send at once). The throttle is a pure, clock-injected helper with tests. `/demo` connects as host and shows `QuizControls`: statements (N, 1–50), latecomers (wait / join), Start (disabled with the reason when no one is ready), Reset, the phase and counts, and the room status badge.
+
+**Acceptance criteria:**
+- [ ] Throttle tests: one send per 250 ms window under a burst, the last state always sent, phase changes not delayed.
+- [ ] From `/demo`, config, Start and Reset reach the room, and the snapshot shows phase, chosen statements and participants.
+- [ ] Start is disabled with "No one is ready yet" (or similar) when no one is ready (spec criterion 2).
+
+**Verification:** `pnpm test`, `pnpm typecheck`, `pnpm lint`, `pnpm build` in `004`; in the dev server, `/demo` connects and Start/Reset work with one `/participate` tab.
+
+**Dependencies:** T5
+
+**Files likely touched:** `worker/{index,QuizRoom}.ts`, `src/room/{client,hostThrottle}.ts` (+ test), `src/demo/QuizControls.tsx`, `src/pages/Demo.tsx`
+
+**Estimated scope:** Medium
+
+### Task 7: `/participate`: start, wait, answer with Skip and Undo, done; QR join on `/demo`
+
+**Description:** `/participate` connects with a stable `sessionId`, shows the shared `StartScreen` (Start takes the wake lock and sends `ready`), then a screen per status: waiting, late, answering ("7 / 30", the statement, five large buttons Disagree … Agree, Skip, Undo hidden on the first statement), and done (with Undo). `/demo` gets a join panel with the shared `JoinQrCode` to `/participate`.
+
+**Acceptance criteria:**
+- [ ] A phone tab answers, skips and undoes, and the host snapshot reflects each within ~1 s (spec criterion 8).
+- [ ] A reload mid-quiz returns to the same statement with answers kept (criterion 10).
+- [ ] With latecomers set to wait, a tab joining mid-quiz sees "You'll join the next one"; set to join, it starts at statement 1 (criterion 9).
+
+**Verification:** `pnpm typecheck`, `pnpm lint`, `pnpm build` in `004`; agent-browser: `/demo` plus one `/participate` tab through a quiz of N = 10.
+
+**Dependencies:** T6
+
+**Files likely touched:** `src/pages/Participate.tsx`, `src/participant/{AnsweringScreen,WaitingScreen,DoneScreen}.tsx`, `src/demo/JoinPanel.tsx`, `src/pages/Demo.tsx`
+
+**Estimated scope:** Medium
+
+## Checkpoint B
+
+- [ ] A phone tab completes a quiz of N = 10 started from `/demo`, with skip, undo, a reload, and latecomers both ways.
+- [ ] `004`: test, typecheck, lint, build.
+- [ ] Review before Phase 3.
+
+## Phase 3: Quiz demo (`quiz-demo`)
+
+### Task 8: Simulated participants from the sampled responses, with count and skip-threshold controls
+
+**Description:** `src/simulation/responses.ts` loads `sources/ipip-ffm-responses.json` and draws people at random without repeats from those who skipped at most the threshold (over all 50). `QuizSim` is a headless participant over `common/simulation`'s `connectToRoom`: `ready` on connect; while `answering`, after a random 3–9 s wait, it sends its person's answer to the statement at its position (or a skip). It never undoes. `004`'s `useSimulation` builds a crowd of `QuizSim`s (limit 200) and keeps each sim's person (sample row, country, skips) for the page. `SimControls`: people (default 50) and skipped at most (default: no limit), applying straight away.
+
+**Acceptance criteria:**
+- [ ] `QuizSim` tests (fake socket and clock): answers its person's real answers in order, skips where they skipped, waits within 3–9 s, never sends `undo`.
+- [ ] Drawing tests: respects the threshold, never repeats a person, and says so when the threshold leaves fewer people than asked for.
+- [ ] On `/demo`, 50 sims join by default and answer through a quiz; the count can't go above 200 (criteria 3, 4, 6).
+
+**Verification:** `pnpm test`, `pnpm typecheck`, `pnpm lint`, `pnpm build` in `004`; agent-browser: 50 sims through N = 10.
+
+**Dependencies:** T2, T6
+
+**Files likely touched:** `src/simulation/{responses,QuizSim,useSimulation}.ts` (+ tests), `src/simulation/SimControls.tsx`, `src/pages/Demo.tsx`
+
+**Estimated scope:** Medium
+
+### Task 9: Speed and fast-forward
+
+**Description:** A speed setting (×1, ×2, ×5, ×10, ×20) for the crowd, dividing each wait that starts after it changes, and "Fast-forward to finished", which makes every sim on this page send all its remaining answers at once. Real phones are untouched.
+
+**Acceptance criteria:**
+- [ ] `QuizSim` tests: every wait is within 3–9 s divided by the speed; fast-forward sends every remaining answer in order and nothing after (criterion 7).
+- [ ] On `/demo`, fast-forward fills every sim's answers within 2 s.
+
+**Verification:** `pnpm test`, `pnpm typecheck`, `pnpm lint` in `004`; agent-browser: 50 sims at ×10, then fast-forward.
+
+**Dependencies:** T8
+
+**Files likely touched:** `src/simulation/{QuizSim,useSimulation}.ts` (+ test), `src/simulation/SimControls.tsx`
+
+**Estimated scope:** Small
+
+### Task 10: Load check at 200 sims × 50 statements × ×20, and fixes
+
+**Description:** Run the heaviest case the spec allows and measure: the room's write rate and CPU time per message, snapshot size and rate on `/demo`, and whether Chrome and Firefox open all 201 sockets. Fix what fails, inside the spec (for example: persist `setState` at most every 250 ms, or answers as SQL rows). Anything that would change the spec (lowering the 200 limit, sharing sockets between sims) is asked about first. Record the numbers in the plan's Risks table.
+
+**Acceptance criteria:**
+- [ ] 200 sims finish a 50-statement quiz at ×20 with every answer in the host snapshot, in Chrome.
+- [ ] Firefox either does the same or the page says why it can't (and the spec is updated after asking).
+- [ ] The numbers and any fix are written down in `tasks/plan.md`.
+
+**Verification:** agent-browser in the dev server and in `preview` (workerd); `pnpm test` if the room changed.
+
+**Dependencies:** T9
+
+**Files likely touched:** `worker/QuizRoom.ts`, `src/room/hostThrottle.ts`, `tasks/plan.md`
+
+**Estimated scope:** Small to Medium (depends on what it finds)
+
+### Task 11: The vote matrix
+
+**Description:** `src/demo/VoteMatrix.tsx` draws the host snapshot: one row per participant (real phones first, then sims in join order, named from the page's sims or "Phone …"), one column per chosen statement numbered 1…N, fixed-size cells on a diverging five-step scale, a distinct skip mark, and a blank for not answered yet. A legend shows the scale, skip and blank. Colours meet contrast in light and dark themes. In the lobby it shows the rows and no columns.
+
+**Acceptance criteria:**
+- [ ] Each sim's row matches its person's answers in `ipip-ffm-responses.json` for the chosen statements (criterion 6).
+- [ ] Skips and blanks are told apart without colour alone (the skip mark is a shape).
+- [ ] Cells and headers have fixed sizes: new answers and new rows never move anything above or beside the matrix.
+
+**Verification:** `pnpm typecheck`, `pnpm lint`, `pnpm build` in `004`; agent-browser: screenshot mid-quiz with sims and a phone, in both themes.
+
+**Dependencies:** T8
+
+**Files likely touched:** `src/demo/{VoteMatrix,MatrixLegend}.tsx`, `src/demo/answerColours.ts`, `src/styles.css`, `src/pages/Demo.tsx`
+
+**Estimated scope:** Medium
+
+### Task 12: The info area for statements and people
+
+**Description:** A fixed-height info area on `/demo`. Hovering or focusing a column number shows the statement: number, id, text, trait, and keying ("reversed" for `keyed: -1`). Hovering a row shows the person: name, phone or sim, and for this page's sims the sample row, country and real-data skips, plus how many statements they've answered. Column numbers and row names are keyboard-focusable.
+
+**Acceptance criteria:**
+- [ ] Hovering column 7 shows that statement's text, trait and keying; hovering a sim's row shows its country and skips (criterion 11).
+- [ ] The area's height never changes, empty or full; nothing on the page moves when it updates.
+- [ ] The same details are reachable by keyboard focus.
+
+**Verification:** `pnpm typecheck`, `pnpm lint` in `004`; agent-browser: hover a column and a row, compare screenshots for movement.
+
+**Dependencies:** T11
+
+**Files likely touched:** `src/demo/{InfoArea,VoteMatrix}.tsx`, `src/pages/Demo.tsx`
+
+**Estimated scope:** Small
+
+### Task 13: `/demo` layout, no layout shifts, and docs
+
+**Description:** Lay out `/demo` as the spec's sketch: the header and blurb, then the simulation controls (first and most prominent), quiz controls and join panel, then the info area, then the matrix last. Reserve widths for counts and labels so live numbers don't shift anything. Take a performance trace at 200 sims × 50 × ×20. Update `004`'s README (pages, layout, patterns, how to run) and `002`'s if its layout changed in Phase 1.
+
+**Acceptance criteria:**
+- [ ] The simulation controls are the first panel on `/demo` (criterion 1).
+- [ ] In the trace, hover feedback is within 100 ms and no main-thread task is over 200 ms (criterion 12).
+- [ ] The README covers the pages, the simulation, the throttle, and the sources.
+
+**Verification:** repo-wide `pnpm lint`, `pnpm typecheck`; tests and builds in `common`, `002`, `004`; agent-browser trace and screenshots.
+
+**Dependencies:** T10, T12
+
+**Files likely touched:** `src/pages/Demo.tsx`, `src/demo/*.tsx`, `examples/004-personality-quiz/README.md`, `examples/002-matchmaking/README.md`
+
+**Estimated scope:** Medium
+
+## Checkpoint C: complete
+
+- [ ] All 14 spec success criteria pass.
+- [ ] Repo-wide `pnpm lint` and `pnpm typecheck`; tests in `common`, `002`, `004`; `002` and `004` build.
+- [ ] Review, then PR (regular merge commit).
 
 ## Later (not in this plan)
 
-- [ ] **Say why Start is blocked when the cue runs out.** With more groups than the cue can tell apart
-  (e.g. 50 in pairs under Colour's 12), Start is disabled and the extra groups turn orange, but nothing
-  says the cue is the reason. Tell the emcee, and how to get going: fewer groups, or a cue with more
-  options (Avatars have no limit). The spec currently says "nothing is explained under Start", so
-  decide where this goes (under Start, on the bar, or by the cue picker) before building it.
+- [ ] **Sims that use Undo.** Sometimes go back and change an answer, so the matrix shows answers changing (spec: out of scope for now).
+- [ ] **Move the host snapshot throttle to `common`** once a second example needs it.

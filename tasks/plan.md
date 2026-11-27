@@ -1,65 +1,88 @@
-# Implementation Plan: GroupSegmentWizard drives the room's grouping
+# Implementation Plan: Personality quiz example, and shared simulation code
 
-_Spec: [`docs/specs/group-segment-wizard.md`](../docs/specs/group-segment-wizard.md) (approved 2026-11-26). Tasks: [`tasks/todo.md`](todo.md). The previous plan (matchmaking) is in [`tasks/matchmaking/`](matchmaking/)._
+_Spec: [`docs/specs/personality-quiz.md`](../docs/specs/personality-quiz.md) (approved 2026-11-27). Tasks: [`tasks/todo.md`](todo.md). Earlier plans: [`tasks/matchmaking/`](matchmaking/), [`tasks/group-segment-wizard/`](group-segment-wizard/)._
 
 ## Overview
 
-Make `GroupSegmentWizard` (the compact layout) the room's grouping control. The splitting maths moves from the prototype into `src/matching/`. The matcher deals into exactly the sizes the bar shows, so Min really makes `15·5`. One `startBlocker` covers both the UI and the room reducer. The wizard sends `config` messages instead of keeping its own state. `/demo` loses its grouping selects. The other layouts stay as code that nothing renders.
+Build the app in `examples/004-personality-quiz`: a `QuizRoom` that a crowd of simulated participants (real people
+from the sampled IPIP-FFM data) and real phones answer, and a `/demo` page where the vote matrix fills in live. First,
+move the generic parts of `002`'s simulation into `packages/common/src/simulation/` and move `002` onto them, so `004`
+is built on the shared code from the start.
 
-All work is in `examples/002-matchmaking` unless a task says otherwise. Read `skills/engineering-standards/` before writing code.
+Read `skills/engineering-standards/` before writing code. Browser checks use `mise exec node@24.16.0 -- agent-browser`.
 
 ## Architecture decisions
 
-- **`Grouping` is renamed for clarity and gains `fit` on the size branch only:** `{ by: 'groupSize'; groupSize: number; fit: 'smart' | 'min' | 'max' } | { by: 'groupCount'; groupCount: number }`. Today's `size` / `count` were ambiguous (size of what?). The rename is its own mechanical task (T0), so T1's diff is only about `fit`. The default becomes group size 3, Smart.
-- **`src/matching/split.ts` is the single source** for `groupSizes`, `startBlocker` and `groupConcerns`. The bar, the Start button, the reducer and `match` all call it.
-- **`match` hands out people in chunks of `groupSizes`** instead of round-robin. That's what makes Min (`15·5`) true. With `random` ordering, the result is statistically the same for the other fits.
-- **The cue's `maxDistinct` is a `startBlocker` argument.** `CUE_TYPES` already loads in the Worker, so the reducer can enforce it. `repeatWarning` is deleted.
-- **No migration code.** `MatchRoom.onStart` already resets a config that `isMatchConfig` rejects to `DEFAULT_CONFIG`, so a room saved without `fit` heals itself.
-- **The wizard's state is the room's `grouping`.** Which number the emcee sets is `grouping.by`. The only local state is what that leaves out: the number not being set and the last fit chosen, remembered for switching back. `nextGrouping(grouping, action, ready)` is a pure function holding every step, cycle and switch.
-- **Variants are kept but not shown** (decided 2026-11-26). This is an exception to engineering-standards' "no dead code", so the folder's header comment says so and links to the spec.
+- **`@playtest-kit/common/simulation` is its own export**, next to `.` and `./server`, so a Worker never imports
+  `agents/client`. It holds sim ids, `SimSocket` / `ConnectSim`, `connectToRoom(agent, room)`, `randomDelay`,
+  `straySimIds` and a generic crowd with its hook. `useDisposeOnUnmount` goes to `common/hooks/effects/`.
+- **The generic crowd builds sims with a factory and takes a limit.** What a sim does, and settings that apply to the
+  whole crowd (`002`'s auto-confirm, `004`'s speed), stay in each example, layered on the crowd.
+- **`004` reuses `002`'s shapes:** pure reducer and thin Agent, snapshots not event streams, roles via `?role=`, a stable
+  `sessionId` per phone tab. New: host snapshots are throttled (250 ms) inside `QuizRoom`; participants' views aren't.
+- **Statement text never crosses the socket.** The page and the Worker both bundle `sources/ipip-bffm-items.json`
+  through one typed module (`src/items/items.ts`); messages carry item ids.
+- **The scaffold is copied into the existing folder**, since `pnpm new-example` would make `005`. `README.md`,
+  `sources/`, `scripts/` and `.gitignore` are kept; the template's README parts are merged into the existing one.
+- **The load check comes as soon as sims exist (T10)**, before the matrix and layout work, so if the room or the
+  browser can't take 200 sims at ×20, the fix lands before anything is built on top.
 
 ## Dependency graph
 
 ```
-T0 rename ──► T1 Grouping.fit + groupSizes ──► T2 shared startBlocker ──► T3 match deals into groupSizes
-                       │                                                         │
-                       └──────────────► T4 nextGrouping (pure) ──────────────────┤
-                                                                                 ▼
-                                                 T5 graduate wizard, drive room ──► T6 variants: hide ──► T7 /demo panel + docs
+T1 sim ids, sockets, connectToRoom ──► T2 generic crowd + hook ─────────────────────────┐
+                                                                                         ▼
+T3 scaffold 004 ──► T4 items + chooseStatements ──► T5 protocol + reducer ──► T6 QuizRoom + host controls ──► T7 /participate
+                                                                                         │
+                                                                     T2 + T6 ──► T8 QuizSim + sim controls ──► T9 speed + fast-forward ──► T10 load check
+                                                                                                                                              │
+                                                                                         T11 vote matrix ──► T12 info area ──► T13 layout + docs
 ```
 
-T4 depends only on T1, so it can run alongside T2 and T3. T8 (50 sims) depends on nothing.
+T1–T2 (`shared-simulation`) and T3–T7 (`quiz-core`) don't depend on each other and can run in parallel.
 
 ## Task list
 
-### Phase 1: Grouping model (`grouping-model`, `room-grouping`)
-- [x] T0: Rename `Grouping`'s fields to `groupSize` / `groupCount`
-- [x] T1: `Grouping` gains `fit`; `groupSizes` in `split.ts`
-- [x] T2: One `startBlocker` for the UI and the room
-- [x] T3: `match` deals into `groupSizes`
+### Phase 1: Shared simulation (`shared-simulation`)
+- [ ] T1: Sim ids, socket types, `connectToRoom`, `randomDelay` and `straySimIds` move to `common/simulation`
+- [ ] T2: A generic crowd and its hook move to `common/simulation`; `002`'s crowd is built on it
 
 ### Checkpoint A
-- [x] `pnpm test`, `pnpm typecheck` and `pnpm lint` pass. A 20-sim round on `/demo` still works through the old selects.
+- [ ] `002` and `common` pass test, typecheck, lint and build; manual check of `002`'s sims on `/demo`.
 
-### Phase 2: The wizard drives the room (`emcee-control`)
-- [x] T4: `nextGrouping`, the wizard's logic as a pure function
-- [x] T5: Graduate `GroupSegmentWizard` and wire it to the room
-- [x] T6: Variants kept as code, not shown
-- [x] T7: Remove `/demo`'s grouping selects, and update the docs
-- [x] T8: Up to 50 simulated participants (independent, any time)
+### Phase 2: Quiz core (`quiz-core`)
+- [ ] T3: Scaffold `004` from the template into the existing folder
+- [ ] T4: Typed statements, and `chooseStatements`
+- [ ] T5: Protocol and room reducer
+- [ ] T6: `QuizRoom`, throttled host snapshots, and the quiz controls on `/demo`
+- [ ] T7: `/participate`: start, wait, answer with Skip and Undo, done; QR join on `/demo`
 
-### Checkpoint B: complete
-- [x] All 7 spec success criteria pass. Review before PR.
+### Checkpoint B
+- [ ] A phone tab completes a quiz of N = 10 started from `/demo`, with skip, undo, reload and latecomers both ways
+      (spec criteria 2, 5, 8–10). `004` passes test, typecheck, lint and build.
+
+### Phase 3: Quiz demo (`quiz-demo`)
+- [ ] T8: Simulated participants from the sampled responses, with count and skip-threshold controls
+- [ ] T9: Speed and fast-forward
+- [ ] T10: Load check at 200 sims × 50 statements × ×20, and fixes
+- [ ] T11: The vote matrix
+- [ ] T12: The info area for statements and people
+- [ ] T13: `/demo` layout, no layout shifts, and docs
+
+### Checkpoint C: complete
+- [ ] All 14 spec success criteria pass. Repo-wide `pnpm lint`, `pnpm typecheck`, tests, and the `002`/`004` builds pass.
+- [ ] Review, then PR (regular merge commit).
 
 ## Risks and mitigations
 
 | Risk | Impact | Mitigation |
 |---|---|---|
-| The compact layout reads `Division` (prototype state) deeply, so rewiring it to `grouping` + `onChange` is a bigger change than moving files | Med | T4 pins down the behaviour as a pure function first, so T5 only swaps where the state comes from |
-| Changing the default from "by size, extras join" to Smart changes the groups existing demos get | Low | This is intended (spec). Smart never leaves anyone alone, and old rooms reset on load |
-| `cccc` complexity budget on `groupSizes` / `nextGrouping` | Low | One small function per fit or action, picked from a lookup table, as `ALGORITHMS` is |
-| At 50 sims, the bar can have 25 segments (pairs) and become cramped on a phone | Med | T8's browser check looks at it. If it's unreadable, raise it before changing the bar, since that's a design call |
-| Two hosts set the wizard at once | Low | Last write wins, the same as today's selects. Each host sees the room's snapshot |
+| `setState` on every answer: at 200 sims × ×20, hundreds of state writes a second, each the whole matrix | High | T10 measures it. If it's the bottleneck, keep the in-memory state current and persist at most every 250 ms (like the host throttle), or store answers as rows in the Agent's SQL. Decide with numbers, not ahead of them |
+| A browser's cap on open WebSockets (Firefox's default may be 200 in all; Chrome's limits differ) below 200 sims + the host socket | High | T10 checks Chrome and Firefox. If capped, say so on the page and lower the limit, or run sims over fewer sockets (an "Ask first" change to the spec) |
+| The host snapshot of a 200 × 50 matrix re-renders the whole matrix 4 times a second | Med | T11 renders cells cheaply (one element per cell, colour from a class, no per-cell components with state), and T13's trace checks criterion 12. Fall back to a `<canvas>` only if the trace fails |
+| Moving `002` onto the generic crowd changes its behaviour (newest-out order, names, auto-confirm on new sims) | Med | T2 keeps `002`'s crowd tests unchanged and passing, plus the Checkpoint A manual check |
+| Copying the template by hand misses something `new-example.mjs` does (renames, port) | Low | T3 reads the script and repeats each step; the build and `dev` prove it |
+| `chooseStatements` and the reducer outgrow the complexity budget (cccc) | Low | Small functions picked by event type, as `002`'s reducer does |
 
 ## Open questions
 
