@@ -50,6 +50,8 @@
   --vote-5: #16a34a;
   --vote-mark: #555;
   --vote-blank: #e4e4e4;
+  --vote-highlight: rgb(0 0 0 / 0.18);
+  --vote-label-bg: var(--color-kumo-base, Canvas);
 }
 
 [data-mode='dark'] {
@@ -60,6 +62,7 @@
   --vote-5: #22c55e;
   --vote-mark: #bbb;
   --vote-blank: #333;
+  --vote-highlight: rgb(255 255 255 / 0.22);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -71,6 +74,7 @@
     --vote-5: #22c55e;
     --vote-mark: #bbb;
     --vote-blank: #333;
+    --vote-highlight: rgb(255 255 255 / 0.22);
   }
 }
 
@@ -181,6 +185,19 @@
   overflow: hidden;
   text-overflow: ellipsis;
   transform: translateY(-50%);
+}
+
+/* A skip's cross and a blank's dot keep their size and shape however the cell stretches. */
+.vote-fit .vote-skip,
+.vote-fit .vote-blank {
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 10px 10px;
+}
+
+/* A name or number crowded out by its neighbours; `MatrixHighlight` shows it while its row or column is hovered. */
+.vote-label-hidden {
+  display: none;
 }
 
 /* Too small to draw a cross or a dot, so a skip and a blank are flat fills. */

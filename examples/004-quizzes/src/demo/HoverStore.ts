@@ -2,6 +2,8 @@
 export interface Hover {
   column: number | null;
   row: string | null;
+  /** Whether the pointer or focus is still in the matrix; the info area keeps showing the last ones after it leaves. */
+  active: boolean;
 }
 
 /**
@@ -10,7 +12,7 @@ export interface Hover {
  */
 export class HoverStore {
   #listeners = new Set<() => void>();
-  #state: Hover = { column: null, row: null };
+  #state: Hover = { active: false, column: null, row: null };
 
   subscribe = (listener: () => void): (() => void) => {
     this.#listeners.add(listener);
@@ -21,7 +23,7 @@ export class HoverStore {
 
   set(change: Partial<Hover>): void {
     const next = { ...this.#state, ...change };
-    if (next.column === this.#state.column && next.row === this.#state.row) {
+    if (next.column === this.#state.column && next.row === this.#state.row && next.active === this.#state.active) {
       return;
     }
     this.#state = next;

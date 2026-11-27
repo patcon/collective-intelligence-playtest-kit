@@ -35,6 +35,14 @@ function labelled(count: number, step: number): Array<number> {
   return Array.from({ length: count }, (_, i) => i).filter((i) => isLabelled(i, step));
 }
 
+describe('matrixLayout with nothing to show', () => {
+  // After a reset there are no statements; `repeat(0, …)` would make the whole template invalid.
+  it.each(['cells', 'pixel-fit'] as const)('has no empty repeat() in %s', (variant) => {
+    const { columns, rows } = matrixLayout(variant, 0, 0, { height: 600, width: 1128 });
+    expect(`${columns} ${rows ?? ''}`).not.toContain('repeat(0');
+  });
+});
+
 describe('isLabelled', () => {
   it('labels every one at a step of 1', () => {
     expect(labelled(3, 1)).toEqual([0, 1, 2]);

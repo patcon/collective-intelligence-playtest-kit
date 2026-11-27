@@ -28,7 +28,10 @@ quiz or join at statement 1.
 
 On `/demo`, the vote matrix has a row per person (phones, then this page's sims, then any from another tab) and a
 column per statement, coloured from Disagree (red) to Agree (green) as in Polis, with a cross for a skip and a dot for not
-answered yet. Hovering or focusing a column number or a row shows that statement or person in the info area above it.
+answered yet. Hovering or focusing a cell, a column number or a row shows that statement or person in the info area
+above it, and highlights that person's row and that statement's column, headers too, like a spreadsheet. A toggle
+switches to a pixel-fit view that stretches the matrix to fill a tall box, labelling only every 5th, 10th… column or
+row when they don't all fit.
 
 ## Code
 

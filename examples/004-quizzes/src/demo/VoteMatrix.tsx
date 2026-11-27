@@ -4,6 +4,7 @@ import type { Answers } from '../room/protocol.ts';
 import { useElementSize } from '../hooks/effects/useElementSize.ts';
 import { cellClassOf } from './answerColours.ts';
 import { hoverOf } from './HoverStore.ts';
+import { MatrixHighlight } from './MatrixHighlight.tsx';
 import type { HoverStore } from './HoverStore.ts';
 import { isLabelled, matrixLayout } from './matrixLayout.ts';
 import type { MatrixVariant } from './matrixLayout.ts';
@@ -30,7 +31,7 @@ function rowName(row: MatrixRow): string {
 function ColumnHeaders({ statements, step }: { statements: ReadonlyArray<ItemId>; step: number }) {
   return statements.map((item, i) => (
     <button aria-label={`Statement ${i + 1}`} className="vote-header" data-column={i} key={item} type="button">
-      {isLabelled(i, step) && <span className="vote-label">{i + 1}</span>}
+      <span className={isLabelled(i, step) ? 'vote-label' : 'vote-label vote-label-hidden'}>{i + 1}</span>
     </button>
   ));
 }
@@ -49,11 +50,18 @@ export function VoteMatrix({ rows, statements, hover, variant }: VoteMatrixProps
   const layout = matrixLayout(variant, statements.length, rows.length, size);
   return (
     <div className={variant === 'pixel-fit' ? 'h-[70vh]' : 'overflow-x-auto'} ref={setBox}>
+      <MatrixHighlight hover={hover} />
       <div
         className={`vote-matrix grid text-xs ${variant === 'pixel-fit' ? 'vote-fit size-full' : 'w-max gap-px'}`}
         data-flat={layout.flat || undefined}
-        onFocus={(event) => hover.set(hoverOf(event.target))}
-        onPointerOver={(event) => hover.set(hoverOf(event.target))}
+        onBlur={(event) => {
+          if (!event.currentTarget.contains(event.relatedTarget)) {
+            hover.set({ active: false });
+          }
+        }}
+        onFocus={(event) => hover.set({ ...hoverOf(event.target), active: true })}
+        onPointerLeave={() => hover.set({ active: false })}
+        onPointerOver={(event) => hover.set({ ...hoverOf(event.target), active: true })}
         style={{ gridTemplateColumns: layout.columns, gridTemplateRows: layout.rows }}
       >
         <span />
@@ -61,7 +69,7 @@ export function VoteMatrix({ rows, statements, hover, variant }: VoteMatrixProps
         {rows.map((row, r) => (
           <div className={row.connected ? 'contents' : 'contents opacity-40'} data-row={row.id} key={row.id}>
             <button aria-label={rowName(row)} className="vote-name" type="button">
-              {isLabelled(r, layout.rowStep) && <span className="vote-label">{rowName(row)}</span>}
+              <span className={isLabelled(r, layout.rowStep) ? 'vote-label' : 'vote-label vote-label-hidden'}>{rowName(row)}</span>
             </button>
             <Cells answers={row.answers} statements={statements} />
           </div>
