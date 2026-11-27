@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { isItemId, itemById, ITEMS, TRAIT_NAMES, TRAITS } from './items.ts';
+import { ANSWER_SCALE, isItemId, itemById, ITEMS, TRAIT_NAMES, TRAITS } from './items.ts';
 import type { ItemId, Trait } from './items.ts';
 
 describe('items', () => {
@@ -18,6 +18,7 @@ describe('items', () => {
     expect(isItemId('OPN11')).toBe(false);
     expect(isItemId('ext1')).toBe(false);
     expect(TRAIT_NAMES.EST).toBe('Emotional stability');
+    expect(ANSWER_SCALE.map((a) => a.label)).toEqual(['Disagree', 'Slightly disagree', 'Neutral', 'Slightly agree', 'Agree']);
   });
 
   it('types out ids and traits that aren’t in the file', () => {

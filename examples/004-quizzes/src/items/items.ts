@@ -41,6 +41,15 @@ function toItem(raw: { id: string; order: number; factor: string; keyed: number;
 /** All 50 statements, in the test's order. */
 export const ITEMS: ReadonlyArray<Item> = itemsFile.items.map(toItem).toSorted((a, b) => a.order - b.order);
 
+/** The five answers, 1 (Disagree) to 5 (Agree), with the test's own labels. */
+export const ANSWER_SCALE = ([1, 2, 3, 4, 5] as const).map((value) => {
+  const step = itemsFile.scale.find((s) => s.value === value);
+  if (!step) {
+    throw new Error(`ipip-bffm-items.json has no answer ${value}`);
+  }
+  return { label: step.label, value };
+});
+
 /** Each trait's full name, such as "Emotional stability" for `EST`. */
 export const TRAIT_NAMES: Readonly<Record<Trait, string>> = itemsFile.factors;
 

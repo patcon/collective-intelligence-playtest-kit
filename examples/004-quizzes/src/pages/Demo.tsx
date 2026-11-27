@@ -1,5 +1,6 @@
 import { Loader } from '@cloudflare/kumo';
 import { RoomStatusBadge } from '@playtest-kit/ui';
+import { JoinPanel } from '../demo/JoinPanel.tsx';
 import { QuizControls } from '../demo/QuizControls.tsx';
 import { hostRoom } from '../room/client.ts';
 import { ROOM } from '../room/protocol.ts';
@@ -31,6 +32,7 @@ function HostView() {
             onStart={() => send({ type: 'start' })}
             snapshot={snapshot}
           />
+          <JoinPanel />
         </div>
       ) : (
         <Loader />
