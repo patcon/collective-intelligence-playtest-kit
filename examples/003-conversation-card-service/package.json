@@ -1,5 +1,5 @@
 {
-  "name": "003-conversation-cards",
+  "name": "003-conversation-card-service",
   "private": true,
   "type": "module",
   "scripts": {

@@ -18,8 +18,8 @@ export const APPS: ReadonlyArray<ListedApp> = [
     blurb: 'Each group gets a cue (a colour, an avatar, a birdsong or a buzz), and people find the others who share it.',
   },
   {
-    stack: '003-conversation-cards',
-    title: '003 · Conversation cards',
+    stack: '003-conversation-card-service',
+    title: '003 · Conversation card service',
     blurb: 'Draw conversation cards at random from a deck, by card type or a short list, without repeats.',
   },
 ];

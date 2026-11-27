@@ -12,7 +12,7 @@
     "typecheck": "pnpm -r --if-present typecheck",
     "storybook": "pnpm --filter @playtest-kit/ui storybook",
     "deploy:setup": "pnpm --filter @playtest-kit/landing run deploy:setup",
-    "deploy": "pnpm --filter 001-valence-remote run deploy && pnpm --filter 002-matchmaking run deploy && pnpm --filter 003-conversation-cards run deploy && pnpm --filter @playtest-kit/landing run deploy",
-    "destroy": "pnpm --filter @playtest-kit/landing run destroy && pnpm --filter 003-conversation-cards run destroy && pnpm --filter 002-matchmaking run destroy && pnpm --filter 001-valence-remote run destroy"
+    "deploy": "pnpm --filter 001-valence-remote run deploy && pnpm --filter 002-matchmaking run deploy && pnpm --filter 003-conversation-card-service run deploy && pnpm --filter @playtest-kit/landing run deploy",
+    "destroy": "pnpm --filter @playtest-kit/landing run destroy && pnpm --filter 003-conversation-card-service run destroy && pnpm --filter 002-matchmaking run destroy && pnpm --filter 001-valence-remote run destroy"
   }
 }

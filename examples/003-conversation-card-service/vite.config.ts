@@ -19,7 +19,7 @@ function previewWorker(): PluginOption {
     main: 'worker/index.ts',
     compatibilityFlags: ['nodejs_compat'],
     worker: {
-      name: '003-conversation-cards-preview',
+      name: '003-conversation-card-service-preview',
       bindings: [],
       assets: { notFoundHandling: 'single-page-application', runWorkerFirst: ['/api/*'] },
     },

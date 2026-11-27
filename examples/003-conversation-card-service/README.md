@@ -1,4 +1,4 @@
-# 003-conversation-cards
+# 003-conversation-card-service
 
 A stateless card service for drawing conversation cards, plus a minimal page that uses it. The deck is
 The And, Self edition, plus custom cards (edition `custom` in the CSV, with the author as `source`). Built from [`000-template`](../000-template). The design is in

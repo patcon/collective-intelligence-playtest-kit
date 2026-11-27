@@ -8,7 +8,7 @@ const lan = process.env.LAN === '1';
 
 /** vite.config.ts mirrors this Worker's config for `pnpm preview`; change both together. */
 export default Stack(
-  '003-conversation-cards',
+  '003-conversation-card-service',
   { providers: providers(), state: state() },
   gen(function* () {
     const website = yield* Website.Vite('Website', {

@@ -227,7 +227,7 @@ importers:
         specifier: 5.1.0
         version: 5.1.0(@opentelemetry/api@1.10.0)(@types/node@26.6.6)(@vitest/browser-playwright@5.1.0)(@vitest/ui@5.1.0)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.4)(yaml@2.9.1))
 
-  examples/003-conversation-cards:
+  examples/003-conversation-card-service:
     dependencies:
       '@cloudflare/kumo':
         specifier: 2.19.0
