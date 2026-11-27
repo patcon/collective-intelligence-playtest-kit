@@ -4,7 +4,7 @@ _Spec: [`docs/specs/personality-quiz.md`](../docs/specs/personality-quiz.md) (ap
 
 ## Overview
 
-Build the app in `examples/004-personality-quiz`: a `QuizRoom` that a crowd of simulated participants (real people
+Build the app in `examples/004-quizzes`: a `QuizRoom` that a crowd of simulated participants (real people
 from the sampled IPIP-FFM data) and real phones answer, and a `/demo` page where the vote matrix fills in live. First,
 move the generic parts of `002`'s simulation into `packages/common/src/simulation/` and move `002` onto them, so `004`
 is built on the shared code from the start.

@@ -48,10 +48,10 @@ Plan: [`plan.md`](plan.md). Spec: [`docs/specs/personality-quiz.md`](../docs/spe
 
 ### Task 3: Scaffold `004` from the template into the existing folder
 
-**Description:** Copy `examples/000-template` into `examples/004-personality-quiz`, doing what `scripts/new-example.mjs` does (skipping `node_modules`, `dist`, `.alchemy` and build info; replacing the template's name in `package.json`, `index.html`, `src/App.tsx`, `alchemy.run.ts`, `vite.config.ts`), but keeping the existing `README.md`, `sources/`, `scripts/` and `.gitignore`. Add `scripts/` to the typecheck as `003` does. Replace the template's counter with the routes: `/` redirects to `/demo`, and `/demo` and `/participate` are lazy placeholders. Add `004` to the root `deploy` / `destroy` scripts and `landing/apps.ts`.
+**Description:** Copy `examples/000-template` into `examples/004-quizzes`, doing what `scripts/new-example.mjs` does (skipping `node_modules`, `dist`, `.alchemy` and build info; replacing the template's name in `package.json`, `index.html`, `src/App.tsx`, `alchemy.run.ts`, `vite.config.ts`), but keeping the existing `README.md`, `sources/`, `scripts/` and `.gitignore`. Add `scripts/` to the typecheck as `003` does. Replace the template's counter with the routes: `/` redirects to `/demo`, and `/demo` and `/participate` are lazy placeholders. Add `004` to the root `deploy` / `destroy` scripts and `landing/apps.ts`.
 
 **Acceptance criteria:**
-- [ ] `pnpm --filter 004-personality-quiz dev` serves `/demo` and `/participate`; `/` lands on `/demo`.
+- [ ] `pnpm --filter 004-quizzes dev` serves `/demo` and `/participate`; `/` lands on `/demo`.
 - [ ] No template counter code is left; `README.md`, `sources/`, `scripts/sample-responses.ts` and `.gitignore` are as they were, plus a "Run it" section in the README.
 - [ ] `004` builds, and is listed on the landing page.
 
@@ -59,7 +59,7 @@ Plan: [`plan.md`](plan.md). Spec: [`docs/specs/personality-quiz.md`](../docs/spe
 
 **Dependencies:** None
 
-**Files likely touched:** `examples/004-personality-quiz/{package.json,index.html,alchemy.run.ts,vite.config.ts,port.ts,offline.ts,tsconfig.json,oxlint.config.ts}`, `src/{App,main}.tsx`, `src/pages/{Demo,Participate}.tsx`, `worker/index.ts`, root `package.json`, `landing/apps.ts`, `pnpm-lock.yaml`
+**Files likely touched:** `examples/004-quizzes/{package.json,index.html,alchemy.run.ts,vite.config.ts,port.ts,offline.ts,tsconfig.json,oxlint.config.ts}`, `src/{App,main}.tsx`, `src/pages/{Demo,Participate}.tsx`, `worker/index.ts`, root `package.json`, `landing/apps.ts`, `pnpm-lock.yaml`
 
 **Estimated scope:** Medium (many files, but copied)
 
@@ -235,7 +235,7 @@ Plan: [`plan.md`](plan.md). Spec: [`docs/specs/personality-quiz.md`](../docs/spe
 
 **Dependencies:** T10, T12
 
-**Files likely touched:** `src/pages/Demo.tsx`, `src/demo/*.tsx`, `examples/004-personality-quiz/README.md`, `examples/002-matchmaking/README.md`
+**Files likely touched:** `src/pages/Demo.tsx`, `src/demo/*.tsx`, `examples/004-quizzes/README.md`, `examples/002-matchmaking/README.md`
 
 **Estimated scope:** Medium
 

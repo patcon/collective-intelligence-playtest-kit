@@ -1,6 +1,9 @@
-# 004-personality-quiz
+# 004-quizzes
 
-A personality quiz. Not scaffolded yet: so far this is only its source material.
+Quizzes a room answers together, starting with a personality quiz (the IPIP Big-Five Factor Markers). It's
+named for quizzes in general because more may follow, to find the right abstractions. Not scaffolded yet: so far
+this is only the personality quiz's source material. The design is in
+[`docs/specs/personality-quiz.md`](../../docs/specs/personality-quiz.md).
 
 ## Sources
 

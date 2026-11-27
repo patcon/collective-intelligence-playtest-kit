@@ -4,7 +4,7 @@ _Status: approved (2026-11-27), not built. Intent agreed in conversation the sam
 
 ## Objective
 
-Build the app in `examples/004-personality-quiz`. An evaluator opens `/demo` on a desktop and watches a room answer
+Build the app in `examples/004-quizzes`. An evaluator opens `/demo` on a desktop and watches a room answer
 the 50 real IPIP-BFFM statements (`sources/ipip-bffm-items.json`). As people answer, a participant × statement
 **vote matrix** fills in live. Most of the room is simulated: each simulated participant is a real person from
 `sources/ipip-ffm-responses.json`, answering with that person's real answers and skips, at a life-like pace. Real
@@ -12,6 +12,9 @@ phones join by QR code at `/participate` and answer the same statements.
 
 The point, for now, is only to see a room responding to these actual statements, including what partial data
 looks like. Nothing downstream of the matrix is built yet.
+
+The example is named `004-quizzes`, not after this one quiz, because more quizzes may follow; the abstractions they
+share are found then, not guessed now.
 
 At the same time, move the generic parts of `002`'s simulated participants into `packages/common`, under a
 `simulation` namespace, and move `002` onto them.
@@ -230,20 +233,20 @@ Same as `002`: React 19.3.1, Kumo 2.19.0, `agents` 0.34.0, Vite 8.3.8, Tailwind 
 
 ```
 pnpm install
-pnpm --filter 004-personality-quiz dev          # Alchemy dev server, port in port.ts
-pnpm --filter 004-personality-quiz dev:lan      # HTTPS on LAN, for real phones
-pnpm --filter 004-personality-quiz test
+pnpm --filter 004-quizzes dev          # Alchemy dev server, port in port.ts
+pnpm --filter 004-quizzes dev:lan      # HTTPS on LAN, for real phones
+pnpm --filter 004-quizzes test
 pnpm --filter 002-matchmaking test
 pnpm --filter @playtest-kit/common test
 pnpm lint && pnpm typecheck                     # repo-wide
-pnpm --filter 002-matchmaking build && pnpm --filter 004-personality-quiz build
+pnpm --filter 002-matchmaking build && pnpm --filter 004-quizzes build
 ```
 
-`pnpm new-example` would make `005-…`, since `004-personality-quiz/` already exists. Copy `000-template` into the
+`pnpm new-example` would make `005-…`, since `004-quizzes/` already exists. Copy `000-template` into the
 existing folder instead (keeping `README.md`, `sources/`, `scripts/` and `.gitignore`), as the script does otherwise.
 Add `004` to the root `deploy`/`destroy` scripts and the landing page, as `003` was.
 
-## Project structure (`examples/004-personality-quiz`)
+## Project structure (`examples/004-quizzes`)
 
 ```
 sources/ipip-bffm-items.json  sources/ipip-ffm-responses.json   # existing
