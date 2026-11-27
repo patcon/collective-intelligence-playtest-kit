@@ -1,8 +1,15 @@
 {
   "extends": "@playtest-kit/config/tsconfig.json",
   "compilerOptions": {
-    "lib": ["ES2024"],
-    "types": ["@cloudflare/workers-types"]
+    "lib": [
+      "ES2024"
+    ],
+    "types": [
+      "@cloudflare/workers-types"
+    ],
+    "resolveJsonModule": true
   },
-  "include": ["."]
+  "include": [
+    "."
+  ]
 }
