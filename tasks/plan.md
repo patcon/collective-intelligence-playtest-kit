@@ -62,9 +62,9 @@ T1–T2 (`shared-simulation`) and T3–T7 (`quiz-core`) don't depend on each oth
       (spec criteria 2, 5, 8–10). `004` passes test, typecheck, lint and build.
 
 ### Phase 3: Quiz demo (`quiz-demo`)
-- [ ] T8: Simulated participants from the sampled responses, with count and skip-threshold controls
-- [ ] T9: Speed and fast-forward
-- [ ] T10: Load check at 200 sims × 50 statements × ×20, and fixes
+- [x] T8: Simulated participants from the sampled responses, with count and skip-threshold controls
+- [x] T9: Speed and fast-forward
+- [x] T10: Load check at 200 sims × 50 statements × ×20, and fixes
 - [ ] T11: The vote matrix
 - [ ] T12: The info area for statements and people
 - [ ] T13: `/demo` layout, no layout shifts, and docs

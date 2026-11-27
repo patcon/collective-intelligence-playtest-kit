@@ -143,9 +143,9 @@ Plan: [`plan.md`](plan.md). Spec: [`docs/specs/personality-quiz.md`](../docs/spe
 **Description:** `src/simulation/responses.ts` loads `sources/ipip-ffm-responses.json` and draws people at random without repeats from those who skipped at most the threshold (over all 50). `QuizSim` is a headless participant over `common/simulation`'s `connectToRoom`: `ready` on connect; while `answering`, after a random 3–9 s wait, it sends its person's answer to the statement at its position (or a skip). It never undoes. `004`'s `useSimulation` builds a crowd of `QuizSim`s (limit 200) and keeps each sim's person (sample row, country, skips) for the page. `SimControls`: people (default 50) and skipped at most (default: no limit), applying straight away.
 
 **Acceptance criteria:**
-- [ ] `QuizSim` tests (fake socket and clock): answers its person's real answers in order, skips where they skipped, waits within 3–9 s, never sends `undo`.
-- [ ] Drawing tests: respects the threshold, never repeats a person, and says so when the threshold leaves fewer people than asked for.
-- [ ] On `/demo`, 50 sims join by default and answer through a quiz; the count can't go above 200 (criteria 3, 4, 6).
+- [x] `QuizSim` tests (fake socket and clock): answers its person's real answers in order, skips where they skipped, waits within 3–9 s, never sends `undo`.
+- [x] Drawing tests: respects the threshold, never repeats a person, and says so when the threshold leaves fewer people than asked for.
+- [x] On `/demo`, 50 sims join by default and answer through a quiz; the count can't go above 200 (criteria 3, 4, 6).
 
 **Verification:** `pnpm test`, `pnpm typecheck`, `pnpm lint`, `pnpm build` in `004`; agent-browser: 50 sims through N = 10.
 
@@ -160,8 +160,8 @@ Plan: [`plan.md`](plan.md). Spec: [`docs/specs/personality-quiz.md`](../docs/spe
 **Description:** A speed setting (×1, ×2, ×5, ×10, ×20) for the crowd, dividing each wait that starts after it changes, and "Fast-forward to finished", which makes every sim on this page send all its remaining answers at once. Real phones are untouched.
 
 **Acceptance criteria:**
-- [ ] `QuizSim` tests: every wait is within 3–9 s divided by the speed; fast-forward sends every remaining answer in order and nothing after (criterion 7).
-- [ ] On `/demo`, fast-forward fills every sim's answers within 2 s.
+- [x] `QuizSim` tests: every wait is within 3–9 s divided by the speed; fast-forward sends every remaining answer in order and nothing after (criterion 7).
+- [x] On `/demo`, fast-forward fills every sim's answers within 2 s.
 
 **Verification:** `pnpm test`, `pnpm typecheck`, `pnpm lint` in `004`; agent-browser: 50 sims at ×10, then fast-forward.
 
@@ -176,9 +176,9 @@ Plan: [`plan.md`](plan.md). Spec: [`docs/specs/personality-quiz.md`](../docs/spe
 **Description:** Run the heaviest case the spec allows and measure: the room's write rate and CPU time per message, snapshot size and rate on `/demo`, and whether Chrome and Firefox open all 201 sockets. Fix what fails, inside the spec (for example: persist `setState` at most every 250 ms, or answers as SQL rows). Anything that would change the spec (lowering the 200 limit, sharing sockets between sims) is asked about first. Record the numbers in the plan's Risks table.
 
 **Acceptance criteria:**
-- [ ] 200 sims finish a 50-statement quiz at ×20 with every answer in the host snapshot, in Chrome.
-- [ ] Firefox either does the same or the page says why it can't (and the spec is updated after asking).
-- [ ] The numbers and any fix are written down in `tasks/plan.md`.
+- [x] 200 sims finish a 50-statement quiz at ×20 with every answer in the host snapshot, in Chrome.
+- [x] Firefox either does the same or the page says why it can't (and the spec is updated after asking).
+- [x] The numbers and any fix are written down in `tasks/plan.md`.
 
 **Verification:** agent-browser in the dev server and in `preview` (workerd); `pnpm test` if the room changed.
 
