@@ -2,9 +2,9 @@
  * Downsamples the Open-Source Psychometrics IPIP-FFM raw data (about 1M people's answers to the 50 IPIP-BFFM
  * items) into `sources/ipip-ffm-responses.json`, small enough to commit, for simulated participants.
  *
- * The zip (151 MB, 416 MB unzipped) is downloaded once into `.cache/` (gitignored) and reused after that. Only
- * clean rows are sampled: one record from their IP address (`IPC` 1, as the codebook advises) and all 50 items
- * answered. The sample is seeded, so the same size gives the same people.
+ * The zip (151 MB, 416 MB unzipped) is downloaded once into `.cache/` (gitignored) and reused after that. Anyone
+ * who answered at least one item can be sampled, so some responses have gaps: a skipped item is `null`. The sample
+ * is seeded, so the same size gives the same people.
  *
  * Run by hand (`node scripts/sample-responses.ts [size]`, default 1000) and commit the output. Needs `unzip`.
  */
@@ -24,10 +24,10 @@ const zipPath = new URL('IPIP-FFM-data-8Nov2018.zip', cacheDir);
 const itemsUrl = new URL('../sources/ipip-bffm-items.json', import.meta.url);
 const outUrl = new URL('../sources/ipip-ffm-responses.json', import.meta.url);
 
-/** One sampled person: their country (as the dataset guessed it from their IP) and their 50 answers, 1–5. */
+/** One sampled person: their country (as the dataset guessed it from their IP) and their 50 answers, 1–5, or null where they skipped. */
 interface Response {
   readonly country: string;
-  readonly answers: ReadonlyArray<number>;
+  readonly answers: ReadonlyArray<number | null>;
 }
 
 /** A seeded random number in [0, 1) (mulberry32), so a sample can be made again. */
@@ -63,16 +63,16 @@ function csvLines(): AsyncIterable<string> {
   return createInterface({ input: unzip.stdout, crlfDelay: Infinity });
 }
 
-/** The row as a response, or null if it isn't clean enough to sample. */
-function toResponse(fields: ReadonlyArray<string>, itemAt: ReadonlyArray<number>, ipcAt: number, countryAt: number): Response | null {
-  if (fields[ipcAt] !== '1') {
-    return null;
-  }
-  const answers = itemAt.map((at) => Number(fields[at]));
-  if (!answers.every((answer) => Number.isInteger(answer) && answer >= 1 && answer <= 5)) {
-    return null;
-  }
-  return { country: fields[countryAt] ?? 'NONE', answers };
+/** The answer in a field, or null where it was skipped (`0`) or missing (`NULL`). */
+function toAnswer(field: string | undefined): number | null {
+  const answer = Number(field);
+  return Number.isInteger(answer) && answer >= 1 && answer <= 5 ? answer : null;
+}
+
+/** The row as a response, or null if it has no answers at all. */
+function toResponse(fields: ReadonlyArray<string>, itemAt: ReadonlyArray<number>, countryAt: number): Response | null {
+  const answers = itemAt.map((at) => toAnswer(fields[at]));
+  return answers.some((answer) => answer !== null) ? { country: fields[countryAt] ?? 'NONE', answers } : null;
 }
 
 async function sample(items: ReadonlyArray<string>, size: number): Promise<{ rows: number; eligible: number; responses: Array<Response> }> {
@@ -80,7 +80,7 @@ async function sample(items: ReadonlyArray<string>, size: number): Promise<{ row
   const reservoir: Array<{ row: number; response: Response }> = [];
   let header: Array<string> | null = null;
   let itemAt: Array<number> = [];
-  let [ipcAt, countryAt, rows, eligible] = [-1, -1, 0, 0];
+  let [countryAt, rows, eligible] = [-1, 0, 0];
 
   for await (const line of csvLines()) {
     const fields = line.split('\t');
@@ -94,11 +94,11 @@ async function sample(items: ReadonlyArray<string>, size: number): Promise<{ row
         return at;
       };
       itemAt = items.map(column);
-      [ipcAt, countryAt] = [column('IPC'), column('country')];
+      countryAt = column('country');
       continue;
     }
     rows++;
-    const response = toResponse(fields, itemAt, ipcAt, countryAt);
+    const response = toResponse(fields, itemAt, countryAt);
     if (!response) {
       continue;
     }
@@ -128,7 +128,7 @@ const { rows, eligible, responses } = await sample(items, size);
 const head = {
   source: DATA_URL,
   about: 'https://openpsychometrics.org/_rawdata/',
-  sampled: { rows, eligible, size: responses.length, seed: SEED, filter: 'IPC = 1 and all 50 items answered' },
+  sampled: { rows, eligible, size: responses.length, seed: SEED, filter: 'at least one item answered' },
 };
 // `items` on one line and one response per line keep the file short and its diffs readable.
 const json = [
@@ -140,4 +140,4 @@ const json = [
   '}',
 ].join('\n');
 writeFileSync(outUrl, `${json}\n`);
-process.stdout.write(`Sampled ${responses.length} of ${eligible} clean rows (${rows} in all) into sources/ipip-ffm-responses.json\n`);
+process.stdout.write(`Sampled ${responses.length} of ${eligible} rows with any answers (${rows} in all) into sources/ipip-ffm-responses.json\n`);

@@ -23,9 +23,11 @@ about 1M people who took the test in 2016–2018 and agreed to their answers bei
 dataset is 151 MB zipped, so only the sample is committed.
 
 Each response is a `country` (guessed by the site from the person's IP, `NONE` when it couldn't tell) and 50
-`answers`, 1–5, in the order of the file's `items`. Only clean rows are sampled: the one record from its IP
-address (`IPC` 1, as the dataset's codebook advises) with every item answered, about 600k of the 1M. The
-dataset's per-item timings, screen sizes and approximate locations are left out.
+`answers`, 1–5, in the order of the file's `items`, with `null` where the person skipped an item. Everyone in the
+dataset finished the test, but about 14% skipped at least one item, mostly just one or two. Those people are kept, so
+the sample shows what partial data looks like; only the ~3,900 who answered nothing are left out. Nor is it limited to
+one record per IP address (the codebook's `IPC` 1), so a few people may appear twice. The dataset's per-item timings,
+screen sizes and approximate locations are left out.
 
 To make the sample again, or a different size:
 
