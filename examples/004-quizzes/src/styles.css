@@ -1,3 +1,36 @@
 @source "../node_modules/@cloudflare/kumo/dist/**/*.{js,jsx,ts,tsx}";
 @import "@cloudflare/kumo/styles/tailwind";
 @import "tailwindcss";
+
+/* A new statement slides in from the right, so it reads as the next one. */
+@keyframes statement-in {
+  from {
+    opacity: 0;
+    transform: translateX(1.5rem);
+  }
+}
+
+.statement-in {
+  animation: statement-in 220ms ease-out;
+}
+
+/* The answer just tapped swells and settles, before the next statement comes in. */
+@keyframes answer-chosen {
+  40% {
+    transform: scale(1.04);
+  }
+}
+
+.answer-chosen {
+  animation: answer-chosen 200ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .statement-in {
+    animation: none;
+  }
+
+  .answer-chosen {
+    animation: none;
+  }
+}

@@ -33,6 +33,8 @@ function QuizScreen({ view, undone, onAnswer, onUndo }: QuizScreenProps) {
     return (
       <AnsweringScreen
         item={item}
+        // A fresh screen per statement: it slides in, with nothing chosen and focus on the statement.
+        key={`${view.position}-${item}`}
         onAnswer={(answer) => onAnswer(item, answer)}
         onUndo={onUndo}
         picked={undone?.item === item ? undone.answer : undefined}
