@@ -22,4 +22,9 @@ export const APPS: ReadonlyArray<ListedApp> = [
     title: '003 · Conversation card service',
     blurb: 'Draw conversation cards at random from a deck, by card type or a short list, without repeats.',
   },
+  {
+    stack: '004-quizzes',
+    title: '004 · Quizzes',
+    blurb: 'A room takes a personality quiz together, and the votes fill in live, one row per person.',
+  },
 ];

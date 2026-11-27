@@ -9,11 +9,12 @@
  * Run by hand (`node scripts/sample-responses.ts [size]`, default 1000) and commit the output. Needs `unzip`.
  */
 import { spawn } from 'node:child_process';
-import { createWriteStream, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { createWriteStream, existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { rename } from 'node:fs/promises';
 import { createInterface } from 'node:readline';
 import { Readable } from 'node:stream';
 import { pipeline } from 'node:stream/promises';
+import itemsFile from '../sources/ipip-bffm-items.json' with { type: 'json' };
 
 const DATA_URL = 'https://openpsychometrics.org/_rawdata/IPIP-FFM-data-8Nov2018.zip';
 const CSV_IN_ZIP = 'IPIP-FFM-data-8Nov2018/data-final.csv';
@@ -21,7 +22,6 @@ const SEED = 2018;
 
 const cacheDir = new URL('../.cache/', import.meta.url);
 const zipPath = new URL('IPIP-FFM-data-8Nov2018.zip', cacheDir);
-const itemsUrl = new URL('../sources/ipip-bffm-items.json', import.meta.url);
 const outUrl = new URL('../sources/ipip-ffm-responses.json', import.meta.url);
 
 /** One sampled person: their country (as the dataset guessed it from their IP) and their 50 answers, 1–5, or null where they skipped. */
@@ -34,11 +34,11 @@ interface Response {
 function seededRandom(seed: number): () => number {
   let state = seed >>> 0;
   return () => {
-    state = (state + 0x6d2b79f5) >>> 0;
+    state = (state + 0x6d_2b_79_f5) >>> 0;
     let t = state;
     t = Math.imul(t ^ (t >>> 15), t | 1);
     t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    return ((t ^ (t >>> 14)) >>> 0) / 4_294_967_296;
   };
 }
 
@@ -122,7 +122,7 @@ if (!Number.isInteger(size) || size < 1) {
   throw new Error(`Sample size must be a positive whole number, not "${process.argv[2]}"`);
 }
 /** Item ids in the order the items file lists them, which is the order each response's answers follow. */
-const items: ReadonlyArray<string> = JSON.parse(readFileSync(itemsUrl, 'utf8')).items.map((item: { id: string }) => item.id);
+const items = itemsFile.items.map((item) => item.id);
 await download();
 const { rows, eligible, responses } = await sample(items, size);
 const head = {

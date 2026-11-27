@@ -1,9 +1,20 @@
 # 004-quizzes
 
 Quizzes a room answers together, starting with a personality quiz (the IPIP Big-Five Factor Markers). It's
-named for quizzes in general because more may follow, to find the right abstractions. Not scaffolded yet: so far
-this is only the personality quiz's source material. The design is in
-[`docs/specs/personality-quiz.md`](../../docs/specs/personality-quiz.md).
+named for quizzes in general because more may follow, to find the right abstractions. The design is in
+[`docs/specs/personality-quiz.md`](../../docs/specs/personality-quiz.md); it's being built from
+[`tasks/todo.md`](../../tasks/todo.md), so for now `/demo` and `/participate` are placeholders.
+
+## Run it
+
+```sh
+pnpm install
+pnpm --filter 004-quizzes dev    # http://localhost:1337/demo; dev:lan serves it to phones over HTTPS
+```
+
+`/` opens `/demo`, the host's page. Phones join at `/participate`. The scaffold is
+[`000-template`](../000-template)'s, so its README covers the stack, the scripts and the house rules; this example
+adds `pnpm sample:responses` (below) and typechecks and lints `scripts/` too.
 
 ## Sources
 
@@ -35,7 +46,7 @@ screen sizes and approximate locations are left out.
 To make the sample again, or a different size:
 
 ```sh
-node scripts/sample-responses.ts [size]   # default 1000; needs unzip
+pnpm sample:responses [size]   # default 1000; needs unzip
 ```
 
 The script downloads the zip once into `.cache/` (gitignored), streams the CSV out of it, and samples with a
