@@ -1,0 +1,3 @@
+# The card service is a route function that works with any deck, kept in an example until it moves to `common`
+
+The card service is meant to be shared, but it starts in `examples/003-conversation-cards/worker/cards/` rather than in `packages/common`. Its shape is fixed for moving out later: it's a self-contained folder with no imports from outside it, and its entry point is `routeCardsRequest(request, deck, options) → Response | null`. That matches `routeAgentRequest`, so a host app mounts it with one `??` line. The deck is always passed in, so the shared code never depends on The And's data, which stays in the example. We're waiting for a second app that actually uses it before moving it, as with other code in `common`.
