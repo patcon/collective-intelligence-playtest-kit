@@ -1,0 +1,81 @@
+import type { ConnectSim, Sim, SimSocket } from '@playtest-kit/common/simulation';
+import { parseToParticipant } from '../room/protocol.ts';
+import type { ParticipantMessage, ParticipantView } from '../room/protocol.ts';
+import type { Person } from './responses.ts';
+
+export interface QuizSimOptions {
+  id: string;
+  connect: ConnectSim;
+  person: Person;
+  /** How long to wait, in ms, before answering each statement. */
+  delay: () => number;
+}
+
+/**
+ * A participant with no screen, answering as one real person from the sample did: the same protocol as a
+ * phone, over its own socket. It's ready as soon as it connects; while answering, it waits a while, then
+ * gives its person's answer to the statement it's on (or skips, where they skipped). It never undoes.
+ */
+export class QuizSim implements Sim {
+  readonly id: string;
+  readonly person: Person;
+  #delay: () => number;
+  #socket: SimSocket;
+  #timer: ReturnType<typeof setTimeout> | null = null;
+  /** The view an answer is pending for, so a repeat of the same view doesn't start another wait. */
+  #waitingOn: ParticipantView | null = null;
+
+  constructor({ id, connect, person, delay }: QuizSimOptions) {
+    this.id = id;
+    this.person = person;
+    this.#delay = delay;
+    this.#socket = connect(id, {
+      onMessage: (raw) => this.#onMessage(raw),
+      onOpen: () => this.#send({ type: 'ready' }),
+    });
+  }
+
+  dispose(): void {
+    this.#cancel();
+    this.#socket.close();
+  }
+
+  #send(msg: ParticipantMessage): void {
+    this.#socket.send(JSON.stringify(msg));
+  }
+
+  #onMessage(raw: string): void {
+    const view = parseToParticipant(raw)?.view;
+    if (!view || (this.#waitingOn && sameStatement(this.#waitingOn, view))) {
+      return;
+    }
+    this.#cancel();
+    if (view.status === 'answering') {
+      this.#waitingOn = view;
+      this.#timer = setTimeout(() => this.#answer(view), this.#delay());
+    }
+  }
+
+  /** Once sent, a repeat of this view (say, after a reconnect that lost the answer) starts a new wait. */
+  #answer(view: ParticipantView): void {
+    this.#timer = null;
+    this.#waitingOn = null;
+    const item = view.statements[view.position];
+    if (item !== undefined) {
+      this.#send({ answer: this.person.answers[item] ?? null, item, type: 'answer' });
+    }
+  }
+
+  #cancel(): void {
+    if (this.#timer !== null) {
+      clearTimeout(this.#timer);
+      this.#timer = null;
+    }
+    this.#waitingOn = null;
+  }
+}
+
+/** Whether two views have this sim on the same statement of the same quiz. */
+function sameStatement(a: ParticipantView, b: ParticipantView): boolean {
+  return a.status === b.status && a.position === b.position && a.statements.join() === b.statements.join();
+}

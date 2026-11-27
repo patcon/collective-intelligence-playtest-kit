@@ -5,6 +5,8 @@ import { QuizControls } from '../demo/QuizControls.tsx';
 import { hostRoom } from '../room/client.ts';
 import { ROOM } from '../room/protocol.ts';
 import { useRoomSnapshot } from '../room/useRoomSnapshot.ts';
+import { SimControls } from '../simulation/SimControls.tsx';
+import { useSimulation } from '../simulation/useSimulation.ts';
 
 const { RoomProvider, useRoomSend, useRoomStatus } = hostRoom;
 
@@ -12,6 +14,7 @@ function HostView() {
   const status = useRoomStatus();
   const send = useRoomSend();
   const snapshot = useRoomSnapshot();
+  const simulation = useSimulation();
 
   return (
     <main className="mx-auto flex min-h-screen max-w-400 flex-col gap-4 p-4">
@@ -26,6 +29,7 @@ function HostView() {
       </header>
       {snapshot ? (
         <div className="grid items-start gap-4 lg:grid-cols-3">
+          <SimControls simulation={simulation} />
           <QuizControls
             onConfig={(config) => send({ config, type: 'config' })}
             onReset={() => send({ type: 'reset' })}
