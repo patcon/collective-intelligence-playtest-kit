@@ -1,10 +1,15 @@
-import { Button, Loader, Surface } from '@cloudflare/kumo';
+import { Loader, Surface } from '@cloudflare/kumo';
 import { RoomStatusBadge } from '@playtest-kit/ui';
 import { useState } from 'react';
 import { HoverStore } from '../demo/HoverStore.ts';
 import { InfoArea } from '../demo/InfoArea.tsx';
 import { JoinPanel } from '../demo/JoinPanel.tsx';
-import { MATRIX_VARIANTS, nextVariant } from '../demo/matrixLayout.ts';
+import { COLUMN_ORDERS, orderColumns } from '../demo/columnOrder.ts';
+import type { ColumnOrder } from '../demo/columnOrder.ts';
+import { CycleButton } from '../demo/CycleButton.tsx';
+import { MATRIX_VARIANTS } from '../demo/matrixLayout.ts';
+import { REVERSED_VIEWS } from '../demo/reversedItems.ts';
+import type { ReversedView } from '../demo/reversedItems.ts';
 import type { MatrixVariant } from '../demo/matrixLayout.ts';
 import { MatrixLegend } from '../demo/MatrixLegend.tsx';
 import { matrixRows } from '../demo/matrixRows.ts';
@@ -25,6 +30,8 @@ function HostView() {
   const simulation = useSimulation();
   const [hover] = useState(() => new HoverStore());
   const [variant, setVariant] = useState<MatrixVariant>('cells');
+  const [columnOrder, setColumnOrder] = useState<ColumnOrder>('seen');
+  const [reversed, setReversed] = useState<ReversedView>('answered');
   const rows = snapshot ? matrixRows(snapshot, new Map(simulation.sims.map((sim) => [sim.id, sim.name]))) : null;
 
   return (
@@ -60,13 +67,13 @@ function HostView() {
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div className="flex items-center gap-3">
                 <h2 className="text-lg font-semibold">Answers</h2>
-                <Button onClick={() => setVariant(nextVariant)} size="sm" variant="secondary">
-                  View: {MATRIX_VARIANTS.find(({ value }) => value === variant)?.label}
-                </Button>
+                <CycleButton label="View" onChange={setVariant} options={MATRIX_VARIANTS} value={variant} />
+                <CycleButton label="Columns" onChange={setColumnOrder} options={COLUMN_ORDERS} value={columnOrder} />
+                <CycleButton label="Reversed" onChange={setReversed} options={REVERSED_VIEWS} value={reversed} />
               </div>
               <MatrixLegend />
             </div>
-            <VoteMatrix hover={hover} rows={rows} statements={snapshot.statements} variant={variant} />
+            <VoteMatrix columns={orderColumns(snapshot.statements, columnOrder)} hover={hover} reversed={reversed} rows={rows} variant={variant} />
           </Surface>
         </>
       ) : (

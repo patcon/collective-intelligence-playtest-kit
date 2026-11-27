@@ -1,11 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { isLabelled, matrixLayout, nextVariant } from './matrixLayout.ts';
-
-describe('nextVariant', () => {
-  it('cycles cells, pixel-fit and back', () => {
-    expect([nextVariant('cells'), nextVariant('pixel-fit')]).toEqual(['pixel-fit', 'cells']);
-  });
-});
+import { isLabelled, matrixLayout } from './matrixLayout.ts';
 
 describe('matrixLayout', () => {
   it('labels every column and row, with shapes, in the cells variant', () => {

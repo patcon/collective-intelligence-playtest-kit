@@ -6,12 +6,6 @@ export const MATRIX_VARIANTS: ReadonlyArray<{ label: string; value: MatrixVarian
   { label: 'Pixel fit', value: 'pixel-fit' },
 ];
 
-/** The variant after `variant`, wrapping round to the first. */
-export function nextVariant(variant: MatrixVariant): MatrixVariant {
-  const i = MATRIX_VARIANTS.findIndex(({ value }) => value === variant);
-  return MATRIX_VARIANTS[(i + 1) % MATRIX_VARIANTS.length]?.value ?? variant;
-}
-
 /** Room (px) a column number needs, up to three digits. */
 const HEADER_WIDTH = 18;
 /** Room (px) a name needs. */

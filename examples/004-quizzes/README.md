@@ -31,7 +31,9 @@ column per statement, coloured from Disagree (red) to Agree (green) as in Polis,
 answered yet. Hovering or focusing a cell, a column number or a row shows that statement or person in the info area
 above it, and highlights that person's row and that statement's column, headers too, like a spreadsheet. A toggle
 switches to a pixel-fit view that stretches the matrix to fill a tall box, labelling only every 5th, 10th… column or
-row when they don't all fit.
+row when they don't all fit. Another orders the columns as seen, or grouped by trait (each group still in the order
+seen), keeping each statement's number from the order seen. A third flips the answers to reversed statements, so
+Agree always scores towards the trait and patterns line up by colour.
 
 ## Code
 
