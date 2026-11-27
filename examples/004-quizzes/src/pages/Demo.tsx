@@ -1,5 +1,8 @@
 import { Loader, Surface } from '@cloudflare/kumo';
 import { RoomStatusBadge } from '@playtest-kit/ui';
+import { useState } from 'react';
+import { HoverStore } from '../demo/HoverStore.ts';
+import { InfoArea } from '../demo/InfoArea.tsx';
 import { JoinPanel } from '../demo/JoinPanel.tsx';
 import { MatrixLegend } from '../demo/MatrixLegend.tsx';
 import { matrixRows } from '../demo/matrixRows.ts';
@@ -18,6 +21,8 @@ function HostView() {
   const send = useRoomSend();
   const snapshot = useRoomSnapshot();
   const simulation = useSimulation();
+  const [hover] = useState(() => new HoverStore());
+  const rows = snapshot ? matrixRows(snapshot, new Map(simulation.sims.map((sim) => [sim.id, sim.name]))) : null;
 
   return (
     <main className="mx-auto flex min-h-screen max-w-400 flex-col gap-4 p-4">
@@ -30,7 +35,7 @@ function HostView() {
           A room takes a personality quiz together (the IPIP Big-Five Factor Markers), and everyone’s answers fill in live.
         </p>
       </header>
-      {snapshot ? (
+      {snapshot && rows ? (
         <>
           <div className="grid items-start gap-4 lg:grid-cols-3">
             <SimControls simulation={simulation} />
@@ -42,12 +47,18 @@ function HostView() {
             />
             <JoinPanel />
           </div>
+          <InfoArea
+            hover={hover}
+            people={new Map(simulation.sims.map((sim) => [sim.id, sim.person]))}
+            rows={rows}
+            statements={snapshot.statements}
+          />
           <Surface className="flex flex-col gap-3 rounded-lg p-5">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <h2 className="text-lg font-semibold">Answers</h2>
               <MatrixLegend />
             </div>
-            <VoteMatrix rows={matrixRows(snapshot, new Map(simulation.sims.map((sim) => [sim.id, sim.name])))} statements={snapshot.statements} />
+            <VoteMatrix hover={hover} rows={rows} statements={snapshot.statements} />
           </Surface>
         </>
       ) : (

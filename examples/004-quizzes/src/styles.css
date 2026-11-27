@@ -109,3 +109,33 @@
 .vote-matrix {
   line-height: var(--vote-cell);
 }
+
+/* Column numbers and row names: buttons for focus, but plain to look at. */
+.vote-header,
+.vote-name {
+  font: inherit;
+  cursor: default;
+  border-radius: 2px;
+}
+
+.vote-header {
+  font-size: 10px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-color-kumo-subtle);
+}
+
+.vote-name {
+  overflow: hidden;
+  padding-right: 0.5rem;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.vote-header:hover,
+.vote-header:focus-visible,
+.vote-name:hover,
+.vote-name:focus-visible {
+  background: var(--color-kumo-tint, rgb(128 128 128 / 0.15));
+}
