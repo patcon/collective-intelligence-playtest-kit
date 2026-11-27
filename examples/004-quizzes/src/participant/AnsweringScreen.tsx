@@ -13,7 +13,7 @@ interface AnsweringScreenProps {
   /** From 0. */
   position: number;
   total: number;
-  /** What was picked here before an Undo brought them back, to show it; undefined if nothing. */
+  /** What was picked here before an Undo brought them back, to show it on the options; undefined if nothing or a skip. */
   picked: Answer | undefined;
   onAnswer: (answer: Answer) => void;
   onUndo: () => void;
@@ -62,12 +62,8 @@ export function AnsweringScreen({ item, position, total, picked, onAnswer, onUnd
           <div className={position === 0 ? 'invisible' : undefined}>
             <UndoButton onUndo={() => chosen === undefined && onUndo()} />
           </div>
-          <Button
-            aria-pressed={shown === null}
-            className={chosen === null ? 'answer-chosen' : undefined}
-            onClick={() => choose(null)}
-            variant={shown === null ? 'primary' : 'ghost'}
-          >
+          {/* Lit only as it's tapped: going back to a skipped statement shows no answer picked, not Skip. */}
+          <Button className={chosen === null ? 'answer-chosen' : undefined} onClick={() => choose(null)} variant={chosen === null ? 'primary' : 'ghost'}>
             Skip
           </Button>
         </div>
