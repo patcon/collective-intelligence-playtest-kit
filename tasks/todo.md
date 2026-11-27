@@ -193,9 +193,9 @@ Plan: [`plan.md`](plan.md). Spec: [`docs/specs/personality-quiz.md`](../docs/spe
 **Description:** `src/demo/VoteMatrix.tsx` draws the host snapshot: one row per participant (real phones first, then sims in join order, named from the page's sims or "Phone …"), one column per chosen statement numbered 1…N, fixed-size cells on a diverging five-step scale, a distinct skip mark, and a blank for not answered yet. A legend shows the scale, skip and blank. Colours meet contrast in light and dark themes. In the lobby it shows the rows and no columns.
 
 **Acceptance criteria:**
-- [ ] Each sim's row matches its person's answers in `ipip-ffm-responses.json` for the chosen statements (criterion 6).
-- [ ] Skips and blanks are told apart without colour alone (the skip mark is a shape).
-- [ ] Cells and headers have fixed sizes: new answers and new rows never move anything above or beside the matrix.
+- [x] Each sim's row matches its person's answers in `ipip-ffm-responses.json` for the chosen statements (criterion 6).
+- [x] Skips and blanks are told apart without colour alone (the skip mark is a shape).
+- [x] Cells and headers have fixed sizes: new answers and new rows never move anything above or beside the matrix.
 
 **Verification:** `pnpm typecheck`, `pnpm lint`, `pnpm build` in `004`; agent-browser: screenshot mid-quiz with sims and a phone, in both themes.
 
@@ -210,9 +210,9 @@ Plan: [`plan.md`](plan.md). Spec: [`docs/specs/personality-quiz.md`](../docs/spe
 **Description:** A fixed-height info area on `/demo`. Hovering or focusing a column number shows the statement: number, id, text, trait, and keying ("reversed" for `keyed: -1`). Hovering a row shows the person: name, phone or sim, and for this page's sims the sample row, country and real-data skips, plus how many statements they've answered. Column numbers and row names are keyboard-focusable.
 
 **Acceptance criteria:**
-- [ ] Hovering column 7 shows that statement's text, trait and keying; hovering a sim's row shows its country and skips (criterion 11).
-- [ ] The area's height never changes, empty or full; nothing on the page moves when it updates.
-- [ ] The same details are reachable by keyboard focus.
+- [x] Hovering column 7 shows that statement's text, trait and keying; hovering a sim's row shows its country and skips (criterion 11).
+- [x] The area's height never changes, empty or full; nothing on the page moves when it updates.
+- [x] The same details are reachable by keyboard focus.
 
 **Verification:** `pnpm typecheck`, `pnpm lint` in `004`; agent-browser: hover a column and a row, compare screenshots for movement.
 
