@@ -2,11 +2,13 @@ import { useOnChange } from '@playtest-kit/common';
 import { connectToRoom, useSimCrowd } from '@playtest-kit/common/simulation';
 import { AGENT, ROOM } from '../room/protocol.ts';
 import { DEFAULT_SIMS, QuizCrowd } from './QuizCrowd.ts';
-import type { QuizCrowdState } from './QuizCrowd.ts';
+import type { QuizCrowdState, Speed } from './QuizCrowd.ts';
 
 export interface Simulation extends QuizCrowdState {
   setCount: (count: number) => void;
   setMaxSkipped: (maxSkipped: number | null) => void;
+  setSpeed: (speed: Speed) => void;
+  fastForward: () => void;
 }
 
 /** This page's simulated participants, `DEFAULT_SIMS` of them to begin with, for as long as the calling component is mounted. */
@@ -16,7 +18,9 @@ export function useSimulation(): Simulation {
 
   return {
     ...state,
+    fastForward: () => crowd.fastForward(),
     setCount: (count) => crowd.setCount(count),
     setMaxSkipped: (maxSkipped) => crowd.setMaxSkipped(maxSkipped),
+    setSpeed: (speed) => crowd.setSpeed(speed),
   };
 }

@@ -1,5 +1,5 @@
 import type { ConnectSim } from '@playtest-kit/common/simulation';
-import { describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { MAX_SIMS, QuizCrowd } from './QuizCrowd.ts';
 import { PEOPLE } from './responses.ts';
 import type { Person } from './responses.ts';
@@ -27,5 +27,33 @@ describe('QuizCrowd', () => {
     crowd.setCount(4);
     expect(crowd.getState()).toMatchObject({ short: 0 });
     expect(crowd.getState().sims).toHaveLength(4);
+  });
+});
+
+describe('QuizCrowd speed', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('divides each wait that starts after a change by the speed', () => {
+    const sent: Array<unknown> = [];
+    const listeners: Array<(raw: string) => void> = [];
+    const talking: ConnectSim = (_id, handlers) => {
+      listeners.push(handlers.onMessage);
+      return { close: () => undefined, send: (text) => sent.push(JSON.parse(text)) };
+    };
+    const crowd = new QuizCrowd(talking, [person(0, 0)], () => 6000);
+    crowd.setCount(1);
+    crowd.setSpeed(20);
+    listeners[0]?.(JSON.stringify({ type: 'view', view: { answers: {}, position: 0, statements: ['EXT1'], status: 'answering' } }));
+    vi.advanceTimersByTime(299);
+    expect(sent).toEqual([]);
+    vi.advanceTimersByTime(1);
+    expect(sent).toEqual([{ answer: null, item: 'EXT1', type: 'answer' }]);
+    expect(crowd.getState().speed).toBe(20);
   });
 });

@@ -15,6 +15,7 @@ export interface QuizSimOptions {
  * A participant with no screen, answering as one real person from the sample did: the same protocol as a
  * phone, over its own socket. It's ready as soon as it connects; while answering, it waits a while, then
  * gives its person's answer to the statement it's on (or skips, where they skipped). It never undoes.
+ * `finish()` sends every answer left at once.
  */
 export class QuizSim implements Sim {
   readonly id: string;
@@ -24,6 +25,10 @@ export class QuizSim implements Sim {
   #timer: ReturnType<typeof setTimeout> | null = null;
   /** The view an answer is pending for, so a repeat of the same view doesn't start another wait. */
   #waitingOn: ParticipantView | null = null;
+  /** The latest view, so `finish()` knows what's left. */
+  #view: ParticipantView | null = null;
+  /** The statements of a quiz this sim has sent every answer to, so the views that catch up don't start new waits. */
+  #finished: string | null = null;
 
   constructor({ id, connect, person, delay }: QuizSimOptions) {
     this.id = id;
@@ -33,6 +38,19 @@ export class QuizSim implements Sim {
       onMessage: (raw) => this.#onMessage(raw),
       onOpen: () => this.#send({ type: 'ready' }),
     });
+  }
+
+  /** Answers every statement left in this quiz straight away, in order, and nothing after. */
+  finish(): void {
+    const view = this.#view;
+    if (view?.status !== 'answering') {
+      return;
+    }
+    this.#cancel();
+    this.#finished = view.statements.join();
+    for (const item of view.statements.slice(view.position)) {
+      this.#send({ answer: this.person.answers[item] ?? null, item, type: 'answer' });
+    }
   }
 
   dispose(): void {
@@ -49,7 +67,14 @@ export class QuizSim implements Sim {
     if (!view || (this.#waitingOn && sameStatement(this.#waitingOn, view))) {
       return;
     }
+    this.#view = view;
+    if (view.status !== 'answering') {
+      this.#finished = null;
+    }
     this.#cancel();
+    if (this.#finished === view.statements.join()) {
+      return;
+    }
     if (view.status === 'answering') {
       this.#waitingOn = view;
       this.#timer = setTimeout(() => this.#answer(view), this.#delay());

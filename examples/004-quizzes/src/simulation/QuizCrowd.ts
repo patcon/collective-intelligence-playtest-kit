@@ -10,6 +10,10 @@ export const MAX_SIMS = 200;
 /** How many sims join when the page opens. */
 export const DEFAULT_SIMS = 50;
 
+/** How much faster than a live room the sims can answer. */
+export const SPEEDS = [1, 2, 5, 10, 20] as const;
+export type Speed = (typeof SPEEDS)[number];
+
 export interface SimDetails {
   id: string;
   /** "Sim 1", "Sim 2"…, by position. */
@@ -23,6 +27,8 @@ export interface QuizCrowdState {
   maxSkipped: number | null;
   /** How many more were asked for than there are people left within `maxSkipped`. */
   short: number;
+  /** Divides each wait that starts from now on. */
+  speed: Speed;
 }
 
 /** Between 3 and 9 seconds a statement: a live room answering with some time pressure. */
@@ -40,12 +46,13 @@ export class QuizCrowd {
   #listeners = new Set<() => void>();
   #maxSkipped: number | null = null;
   #short = 0;
-  #state: QuizCrowdState = { maxSkipped: null, short: 0, sims: [] };
+  #speed: Speed = 1;
+  #state: QuizCrowdState = { maxSkipped: null, short: 0, sims: [], speed: 1 };
 
   constructor(connect: ConnectSim, people: ReadonlyArray<Person> = PEOPLE, delay: () => number = answerDelay) {
     this.#people = people;
     this.#crowd = new SimCrowd({
-      build: (id) => new QuizSim({ connect, delay, id, person: this.#draw() }),
+      build: (id) => new QuizSim({ connect, delay: () => delay() / this.#speed, id, person: this.#draw() }),
       limit: MAX_SIMS,
       newId: newSimId,
     });
@@ -76,6 +83,19 @@ export class QuizCrowd {
     this.#publish();
   }
 
+  /** Applies to the waits that start from now on; one already under way runs out at the old speed. */
+  setSpeed(speed: Speed): void {
+    this.#speed = speed;
+    this.#publish();
+  }
+
+  /** Every sim on this page answers all its remaining statements straight away. Real phones aren't touched. */
+  fastForward(): void {
+    for (const sim of this.#crowd.sims) {
+      sim.finish();
+    }
+  }
+
   dispose(): void {
     this.#crowd.dispose();
   }
@@ -98,6 +118,7 @@ export class QuizCrowd {
     this.#state = {
       maxSkipped: this.#maxSkipped,
       short: this.#short,
+      speed: this.#speed,
       sims: sims.map((summary, i) => {
         const sim = this.#crowd.sims[i];
         if (!sim) {

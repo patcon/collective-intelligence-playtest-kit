@@ -56,6 +56,23 @@ describe('QuizSim', () => {
     ]);
   });
 
+  it('fast-forwards: every answer left, in order, then nothing more as the room catches up', () => {
+    const { at, sent, sim } = simulated();
+    at(0);
+    vi.advanceTimersByTime(DELAY);
+    at(1);
+    sim.finish();
+    expect(sent).toEqual([
+      { answer: 5, item: 'EXT1', type: 'answer' },
+      { answer: null, item: 'AGR1', type: 'answer' },
+      { answer: 2, item: 'CSN1', type: 'answer' },
+    ]);
+    at(2);
+    at(3);
+    vi.advanceTimersByTime(DELAY * 10);
+    expect(sent).toHaveLength(3);
+  });
+
   it('drops a pending answer when the quiz is reset, and never undoes', () => {
     const { at, sent, view } = simulated();
     at(0);
