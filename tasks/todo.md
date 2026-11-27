@@ -51,9 +51,9 @@ Plan: [`plan.md`](plan.md). Spec: [`docs/specs/personality-quiz.md`](../docs/spe
 **Description:** Copy `examples/000-template` into `examples/004-quizzes`, doing what `scripts/new-example.mjs` does (skipping `node_modules`, `dist`, `.alchemy` and build info; replacing the template's name in `package.json`, `index.html`, `src/App.tsx`, `alchemy.run.ts`, `vite.config.ts`), but keeping the existing `README.md`, `sources/`, `scripts/` and `.gitignore`. Add `scripts/` to the typecheck as `003` does. Replace the template's counter with the routes: `/` redirects to `/demo`, and `/demo` and `/participate` are lazy placeholders. Add `004` to the root `deploy` / `destroy` scripts and `landing/apps.ts`.
 
 **Acceptance criteria:**
-- [ ] `pnpm --filter 004-quizzes dev` serves `/demo` and `/participate`; `/` lands on `/demo`.
-- [ ] No template counter code is left; `README.md`, `sources/`, `scripts/sample-responses.ts` and `.gitignore` are as they were, plus a "Run it" section in the README.
-- [ ] `004` builds, and is listed on the landing page.
+- [x] `pnpm --filter 004-quizzes dev` serves `/demo` and `/participate`; `/` lands on `/demo`.
+- [x] No template counter code is left; `README.md`, `sources/`, `scripts/sample-responses.ts` and `.gitignore` are as they were, plus a "Run it" section in the README.
+- [x] `004` builds, and is listed on the landing page.
 
 **Verification:** `pnpm install`; in `004`: `pnpm typecheck`, `pnpm lint`, `pnpm build`; open `/` in the dev server.
 
@@ -68,9 +68,9 @@ Plan: [`plan.md`](plan.md). Spec: [`docs/specs/personality-quiz.md`](../docs/spe
 **Description:** `src/items/items.ts` reads `sources/ipip-bffm-items.json` into typed `Item`s (id, text, trait, keyed), with `TRAITS` and lookups by id, usable in the page and the Worker. `src/room/chooseStatements.ts` picks N, as the spec's "Choosing the statements" says: `floor(N / 5)` per trait, one more for `N mod 5` random traits, random within each trait, returned in the test's order. `rng` is injected.
 
 **Acceptance criteria:**
-- [ ] For every N from 1 to 50: N distinct ids, per-trait counts differ by at most 1, in the items file's order.
-- [ ] The same seed gives the same choice; N = 50 gives every statement in order.
-- [ ] `items.ts` has 50 items, 10 per trait, and its types reject a trait or id that isn't in the file.
+- [x] For every N from 1 to 50: N distinct ids, per-trait counts differ by at most 1, in the items file's order.
+- [x] The same seed gives the same choice; N = 50 gives every statement in order.
+- [x] `items.ts` has 50 items, 10 per trait, and its types reject a trait or id that isn't in the file.
 
 **Verification:** `pnpm test`, `pnpm typecheck`, `pnpm lint` in `004`.
 
@@ -85,8 +85,8 @@ Plan: [`plan.md`](plan.md). Spec: [`docs/specs/personality-quiz.md`](../docs/spe
 **Description:** `src/room/protocol.ts`: the messages, `QuizConfig`, `ParticipantView` and `RoomSnapshot` from the spec, with `parse*` functions that validate at the boundary. `src/room/quizRoom.ts`: the pure `reduce(state, event, rng)` over join, leave, ready, answer, undo, config, start and reset, with `viewFor` and `snapshotOf` selectors.
 
 **Acceptance criteria:**
-- [ ] Reducer tests cover: Start refused with no one ready; Start choosing statements (via `chooseStatements`) and moving ready people to `answering`; an answer only at the sender's position (others ignored); skip as `null`; reaching `done`; undo at the first statement, mid-quiz, and from `done` (clearing that answer); latecomers waiting (`late`, then included at the next Start) and joining (start at statement 1); leave and reconnect keeping answers; Reset clearing everything and forgetting anyone gone; config applying at the next Start.
-- [ ] Parser tests reject unknown types, unknown item ids, answers outside 1–5, and config with N outside 1–50 or an unknown latecomers value.
+- [x] Reducer tests cover: Start refused with no one ready; Start choosing statements (via `chooseStatements`) and moving ready people to `answering`; an answer only at the sender's position (others ignored); skip as `null`; reaching `done`; undo at the first statement, mid-quiz, and from `done` (clearing that answer); latecomers waiting (`late`, then included at the next Start) and joining (start at statement 1); leave and reconnect keeping answers; Reset clearing everything and forgetting anyone gone; config applying at the next Start.
+- [x] Parser tests reject unknown types, unknown item ids, answers outside 1–5, and config with N outside 1–50 or an unknown latecomers value.
 
 **Verification:** `pnpm test`, `pnpm typecheck`, `pnpm lint` in `004`.
 
@@ -101,9 +101,9 @@ Plan: [`plan.md`](plan.md). Spec: [`docs/specs/personality-quiz.md`](../docs/spe
 **Description:** `worker/QuizRoom.ts`, a thin `agents` `Agent` like `002`'s `MatchRoom`: roles from `?role=`, socket events to reducer events, `setState`, each participant's view sent at once, and the host snapshot through a throttle (the first change sends at once, later ones within 250 ms fold into one send, phase changes send at once). The throttle is a pure, clock-injected helper with tests. `/demo` connects as host and shows `QuizControls`: statements (N, 1–50), latecomers (wait / join), Start (disabled with the reason when no one is ready), Reset, the phase and counts, and the room status badge.
 
 **Acceptance criteria:**
-- [ ] Throttle tests: one send per 250 ms window under a burst, the last state always sent, phase changes not delayed.
-- [ ] From `/demo`, config, Start and Reset reach the room, and the snapshot shows phase, chosen statements and participants.
-- [ ] Start is disabled with "No one is ready yet" (or similar) when no one is ready (spec criterion 2).
+- [x] Throttle tests: one send per 250 ms window under a burst, the last state always sent, phase changes not delayed.
+- [x] From `/demo`, config, Start and Reset reach the room, and the snapshot shows phase, chosen statements and participants.
+- [x] Start is disabled with "No one is ready yet" (or similar) when no one is ready (spec criterion 2).
 
 **Verification:** `pnpm test`, `pnpm typecheck`, `pnpm lint`, `pnpm build` in `004`; in the dev server, `/demo` connects and Start/Reset work with one `/participate` tab.
 
@@ -118,9 +118,9 @@ Plan: [`plan.md`](plan.md). Spec: [`docs/specs/personality-quiz.md`](../docs/spe
 **Description:** `/participate` connects with a stable `sessionId`, shows the shared `StartScreen` (Start takes the wake lock and sends `ready`), then a screen per status: waiting, late, answering ("7 / 30", the statement, five large buttons Disagree … Agree, Skip, Undo hidden on the first statement), and done (with Undo). `/demo` gets a join panel with the shared `JoinQrCode` to `/participate`.
 
 **Acceptance criteria:**
-- [ ] A phone tab answers, skips and undoes, and the host snapshot reflects each within ~1 s (spec criterion 8).
-- [ ] A reload mid-quiz returns to the same statement with answers kept (criterion 10).
-- [ ] With latecomers set to wait, a tab joining mid-quiz sees "You'll join the next one"; set to join, it starts at statement 1 (criterion 9).
+- [x] A phone tab answers, skips and undoes, and the host snapshot reflects each within ~1 s (spec criterion 8).
+- [x] A reload mid-quiz returns to the same statement with answers kept (criterion 10).
+- [x] With latecomers set to wait, a tab joining mid-quiz sees "You'll join the next one"; set to join, it starts at statement 1 (criterion 9).
 
 **Verification:** `pnpm typecheck`, `pnpm lint`, `pnpm build` in `004`; agent-browser: `/demo` plus one `/participate` tab through a quiz of N = 10.
 
@@ -132,8 +132,8 @@ Plan: [`plan.md`](plan.md). Spec: [`docs/specs/personality-quiz.md`](../docs/spe
 
 ## Checkpoint B
 
-- [ ] A phone tab completes a quiz of N = 10 started from `/demo`, with skip, undo, a reload, and latecomers both ways.
-- [ ] `004`: test, typecheck, lint, build.
+- [x] A phone tab completes a quiz of N = 10 started from `/demo`, with skip, undo, a reload, and latecomers both ways.
+- [x] `004`: test, typecheck, lint, build.
 - [ ] Review before Phase 3.
 
 ## Phase 3: Quiz demo (`quiz-demo`)

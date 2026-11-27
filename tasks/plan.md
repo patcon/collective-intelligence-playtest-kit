@@ -51,14 +51,14 @@ T1–T2 (`shared-simulation`) and T3–T7 (`quiz-core`) don't depend on each oth
 - [x] `002` and `common` pass test, typecheck, lint and build; manual check of `002`'s sims on `/demo`.
 
 ### Phase 2: Quiz core (`quiz-core`)
-- [ ] T3: Scaffold `004` from the template into the existing folder
-- [ ] T4: Typed statements, and `chooseStatements`
-- [ ] T5: Protocol and room reducer
-- [ ] T6: `QuizRoom`, throttled host snapshots, and the quiz controls on `/demo`
-- [ ] T7: `/participate`: start, wait, answer with Skip and Undo, done; QR join on `/demo`
+- [x] T3: Scaffold `004` from the template into the existing folder
+- [x] T4: Typed statements, and `chooseStatements`
+- [x] T5: Protocol and room reducer
+- [x] T6: `QuizRoom`, throttled host snapshots, and the quiz controls on `/demo`
+- [x] T7: `/participate`: start, wait, answer with Skip and Undo, done; QR join on `/demo`
 
 ### Checkpoint B
-- [ ] A phone tab completes a quiz of N = 10 started from `/demo`, with skip, undo, reload and latecomers both ways
+- [x] A phone tab completes a quiz of N = 10 started from `/demo`, with skip, undo, reload and latecomers both ways
       (spec criteria 2, 5, 8–10). `004` passes test, typecheck, lint and build.
 
 ### Phase 3: Quiz demo (`quiz-demo`)
