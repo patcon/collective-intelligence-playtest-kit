@@ -67,10 +67,10 @@ T1–T2 (`shared-simulation`) and T3–T7 (`quiz-core`) don't depend on each oth
 - [x] T10: Load check at 200 sims × 50 statements × ×20, and fixes
 - [x] T11: The vote matrix
 - [x] T12: The info area for statements and people
-- [ ] T13: `/demo` layout, no layout shifts, and docs
+- [x] T13: `/demo` layout, no layout shifts, and docs
 
 ### Checkpoint C: complete
-- [ ] All 14 spec success criteria pass. Repo-wide `pnpm lint`, `pnpm typecheck`, tests, and the `002`/`004` builds pass.
+- [x] All 14 spec success criteria pass. Repo-wide `pnpm lint`, `pnpm typecheck`, tests, and the `002`/`004` builds pass.
 - [ ] Review, then PR (regular merge commit).
 
 ## Risks and mitigations

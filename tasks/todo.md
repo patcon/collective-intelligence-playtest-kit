@@ -227,9 +227,9 @@ Plan: [`plan.md`](plan.md). Spec: [`docs/specs/personality-quiz.md`](../docs/spe
 **Description:** Lay out `/demo` as the spec's sketch: the header and blurb, then the simulation controls (first and most prominent), quiz controls and join panel, then the info area, then the matrix last. Reserve widths for counts and labels so live numbers don't shift anything. Take a performance trace at 200 sims × 50 × ×20. Update `004`'s README (pages, layout, patterns, how to run) and `002`'s if its layout changed in Phase 1.
 
 **Acceptance criteria:**
-- [ ] The simulation controls are the first panel on `/demo` (criterion 1).
-- [ ] In the trace, hover feedback is within 100 ms and no main-thread task is over 200 ms (criterion 12).
-- [ ] The README covers the pages, the simulation, the throttle, and the sources.
+- [x] The simulation controls are the first panel on `/demo` (criterion 1).
+- [x] In the trace, hover feedback is within 100 ms and no main-thread task is over 200 ms (criterion 12).
+- [x] The README covers the pages, the simulation, the throttle, and the sources.
 
 **Verification:** repo-wide `pnpm lint`, `pnpm typecheck`; tests and builds in `common`, `002`, `004`; agent-browser trace and screenshots.
 
@@ -241,8 +241,8 @@ Plan: [`plan.md`](plan.md). Spec: [`docs/specs/personality-quiz.md`](../docs/spe
 
 ## Checkpoint C: complete
 
-- [ ] All 14 spec success criteria pass.
-- [ ] Repo-wide `pnpm lint` and `pnpm typecheck`; tests in `common`, `002`, `004`; `002` and `004` build.
+- [x] All 14 spec success criteria pass.
+- [x] Repo-wide `pnpm lint` and `pnpm typecheck`; tests in `common`, `002`, `004`; `002` and `004` build.
 - [ ] Review, then PR (regular merge commit).
 
 ## Later (not in this plan)
