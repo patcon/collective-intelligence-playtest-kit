@@ -1,30 +1,31 @@
-import { Banner, Checkbox, Loader, Surface } from '@cloudflare/kumo';
+import { Banner, Loader, Surface } from '@cloudflare/kumo';
 import { Component, Suspense, useState } from 'react';
 import type { ReactNode } from 'react';
 import { CardDrawer } from './cards/CardDrawer.tsx';
 import { CardLookup } from './cards/CardLookup.tsx';
 import { messageOf, requestCards } from './cards/cardsApi.ts';
+import type { ViewOptions } from './cards/viewOptions.ts';
+import { ViewOptionsControls } from './cards/ViewOptionsControls.tsx';
 
 /** Started as the module loads, so the request is in flight before React's first render. */
 const deck = requestCards();
 
 export default function App() {
-  const [printed, setPrinted] = useState(false);
+  const [view, setView] = useState<ViewOptions>({ printed: false, showApi: false });
   return (
     <main className="mx-auto flex min-h-screen max-w-2xl flex-col gap-4 p-4">
       <h1 className="text-xl font-semibold">003 · Conversation cards</h1>
-      <Checkbox checked={printed} label="Printed look" onCheckedChange={(checked) => setPrinted(checked === true)} />
       <Surface className="flex flex-col gap-4 rounded-lg p-6">
         <h2 className="text-lg font-semibold">Draw</h2>
         <LoadFailure>
           <Suspense fallback={<Loader />}>
-            <CardDrawer deck={deck} printed={printed} />
+            <CardDrawer beside={<ViewOptionsControls onChange={setView} value={view} />} deck={deck} view={view} />
           </Suspense>
         </LoadFailure>
       </Surface>
       <Surface className="flex flex-col gap-4 rounded-lg p-6">
         <h2 className="text-lg font-semibold">One card for everyone</h2>
-        <CardLookup printed={printed} />
+        <CardLookup view={view} />
       </Surface>
     </main>
   );

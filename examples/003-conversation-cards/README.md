@@ -32,9 +32,11 @@ Options: `prefix` (default `/api/cards`) and `rng` (default `Math.random`, injec
 
 ## The page
 
-`/` draws cards (by card type, a short list of ids, and how many), excluding the cards already seen,
-and shows how many are left to choose from. "One card for everyone" looks a card up by id. The
-**Printed look** checkbox shows cards as the physical cards appear.
+`/` draws cards (by card type, a short list of ids, and how many), excluding the cards already seen
+(hover "N seen" for their ids), and shows the pool each draw came from. "One card for everyone" looks a
+card up by id. Beside the Draw button, **Printed look** shows cards as the physical cards appear, and
+**Show API calls** shows each section's last call to the service: its endpoint, the request, and the
+formatted response (errors included). Before the first draw, that's the deck load, `GET /api/cards`.
 
 ## Layout
 

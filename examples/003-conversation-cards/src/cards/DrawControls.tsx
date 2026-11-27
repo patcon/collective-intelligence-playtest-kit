@@ -1,19 +1,22 @@
 import { Button, Input, Select } from '@cloudflare/kumo';
 import { ShuffleIcon } from '@phosphor-icons/react';
 import { useState } from 'react';
+import type { ReactNode } from 'react';
 import type { CardFilters } from '../../worker/cards/types.ts';
 
 const ALL_TYPES = 'all';
 
-/** Choose a card type, a short list of ids and how many to draw; then draw. */
+/** Choose a card type, a short list of ids and how many to draw; then draw. `children` sit beside the Draw button. */
 export function DrawControls({
   types,
   pending,
   onDraw,
+  children,
 }: {
   types: ReadonlyArray<string>;
   pending: boolean;
   onDraw: (filters: CardFilters, limit: number) => void;
+  children?: ReactNode;
 }) {
   const [type, setType] = useState(ALL_TYPES);
   const [ids, setIds] = useState('');
@@ -40,9 +43,12 @@ export function DrawControls({
         type="number"
         value={limit}
       />
-      <Button icon={<ShuffleIcon />} loading={pending} onClick={draw} variant="primary">
-        Draw
-      </Button>
+      <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
+        <Button icon={<ShuffleIcon />} loading={pending} onClick={draw} variant="primary">
+          Draw
+        </Button>
+        {children}
+      </div>
     </div>
   );
 }
