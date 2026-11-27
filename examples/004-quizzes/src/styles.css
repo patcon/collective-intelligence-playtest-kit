@@ -36,38 +36,39 @@
 }
 
 /*
- * The vote matrix: five answers on a diverging orange–purple scale (readable with the common colour
- * blindnesses), a skip as a cross, and "not answered yet" as a faint dot. Steps 1–2 and 4–5 carry text-free
- * meaning by colour; skip and blank differ by shape, not only colour.
+ * The vote matrix: five answers on Polis's scale, Disagree red through grey to Agree green (001's valence
+ * reds and greens), a skip as a cross, and "not answered yet" as a faint dot. Red and green are hard to tell
+ * apart with red–green colour blindness, so the strong steps differ from the mild ones in lightness too; skip
+ * and blank differ by shape, not only colour.
  */
 :root {
   --vote-cell: 1.125rem;
-  --vote-1: #b35806;
-  --vote-2: #f1a340;
+  --vote-1: #dc2626;
+  --vote-2: #fca5a5;
   --vote-3: #c9c9c9;
-  --vote-4: #998ec3;
-  --vote-5: #542788;
+  --vote-4: #86efac;
+  --vote-5: #16a34a;
   --vote-mark: #555;
   --vote-blank: #e4e4e4;
 }
 
 [data-mode='dark'] {
-  --vote-1: #e08214;
-  --vote-2: #fdb863;
+  --vote-1: #ef4444;
+  --vote-2: #991b1b;
   --vote-3: #6e6e6e;
-  --vote-4: #b2abd2;
-  --vote-5: #8073ac;
+  --vote-4: #166534;
+  --vote-5: #22c55e;
   --vote-mark: #bbb;
   --vote-blank: #333;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-mode='light']) {
-    --vote-1: #e08214;
-    --vote-2: #fdb863;
+    --vote-1: #ef4444;
+    --vote-2: #991b1b;
     --vote-3: #6e6e6e;
-    --vote-4: #b2abd2;
-    --vote-5: #8073ac;
+    --vote-4: #166534;
+    --vote-5: #22c55e;
     --vote-mark: #bbb;
     --vote-blank: #333;
   }

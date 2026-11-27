@@ -27,7 +27,7 @@ in the test's order; everyone answers the same ones. Reset clears every answer. 
 quiz or join at statement 1.
 
 On `/demo`, the vote matrix has a row per person (phones, then this page's sims, then any from another tab) and a
-column per statement, coloured from Disagree (orange) to Agree (purple), with a cross for a skip and a dot for not
+column per statement, coloured from Disagree (red) to Agree (green) as in Polis, with a cross for a skip and a dot for not
 answered yet. Hovering or focusing a column number or a row shows that statement or person in the info area above it.
 
 ## Code
