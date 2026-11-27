@@ -29,6 +29,8 @@ export interface QuizCrowdState {
   short: number;
   /** Divides each wait that starts from now on. */
   speed: Speed;
+  /** Sims whose sockets haven't opened: the browser's cap on WebSockets, most likely. */
+  unconnected: number;
 }
 
 /** Between 3 and 9 seconds a statement: a live room answering with some time pressure. */
@@ -47,12 +49,13 @@ export class QuizCrowd {
   #maxSkipped: number | null = null;
   #short = 0;
   #speed: Speed = 1;
-  #state: QuizCrowdState = { maxSkipped: null, short: 0, sims: [], speed: 1 };
+  #state: QuizCrowdState = { maxSkipped: null, short: 0, sims: [], speed: 1, unconnected: 0 };
 
   constructor(connect: ConnectSim, people: ReadonlyArray<Person> = PEOPLE, delay: () => number = answerDelay) {
     this.#people = people;
     this.#crowd = new SimCrowd({
-      build: (id) => new QuizSim({ connect, delay: () => delay() / this.#speed, id, person: this.#draw() }),
+      build: (id) =>
+        new QuizSim({ connect, delay: () => delay() / this.#speed, id, onConnectionChange: () => this.#publish(), person: this.#draw() }),
       limit: MAX_SIMS,
       newId: newSimId,
     });
@@ -119,6 +122,7 @@ export class QuizCrowd {
       maxSkipped: this.#maxSkipped,
       short: this.#short,
       speed: this.#speed,
+      unconnected: this.#crowd.sims.filter((sim) => sim.unconnected).length,
       sims: sims.map((summary, i) => {
         const sim = this.#crowd.sims[i];
         if (!sim) {

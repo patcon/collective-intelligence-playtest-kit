@@ -2,7 +2,7 @@ import type { ConnectSim } from '@playtest-kit/common/simulation';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { ItemId } from '../items/items.ts';
 import type { ParticipantView } from '../room/protocol.ts';
-import { QuizSim } from './QuizSim.ts';
+import { CONNECT_GRACE_MS, QuizSim } from './QuizSim.ts';
 import type { Person } from './responses.ts';
 
 const DELAY = 4000;
@@ -79,6 +79,16 @@ describe('QuizSim', () => {
     view({ answers: {}, position: 0, statements: [], status: 'waiting' });
     vi.advanceTimersByTime(DELAY * 10);
     expect(sent).toEqual([]);
+  });
+
+  it('counts as unconnected once its socket has had the grace period to open, and not after it opens', () => {
+    const { open, sim } = simulated();
+    vi.advanceTimersByTime(CONNECT_GRACE_MS - 1);
+    expect(sim.unconnected).toBe(false);
+    vi.advanceTimersByTime(1);
+    expect(sim.unconnected).toBe(true);
+    open();
+    expect(sim.unconnected).toBe(false);
   });
 
   it('closes its socket and drops a pending answer when disposed', () => {

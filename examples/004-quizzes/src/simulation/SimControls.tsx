@@ -16,6 +16,14 @@ function thresholdOf(value: string): number | null {
   return value === 'any' ? null : Number(value);
 }
 
+/** Why the room has fewer sims than the count, if it does. */
+function noticeOf({ short, unconnected }: Simulation): string | null {
+  if (unconnected > 0) {
+    return `${unconnected} ${unconnected === 1 ? 'sim' : 'sims'} couldn't connect: this browser caps open WebSockets across all its tabs (Firefox allows 200). Close other tabs, or lower the count.`;
+  }
+  return short > 0 ? `${short} fewer than asked for: no one else in the sample skipped that few.` : null;
+}
+
 const SPEED_TABS = SPEEDS.map((speed) => ({ label: `×${speed}`, value: String(speed) }));
 
 /** How many simulated people are in the room, how much of the real data they may have skipped, and how fast they answer. */
@@ -55,10 +63,8 @@ export function SimControls({ simulation }: { simulation: Simulation }) {
       <Button icon={FastForwardIcon} onClick={simulation.fastForward} variant="secondary">
         Fast-forward to finished
       </Button>
-      {/* Its line is kept even when empty, so the panel doesn't jump. */}
-      <p className="min-h-5 text-sm text-kumo-subtle">
-        {simulation.short > 0 ? `${simulation.short} fewer than asked for: no one else in the sample skipped that few.` : null}
-      </p>
+      {/* Its lines are kept even when empty, so the panel doesn’t jump when a notice comes or goes. */}
+      <p className="min-h-15 text-sm text-kumo-subtle">{noticeOf(simulation)}</p>
     </Surface>
   );
 }

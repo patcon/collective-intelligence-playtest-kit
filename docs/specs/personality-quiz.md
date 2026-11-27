@@ -353,6 +353,12 @@ export function chooseStatements(items: ReadonlyArray<Item>, count: number, rng:
    throttle stays in `004` until a second example needs it; then it moves to `common`.
 5. **Sim details** stay on the page that made the sims, not in the room protocol, for now.
 6. **No room-level end:** the quiz runs until Reset; each person is `done` on their own.
+7. **Browser WebSocket caps (2026-11-27, from the load check):** Firefox allows 200 open WebSockets across the whole
+   browser, all tabs included, so a `/demo` page gets about 197 sims (fewer with other tabs open); Chrome ran 200 plus
+   the host. The limit stays 200. A sim whose socket hasn't opened within 4 s counts as unable to connect, and the
+   simulation panel says how many, and why. Sims don't share sockets, so they keep speaking exactly the phone's protocol.
+8. **The room saves its state at most every 250 ms** (at once on a phase change), through the same throttle as the
+   host snapshots, and keeps it current in memory. Saving on every answer capped the room below what ×20 needs.
 
 ## Open questions
 

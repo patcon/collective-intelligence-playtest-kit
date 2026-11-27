@@ -9,13 +9,19 @@ export interface QuizSimOptions {
   person: Person;
   /** How long to wait, in ms, before answering each statement. */
   delay: () => number;
+  /** Called when `unconnected` changes. */
+  onConnectionChange?: () => void;
 }
+
+/** How long a new sim's socket has to open before it counts as unable to connect. */
+export const CONNECT_GRACE_MS = 4000;
 
 /**
  * A participant with no screen, answering as one real person from the sample did: the same protocol as a
  * phone, over its own socket. It's ready as soon as it connects; while answering, it waits a while, then
  * gives its person's answer to the statement it's on (or skips, where they skipped). It never undoes.
- * `finish()` sends every answer left at once.
+ * `finish()` sends every answer left at once. A sim whose socket hasn't opened within `CONNECT_GRACE_MS`
+ * is `unconnected`: usually the browser's cap on open WebSockets (Firefox allows 200, across all its tabs).
  */
 export class QuizSim implements Sim {
   readonly id: string;
@@ -27,17 +33,42 @@ export class QuizSim implements Sim {
   #waitingOn: ParticipantView | null = null;
   /** The latest view, so `finish()` knows what's left. */
   #view: ParticipantView | null = null;
+  #opened = false;
+  #graceOver = false;
+  #graceTimer: ReturnType<typeof setTimeout>;
+  #onConnectionChange: () => void;
   /** The statements of a quiz this sim has sent every answer to, so the views that catch up don't start new waits. */
   #finished: string | null = null;
 
-  constructor({ id, connect, person, delay }: QuizSimOptions) {
+  constructor({ id, connect, person, delay, onConnectionChange = () => undefined }: QuizSimOptions) {
     this.id = id;
     this.person = person;
     this.#delay = delay;
+    this.#onConnectionChange = onConnectionChange;
+    this.#graceTimer = setTimeout(() => {
+      this.#graceOver = true;
+      if (!this.#opened) {
+        this.#onConnectionChange();
+      }
+    }, CONNECT_GRACE_MS);
     this.#socket = connect(id, {
       onMessage: (raw) => this.#onMessage(raw),
-      onOpen: () => this.#send({ type: 'ready' }),
+      onOpen: () => this.#onOpen(),
     });
+  }
+
+  /** Never connected, though it's had time to. Its socket keeps trying, and may get through once others close. */
+  get unconnected(): boolean {
+    return this.#graceOver && !this.#opened;
+  }
+
+  #onOpen(): void {
+    const wasUnconnected = this.unconnected;
+    this.#opened = true;
+    this.#send({ type: 'ready' });
+    if (wasUnconnected) {
+      this.#onConnectionChange();
+    }
   }
 
   /** Answers every statement left in this quiz straight away, in order, and nothing after. */
@@ -54,6 +85,7 @@ export class QuizSim implements Sim {
   }
 
   dispose(): void {
+    clearTimeout(this.#graceTimer);
     this.#cancel();
     this.#socket.close();
   }
