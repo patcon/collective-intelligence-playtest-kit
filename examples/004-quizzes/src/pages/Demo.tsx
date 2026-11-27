@@ -1,9 +1,11 @@
-import { Loader, Surface } from '@cloudflare/kumo';
+import { Button, Loader, Surface } from '@cloudflare/kumo';
 import { RoomStatusBadge } from '@playtest-kit/ui';
 import { useState } from 'react';
 import { HoverStore } from '../demo/HoverStore.ts';
 import { InfoArea } from '../demo/InfoArea.tsx';
 import { JoinPanel } from '../demo/JoinPanel.tsx';
+import { MATRIX_VARIANTS, nextVariant } from '../demo/matrixLayout.ts';
+import type { MatrixVariant } from '../demo/matrixLayout.ts';
 import { MatrixLegend } from '../demo/MatrixLegend.tsx';
 import { matrixRows } from '../demo/matrixRows.ts';
 import { QuizControls } from '../demo/QuizControls.tsx';
@@ -22,6 +24,7 @@ function HostView() {
   const snapshot = useRoomSnapshot();
   const simulation = useSimulation();
   const [hover] = useState(() => new HoverStore());
+  const [variant, setVariant] = useState<MatrixVariant>('cells');
   const rows = snapshot ? matrixRows(snapshot, new Map(simulation.sims.map((sim) => [sim.id, sim.name]))) : null;
 
   return (
@@ -55,10 +58,15 @@ function HostView() {
           />
           <Surface className="flex flex-col gap-3 rounded-lg p-5">
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <h2 className="text-lg font-semibold">Answers</h2>
+              <div className="flex items-center gap-3">
+                <h2 className="text-lg font-semibold">Answers</h2>
+                <Button onClick={() => setVariant(nextVariant)} size="sm" variant="secondary">
+                  View: {MATRIX_VARIANTS.find(({ value }) => value === variant)?.label}
+                </Button>
+              </div>
               <MatrixLegend />
             </div>
-            <VoteMatrix hover={hover} rows={rows} statements={snapshot.statements} />
+            <VoteMatrix hover={hover} rows={rows} statements={snapshot.statements} variant={variant} />
           </Surface>
         </>
       ) : (

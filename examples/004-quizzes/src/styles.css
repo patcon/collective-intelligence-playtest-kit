@@ -140,3 +140,54 @@
 .vote-name:focus-visible {
   background: var(--color-kumo-tint, rgb(128 128 128 / 0.15));
 }
+
+/* Pixel fit: cells stretch to fill the box, with no gaps or rounding. */
+.vote-fit {
+  line-height: normal;
+}
+
+.vote-fit .vote-cell {
+  width: auto;
+  height: auto;
+  border-radius: 0;
+}
+
+.vote-fit .vote-header,
+.vote-fit .vote-name {
+  position: relative;
+  min-height: 0;
+  overflow: visible;
+}
+
+/*
+ * A label is centred on its own column or row, spilling onto unlabelled neighbours; it lets the pointer through,
+ * so each neighbour stays its own target.
+ */
+.vote-fit .vote-label {
+  position: absolute;
+  top: 50%;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.vote-fit .vote-header .vote-label {
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.vote-fit .vote-name .vote-label {
+  right: 0.5rem;
+  left: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transform: translateY(-50%);
+}
+
+/* Too small to draw a cross or a dot, so a skip and a blank are flat fills. */
+.vote-matrix[data-flat] .vote-skip {
+  background: var(--vote-mark);
+}
+
+.vote-matrix[data-flat] .vote-blank {
+  background: var(--vote-blank);
+}
