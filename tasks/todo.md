@@ -9,9 +9,9 @@ Plan: [`plan.md`](plan.md). Spec: [`docs/specs/personality-quiz.md`](../docs/spe
 **Description:** Create `packages/common/src/simulation/` behind a new `./simulation` export. Move `newSimId`, `isSimId`, the `sim-` prefix, `SimSocket` and `ConnectSim` there unchanged. `connectToRoom` takes the agent name (and role, default `participant`) instead of importing `002`'s `AGENT`. `randomDelay(minMs, maxMs)` replaces `002`'s fixed 2–8 s, and `straySimIds` takes a list of participant ids and this page's sim ids instead of `002`'s snapshot. `002` imports all of them and deletes its copies. No change in `002`'s behaviour.
 
 **Acceptance criteria:**
-- [ ] `@playtest-kit/common/simulation` exports these; `.` and `./server` don't, and nothing under `common/src/server` imports them.
-- [ ] `isSimId`, `randomDelay` (stays in range, injected random) and `straySimIds` have tests in `common`; `002`'s `straySimIds.test.ts` moves there, adapted to ids.
-- [ ] `002` has no own copy of these; its tests pass.
+- [x] `@playtest-kit/common/simulation` exports these; `.` and `./server` don't, and nothing under `common/src/server` imports them.
+- [x] `isSimId`, `randomDelay` (stays in range, injected random) and `straySimIds` have tests in `common`; `002`'s `straySimIds.test.ts` moves there, adapted to ids.
+- [x] `002` has no own copy of these; its tests pass.
 
 **Verification:** `pnpm test`, `pnpm typecheck`, `pnpm lint` in `packages/common` and `examples/002-matchmaking`; `pnpm build` in `002`.
 
@@ -26,9 +26,9 @@ Plan: [`plan.md`](plan.md). Spec: [`docs/specs/personality-quiz.md`](../docs/spe
 **Description:** Add a generic crowd to `common/simulation`: a store (`subscribe` / `getState`) of sims built by a factory `(id) => Sim` (where a `Sim` has `id` and `dispose()`), with `setCount` kept within 0 and a limit given to the constructor, newest out first, and names "Sim 1"… by position. Add a hook that owns a crowd for a component's life, and move `useDisposeOnUnmount` to `common/hooks/effects/`. `002`'s `SimulatedCrowd` keeps auto-confirm and `found(id)` on top of the generic crowd (limit 50), and its `useSimulation` wraps the shared hook.
 
 **Acceptance criteria:**
-- [ ] The generic crowd has tests in `common`: limit, newest out first, names, `dispose` closes every sim, listeners told on each change.
-- [ ] `002`'s `SimulatedCrowd.test.ts` and `SimulatedParticipant.test.ts` pass unchanged (apart from imports).
-- [ ] `packages/common/README.md` documents the `simulation` export.
+- [x] The generic crowd has tests in `common`: limit, newest out first, names, `dispose` closes every sim, listeners told on each change.
+- [x] `002`'s `SimulatedCrowd.test.ts` and `SimulatedParticipant.test.ts` pass unchanged (apart from imports).
+- [x] `packages/common/README.md` documents the `simulation` export.
 
 **Verification:** `pnpm test`, `pnpm typecheck`, `pnpm lint` in `packages/common` and `002`; `pnpm build` in `002`.
 
@@ -40,8 +40,8 @@ Plan: [`plan.md`](plan.md). Spec: [`docs/specs/personality-quiz.md`](../docs/spe
 
 ## Checkpoint A
 
-- [ ] `packages/common` and `002`: test, typecheck, lint; `002` builds.
-- [ ] Manual check of `002` on `/demo`: add and remove sims (up to 50), auto-confirm on and off, "found them" on a sim's card, clear stray sims from a second tab.
+- [x] `packages/common` and `002`: test, typecheck, lint; `002` builds.
+- [x] Manual check of `002` on `/demo`: add and remove sims (up to 50), auto-confirm on and off, "found them" on a sim's card, clear stray sims from a second tab.
 - [ ] Review before Phase 3 builds on it.
 
 ## Phase 2: Quiz core (`quiz-core`)

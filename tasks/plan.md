@@ -44,11 +44,11 @@ T1–T2 (`shared-simulation`) and T3–T7 (`quiz-core`) don't depend on each oth
 ## Task list
 
 ### Phase 1: Shared simulation (`shared-simulation`)
-- [ ] T1: Sim ids, socket types, `connectToRoom`, `randomDelay` and `straySimIds` move to `common/simulation`
-- [ ] T2: A generic crowd and its hook move to `common/simulation`; `002`'s crowd is built on it
+- [x] T1: Sim ids, socket types, `connectToRoom`, `randomDelay` and `straySimIds` move to `common/simulation`
+- [x] T2: A generic crowd and its hook move to `common/simulation`; `002`'s crowd is built on it
 
 ### Checkpoint A
-- [ ] `002` and `common` pass test, typecheck, lint and build; manual check of `002`'s sims on `/demo`.
+- [x] `002` and `common` pass test, typecheck, lint and build; manual check of `002`'s sims on `/demo`.
 
 ### Phase 2: Quiz core (`quiz-core`)
 - [ ] T3: Scaffold `004` from the template into the existing folder
