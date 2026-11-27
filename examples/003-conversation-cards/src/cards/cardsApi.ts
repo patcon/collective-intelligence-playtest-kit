@@ -3,17 +3,17 @@ import type { Card, CardFilters, CardsResponse } from '../../worker/cards/types.
 const BASE = '/api/cards';
 
 /** Every card the filters allow, in deck order. */
-export async function listCards(filters: CardFilters = {}): Promise<CardsResponse> {
+export async function requestCards(filters: CardFilters = {}): Promise<CardsResponse> {
   return parseCardsResponse(await getJson(`${BASE}${queryOf(filters)}`));
 }
 
 /** Up to `limit` cards drawn at random from the pool the filters allow. */
-export async function drawCards(filters: CardFilters, limit: number): Promise<CardsResponse> {
+export async function requestDraw(filters: CardFilters, limit: number): Promise<CardsResponse> {
   return parseCardsResponse(await getJson(`${BASE}/random${queryOf(filters, limit)}`));
 }
 
 /** The card with `id`, or `null` if the deck has none. */
-export async function fetchCard(id: string): Promise<Card | null> {
+export async function requestCard(id: string): Promise<Card | null> {
   const response = await fetch(`${BASE}/${encodeURIComponent(id)}`);
   if (response.status === 404) {
     return null;

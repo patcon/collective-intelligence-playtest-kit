@@ -2,7 +2,7 @@ import { Banner, Button, Input } from '@cloudflare/kumo';
 import { MagnifyingGlassIcon } from '@phosphor-icons/react';
 import { useState } from 'react';
 import type { Card } from '../../worker/cards/types.ts';
-import { fetchCard, messageOf } from './cardsApi.ts';
+import { messageOf, requestCard } from './cardsApi.ts';
 import { CardView } from './CardView.tsx';
 
 type Lookup = { card: Card } | { missing: string } | { error: string } | null;
@@ -16,7 +16,7 @@ export function CardLookup({ printed }: { printed: boolean }) {
   const show = async () => {
     setPending(true);
     try {
-      const card = await fetchCard(id.trim());
+      const card = await requestCard(id.trim());
       setLookup(card ? { card } : { missing: id.trim() });
     } catch (error) {
       setLookup({ error: messageOf(error) });

@@ -1,9 +1,12 @@
 import type { CardFilters } from './types.ts';
 
-/** Reads `type`, and the comma-separated `ids` and `exclude`, from a card route's query string. */
+/**
+ * Reads `type`, and the comma-separated `ids` and `exclude`, from a card route's query string. A filter
+ * that's present but empty (`?ids=`) is treated as absent, so it doesn't narrow the pool to nothing.
+ */
 export function parseFilters(params: URLSearchParams): CardFilters {
   return {
-    type: params.get('type') ?? undefined,
+    type: params.get('type') || undefined,
     ids: listParam(params, 'ids'),
     exclude: listParam(params, 'exclude'),
   };
@@ -19,6 +22,9 @@ export function parseLimit(params: URLSearchParams): number | null {
 }
 
 function listParam(params: URLSearchParams, name: string): Array<string> | undefined {
-  const value = params.get(name);
-  return value === null ? undefined : value.split(',').map((id) => id.trim()).filter(Boolean);
+  const ids = (params.get(name) ?? '')
+    .split(',')
+    .map((id) => id.trim())
+    .filter(Boolean);
+  return ids.length > 0 ? ids : undefined;
 }

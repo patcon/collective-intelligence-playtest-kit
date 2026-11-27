@@ -37,6 +37,7 @@ describe('GET /api/cards', () => {
     ['excluded ids, after the other filters', '?type=gem&exclude=3', ['2', '4']],
     ['ids it ignores when unknown', '?ids=2,99&exclude=98', ['2']],
     ['an unknown card type, to an empty pool', '?type=nope', []],
+    ['nothing, when the filters are present but empty', '?type=&ids=,&exclude=', ['1', '2', '3', '4', '5']],
   ])('narrows the pool by %s', async (_, query, expected) => {
     const { status, body } = await json<CardsResponse>(`/api/cards${query}`);
     expect(status).toBe(200);
@@ -81,6 +82,7 @@ describe('GET /api/cards/random', () => {
   it('returns the whole pool when the limit is larger', async () => {
     const { body } = await json<CardsResponse>('/api/cards/random?type=gem&limit=10');
     expect(idsOf(body.cards).toSorted()).toEqual(['2', '3', '4']);
+    expect(body.meta).toEqual({ pool: 3, total: 5 });
   });
 
   it('never draws an excluded card', async () => {

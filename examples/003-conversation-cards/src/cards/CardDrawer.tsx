@@ -17,7 +17,8 @@ export function CardDrawer({ deck, printed }: { deck: Promise<CardsResponse>; pr
       <DrawControls onDraw={(filters, limit) => void draw(filters, limit)} pending={pending} types={types} />
       <div className="flex items-center gap-3 text-sm text-kumo-subtle">
         <span>
-          {drawMeta ? `Drawn from a pool of ${drawMeta.pool}` : `${meta.total} cards in the deck`} · {seen.length} seen
+          {drawMeta ? `Drawn from a pool of ${drawMeta.pool} of ${drawMeta.total}` : `${meta.total} cards in the deck`} ·{' '}
+          {seen.length} seen
         </span>
         <Button className="ml-auto" disabled={seen.length === 0} icon={<ArrowCounterClockwiseIcon />} onClick={reset} size="sm">
           Reset seen

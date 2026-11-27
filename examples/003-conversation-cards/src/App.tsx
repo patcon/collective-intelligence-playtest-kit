@@ -3,10 +3,10 @@ import { Component, Suspense, useState } from 'react';
 import type { ReactNode } from 'react';
 import { CardDrawer } from './cards/CardDrawer.tsx';
 import { CardLookup } from './cards/CardLookup.tsx';
-import { listCards, messageOf } from './cards/cardsApi.ts';
+import { messageOf, requestCards } from './cards/cardsApi.ts';
 
 /** Started as the module loads, so the request is in flight before React's first render. */
-const deck = listCards();
+const deck = requestCards();
 
 export default function App() {
   const [printed, setPrinted] = useState(false);

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { Card, CardFilters, CardsResponse } from '../../worker/cards/types.ts';
-import { drawCards, messageOf } from './cardsApi.ts';
+import { messageOf, requestDraw } from './cardsApi.ts';
 
 /** Draws from the card service, remembering every card seen so later draws exclude it. */
 export function useCardDraws() {
@@ -13,7 +13,7 @@ export function useCardDraws() {
   const draw = async (filters: CardFilters, limit: number) => {
     setPending(true);
     try {
-      const result = await drawCards({ ...filters, exclude: seen }, limit);
+      const result = await requestDraw({ ...filters, exclude: seen }, limit);
       setDrawn(result.cards);
       setMeta(result.meta);
       setSeen([...seen, ...result.cards.map((card) => card.id)]);
