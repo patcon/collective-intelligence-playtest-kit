@@ -1,3 +1,4 @@
+import { DurableObjectNamespace } from '@alchemy.run/cloudflare-runtime/core/bindings';
 import cloudflare from '@alchemy.run/cloudflare-runtime/vite';
 import shared from '@playtest-kit/config/vite';
 import basicSsl from '@vitejs/plugin-basic-ssl';
@@ -20,7 +21,8 @@ function previewWorker(): PluginOption {
     compatibilityFlags: ['nodejs_compat'],
     worker: {
       name: '004-quizzes-preview',
-      bindings: [],
+      bindings: [DurableObjectNamespace.local({ binding: 'QuizRoom', className: 'QuizRoom' })],
+      durableObjectNamespaces: [{ className: 'QuizRoom', sql: true }],
       assets: { notFoundHandling: 'single-page-application', runWorkerFirst: ['/agents/*'] },
     },
   });

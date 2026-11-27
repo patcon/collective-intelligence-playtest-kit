@@ -1,9 +1,13 @@
+import { routeAgentRequest } from 'agents';
+
+export { QuizRoom } from './QuizRoom.ts';
+
 /**
  * Answers `/agents/*` (routed here first; see `runWorkerFirst` in alchemy.run.ts), where the quiz room's
- * sockets will connect, and leaves every other path to the static assets. There's no room yet.
+ * sockets connect, and leaves every other path to the static assets.
  */
 export default {
-  fetch(): Response {
-    return new Response('Not found', { status: 404 });
+  async fetch(request: Request, env: Parameters<typeof routeAgentRequest>[1]): Promise<Response> {
+    return (await routeAgentRequest(request, env)) ?? new Response('Not found', { status: 404 });
   },
-} satisfies ExportedHandler;
+};

@@ -1,4 +1,4 @@
-import { Website, providers, state } from '@alchemy.run/cloudflare';
+import { DurableObject, Website, providers, state } from '@alchemy.run/cloudflare';
 import { Stack } from 'alchemy';
 import { map } from 'alchemy/Output';
 import { gen } from 'effect/Effect';
@@ -15,6 +15,7 @@ export default Stack(
       main: 'worker/index.ts',
       assets: { notFoundHandling: 'single-page-application', runWorkerFirst: ['/agents/*'] },
       dev: { host: lan ? '0.0.0.0' : 'localhost', port: PORT },
+      env: { QuizRoom: DurableObject('QuizRoom') },
     });
 
     // In dev, `urls` lists localhost and each LAN address, the way `vite --host` does. Alchemy
