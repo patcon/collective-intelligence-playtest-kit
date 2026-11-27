@@ -1,6 +1,6 @@
 # Spec: Personality quiz example, and shared simulation code
 
-_Status: draft (2026-11-27). Intent agreed in conversation the same day; summarized under Objective._
+_Status: approved (2026-11-27), not built. Intent agreed in conversation the same day; summarized under Objective._
 
 ## Objective
 
@@ -207,8 +207,8 @@ interface RoomSnapshot {
   nothing moves when it changes. (A floating popup is fine where there's no room for the area.)
 - **No layout shifts:** hovering, live updates and status changes never move other content. Cells have a fixed size;
   counts and labels reserve their width; the matrix is last on the page so new rows only extend it downward.
-- **Performance:** at 200 sims, 50 statements and ×20 speed, the page stays responsive (hover feedback within a frame
-  or two).
+- **Performance:** at 200 sims, 50 statements and ×20 speed, hover feedback within 100 ms and no main-thread task
+  over 200 ms (success criterion 12).
 
 ### Participant (`/participate`, mobile)
 
@@ -223,8 +223,8 @@ lock is taken on Start.
 
 ## Tech stack
 
-Same as `002`: React, Kumo, `agents`, Vite, Tailwind, tsrs (TS 7), vitest and Alchemy, at the versions `002` pins.
-No new dependencies are expected.
+Same as `002`: React 19.3.1, Kumo 2.19.0, `agents` 0.34.0, Vite 8.3.8, Tailwind 4.3.5, tsrs 0.25.0-ts7.1.0-beta
+(TS 7), vitest 5.1.0, and Alchemy 2.0.0-beta.87 for dev and deploy. No new dependencies are expected.
 
 ## Commands
 
@@ -268,6 +268,18 @@ README.md
 Follow `skills/engineering-standards`. Lint enforces the house rules: effects only in `hooks/effects/`, no inline
 comments, cognitive complexity ≤ 15, cyclomatic complexity ≤ 10, no hand-written memoization, named exports, and file
 names that match their main export.
+
+The pure core looks like this (sketch; `shuffle` and `Rng` as in `002/src/matching/`):
+
+```ts
+/** N statements spread evenly across the traits (any remainder to random traits), back in the test's order. */
+export function chooseStatements(items: ReadonlyArray<Item>, count: number, rng: Rng): Array<ItemId> {
+  const byTrait = TRAITS.map((trait) => shuffle(items.filter((item) => item.factor === trait), rng));
+  const extra = new Set(shuffle(TRAITS, rng).slice(0, count % TRAITS.length));
+  const chosen = new Set(byTrait.flatMap((pool, t) => pool.slice(0, Math.floor(count / TRAITS.length) + (extra.has(TRAITS[t]) ? 1 : 0))));
+  return items.filter((item) => chosen.has(item)).map((item) => item.id);
+}
+```
 
 ## Testing strategy
 
@@ -315,27 +327,30 @@ names that match their main export.
 5. With N = 12, Start chooses 12 statements, 2 or 3 per trait, shown in the test's order, the same for everyone, and
    fixed until Reset.
 6. Each sim's answers in the matrix match its person's row in `ipip-ffm-responses.json`.
-7. At ×1, sims take about 3–9 s per statement; at ×10, about a tenth of that. Fast-forward fills every sim's row at once.
+7. Every sim wait falls within 3–9 s divided by the speed (×1: 3–9 s; ×10: 0.3–0.9 s), checked in the `QuizSim` unit
+   test with a fake clock. Fast-forward fills every sim's row within 2 s on `/demo`.
 8. A phone at `/participate` can answer, skip and undo, and its row (at the top of the matrix) updates within ~1 s.
 9. With latecomers set to wait, a phone that joins during the quiz sees the "next one" message and isn't in this quiz;
    set to join, it starts at statement 1.
 10. A phone that reloads during the quiz comes back to the same statement with its answers kept.
 11. Hovering a column number shows its statement (text, trait, keying); hovering a row shows that person's details.
     Neither, nor live updates, shifts the layout.
-12. At 200 sims, 50 statements and ×20, `/demo` stays responsive.
+12. At 200 sims, 50 statements and ×20, a performance trace of `/demo` shows hover feedback within 100 ms and no
+    main-thread task over 200 ms.
 13. `002` passes its tests and the manual check, imports its generic simulation code from
     `@playtest-kit/common/simulation`, and has its own copies deleted.
 14. `pnpm lint`, `pnpm typecheck`, all tests, and the `002` and `004` builds pass.
 
-## Decisions (proposed 2026-11-27, for review)
+## Decisions (resolved 2026-11-27)
 
 1. **Skip threshold** counts a person's skips over all 50 statements, not just the N chosen, so sims can be drawn before Start.
 2. **Undo** clears the answer it goes back over, so the cell shows "not answered" until it's answered again.
 3. **Sim pace:** a uniform random 3–9 s per statement at ×1.
-4. **Host snapshots** are throttled to one per 250 ms. That's a departure from `002`, needed for 200 sims at ×20.
-5. **Sim details** stay on the page that made the sims, not in the room protocol.
+4. **Host snapshots** are throttled to one per 250 ms. That's a departure from `002`, needed for 200 sims at ×20. The
+   throttle stays in `004` until a second example needs it; then it moves to `common`.
+5. **Sim details** stay on the page that made the sims, not in the room protocol, for now.
 6. **No room-level end:** the quiz runs until Reset; each person is `done` on their own.
 
 ## Open questions
 
-None, beyond reviewing the proposed decisions above.
+None.
