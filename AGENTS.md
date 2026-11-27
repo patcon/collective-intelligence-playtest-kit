@@ -17,3 +17,17 @@ Read the relevant skill before starting work:
 
 - https://github.com/cloudflare/agents
 - https://github.com/Brayden/intent-ui
+
+## Agent skills
+
+### Issue tracker
+
+Issues live in GitHub Issues on `patcon/collective-intelligence-playtest-kit` (via `gh`). See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Default vocabulary: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context: root `GLOSSARY.md` + ADRs in `docs/decisions/`. See `docs/agents/domain.md`.
