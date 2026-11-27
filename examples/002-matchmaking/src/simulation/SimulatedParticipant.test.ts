@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { ParticipantView } from '../room/protocol.ts';
 import { SimulatedParticipant } from './SimulatedParticipant.ts';
-import type { ConnectSim } from './SimulatedParticipant.ts';
+import type { ConnectSim } from '@playtest-kit/common/simulation';
 
 const DELAY = 3000;
 const red = { hex: '#e6194b', name: 'Red', type: 'colour' } as const;

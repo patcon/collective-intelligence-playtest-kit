@@ -10,6 +10,7 @@ Published as TypeScript source (no build step), like `ui`.
 | --- | --- |
 | `@playtest-kit/common` | Browser code |
 | `@playtest-kit/common/server` | Worker and Durable Object code (no React, no DOM) |
+| `@playtest-kit/common/simulation` | Simulated participants on a demo page (browser only; kept apart so a Worker never imports `agents/client`) |
 
 ## What's here
 
@@ -21,6 +22,9 @@ Published as TypeScript source (no build step), like `ui`.
 | `socketProtocol()` | `wss` on an HTTPS page, else `ws`: for sockets to a room not made with `createRoomClient`. |
 | `useInterval`, `useOnChange`, `usePageVisibility`, `useWakeLock` | Effect hooks, each in `src/hooks/effects/` (the only place lint allows effects). |
 | `unlockAudio()`, `unlockedAudio()` | Resume the page's `AudioContext` from a tap, so sound can play later without one. |
+| `newSimId`, `isSimId`, `straySimIds` (`/simulation`) | Mark sim ids so any page can tell them from phones, and find sims in a room that this page didn't make. |
+| `connectToRoom(agent, room)`, `SimSocket`, `ConnectSim` (`/simulation`) | Open a headless participant socket to a room, for a sim. |
+| `randomDelay(minMs, maxMs)` (`/simulation`) | A uniform random wait, for a sim's pauses. |
 | `roleFromUrl`, `roleOf`, `sendToRole` (`/server`) | Read a connection's role from `?role=` and its tags; send JSON to every connection with a role. |
 
 Only move something here once a second example needs it.

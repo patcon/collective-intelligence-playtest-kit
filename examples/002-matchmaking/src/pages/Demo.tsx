@@ -1,4 +1,5 @@
 import { Button, Loader } from '@cloudflare/kumo';
+import { straySimIds } from '@playtest-kit/common/simulation';
 import { RoomStatusBadge } from '@playtest-kit/ui';
 import type { ReactNode } from 'react';
 import { ConfigPanels } from '../demo/ConfigPanels.tsx';
@@ -6,7 +7,6 @@ import { EmceePane } from '../demo/EmceePane.tsx';
 import { JoinPanel } from '../demo/JoinPanel.tsx';
 import { ParticipantCards } from '../demo/ParticipantCards.tsx';
 import { PhoneFrame } from '../demo/PhoneFrame.tsx';
-import { straySimIds } from '../demo/straySimIds.ts';
 import { hostRoom } from '../room/client.ts';
 import type { RoomSnapshot } from '../room/protocol.ts';
 import { useRoomSnapshot } from '../room/useRoomSnapshot.ts';
@@ -20,7 +20,7 @@ const { RoomProvider, useRoomSend, useRoomStatus } = hostRoom;
 function Dashboard({ header, snapshot, simulation }: { header: ReactNode; snapshot: RoomSnapshot; simulation: Simulation }) {
   const send = useRoomSend();
   const simNames = new Map(simulation.sims.map((sim) => [sim.id, sim.name]));
-  const strays = straySimIds(snapshot, new Set(simNames.keys()));
+  const strays = straySimIds(snapshot.participants.map((p) => p.id), new Set(simNames.keys()));
   return (
     <div className="flex flex-col gap-4 md:flex-row md:items-start">
       <div className="flex min-w-0 flex-1 flex-col gap-4">

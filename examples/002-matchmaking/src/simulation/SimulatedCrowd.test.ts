@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { MAX_SIMS, SimulatedCrowd } from './SimulatedCrowd.ts';
-import type { ConnectSim } from './SimulatedParticipant.ts';
+import type { ConnectSim } from '@playtest-kit/common/simulation';
 
 function crowdOnFakeSockets() {
   const close = vi.fn();

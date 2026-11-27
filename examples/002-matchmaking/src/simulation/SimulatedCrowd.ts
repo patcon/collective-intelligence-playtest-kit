@@ -1,5 +1,6 @@
+import { newSimId, randomDelay } from '@playtest-kit/common/simulation';
+import type { ConnectSim } from '@playtest-kit/common/simulation';
 import { SimulatedParticipant } from './SimulatedParticipant.ts';
-import type { ConnectSim } from './SimulatedParticipant.ts';
 
 /** The most simulated participants a page runs at once. */
 export const MAX_SIMS = 50;
@@ -16,19 +17,8 @@ export interface CrowdState {
 }
 
 /** Between 2 and 8 seconds: long enough to watch the counts go up, short enough not to wait on. */
-function randomDelay(): number {
-  return 2000 + Math.random() * 6000;
-}
-
-const SIM_ID_PREFIX = 'sim-';
-
-function newSimId(): string {
-  return `${SIM_ID_PREFIX}${Math.random().toString(36).slice(2, 10)}`;
-}
-
-/** Whether a participant id is a simulated one, from this page or any other. */
-export function isSimId(id: string): boolean {
-  return id.startsWith(SIM_ID_PREFIX);
+function tapDelay(): number {
+  return randomDelay(2000, 8000);
 }
 
 /**
@@ -42,7 +32,7 @@ export class SimulatedCrowd {
   #sims: Array<SimulatedParticipant> = [];
   #state: CrowdState = { autoConfirm: true, sims: [] };
 
-  constructor(connect: ConnectSim, delay: () => number = randomDelay) {
+  constructor(connect: ConnectSim, delay: () => number = tapDelay) {
     this.#connect = connect;
     this.#delay = delay;
   }
