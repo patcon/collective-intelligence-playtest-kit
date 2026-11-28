@@ -432,20 +432,26 @@ function ClusterPanel({ clustering, snapshot, statementCount, redundantSort, onC
   );
 }
 
+/** With the height locked, the rows together are this tall, whatever the number of people. */
+const LOCKED_HEIGHT = 200;
+
 /**
- * The cell size: square cells of `cell` pixels, or, with `fill`, rows `cell` high and columns widened to fill the
- * width of the box the matrix sits in (in whole pixels, so the 1px gaps stay even).
+ * The cell size. Rows are `cell` pixels high, or, with `locked`, share `LOCKED_HEIGHT` between them (1px each at
+ * 200 people). Columns are as wide as rows are high, or, with `fill`, widened to fill the width of the box the
+ * matrix sits in (in whole pixels, so the 1px gaps stay even).
  */
 function useCellSizing() {
   const [cell, setCell] = useState(14);
   const [fill, setFill] = useState(false);
+  const [locked, setLocked] = useState(false);
   const [box, setBox] = useState<HTMLDivElement | null>(null);
   const available = useElementSize(fill ? box : null)?.width;
-  const sizeFor = (columns: number) =>
-    available === undefined || columns === 0
-      ? { height: cell, width: cell }
-      : { height: cell, width: Math.max(3, Math.floor((available - LABEL_WIDTH) / columns)) };
-  return { cell, fill, setBox, setCell, setFill, sizeFor };
+  const sizeFor = (columns: number, rows: number) => {
+    const height = locked && rows > 0 ? LOCKED_HEIGHT / rows : cell;
+    const width = available === undefined || columns === 0 ? height : Math.max(3, Math.floor((available - LABEL_WIDTH) / columns));
+    return { height, width };
+  };
+  return { cell, fill, locked, setBox, setCell, setFill, setLocked, sizeFor };
 }
 
 export function MatrixPrototype() {
@@ -453,7 +459,7 @@ export function MatrixPrototype() {
   const timeline = useTimeline(head, stream);
   const { cursor, seek, snapshot } = timeline;
   const [shown, setShown] = useState<Shown>('score');
-  const { cell, fill, setBox, setCell, setFill, sizeFor } = useCellSizing();
+  const { cell, fill, locked, setBox, setCell, setFill, setLocked, sizeFor } = useCellSizing();
   const [hover, setHover] = useState<Hover>({ col: null, row: null });
 
   const [rowOrderName, setRowOrderName] = useState<RowOrder>('clusters');
@@ -534,7 +540,15 @@ export function MatrixPrototype() {
             <span className="text-xs font-medium">Cells show</span>
             <Tabs onValueChange={(value) => setShown(value === 'answer' ? 'answer' : 'score')} tabs={SHOWN_TABS} value={shown} />
           </div>
-          <Slider label={fill ? `Row height: ${cell}px` : `Cell size: ${cell}px`} max={24} min={4} onValueChange={(v) => typeof v === 'number' && setCell(v)} value={cell} />
+          <Slider
+            disabled={locked}
+            label={fill ? `Row height: ${cell}px` : `Cell size: ${cell}px`}
+            max={24}
+            min={4}
+            onValueChange={(v) => typeof v === 'number' && setCell(v)}
+            value={cell}
+          />
+          <Checkbox checked={locked} label={`Lock the rows to ${LOCKED_HEIGHT}px in all`} onCheckedChange={(checked) => setLocked(checked === true)} />
           <Checkbox checked={fill} label="Fill the width (cells no longer square)" onCheckedChange={(checked) => setFill(checked === true)} />
         </Surface>
         <ClusterPanel
@@ -562,7 +576,7 @@ export function MatrixPrototype() {
             onSortBy={sortByStatement}
             rowOrder={rowOrder}
             shown={shown}
-            size={sizeFor(colOrder.length)}
+            size={sizeFor(colOrder.length, rowOrder.length)}
             snapshot={snapshot}
             sortBy={rowOrderName === 'statement' ? sortBy : null}
           />

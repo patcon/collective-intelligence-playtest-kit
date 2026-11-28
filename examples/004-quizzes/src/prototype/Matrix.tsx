@@ -27,13 +27,17 @@ export const LABEL_WIDTH = 64;
 const HEADER_HEIGHT = 22;
 
 /**
- * Every row and column gets a slot `cell` pixels long (columns `cellWidth`, rows `cellHeight`), and everything in it (cells, the header and its trait bar,
- * the row's name, the highlights) fills the first `cell - 1` of them, the box, leaving a 1px gap after: so it all
- * lines up, and a highlight's 1px outline falls in the gaps either side.
+ * Every row and column gets a slot `cell` pixels long (columns `cellWidth`, rows `cellHeight`), and everything in
+ * it (cells, the header and its trait bar, the row's name, the highlights) fills the first `cell - 1` of them, the
+ * box, leaving a 1px gap after: so it all lines up, and a highlight's 1px outline falls in the gaps either side.
+ * Slots under `MIN_GAPPED` pixels (rows locked to a fixed height with many people) have no gap: it would be most
+ * of the slot.
  */
 function boxOf(cell: number): number {
-  return cell - 1;
+  return cell >= MIN_GAPPED ? cell - 1 : cell;
 }
+
+const MIN_GAPPED = 4;
 
 /** Milliseconds each position waits before moving, so the whole ripple takes at most about half a second. */
 function stagger(count: number): number {
