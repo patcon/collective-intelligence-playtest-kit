@@ -8,7 +8,7 @@ import type { Item, ItemId } from '../items/items.ts';
 import type { Answer } from '../room/protocol.ts';
 import { CLUSTER_ALGORITHMS, clusterColour, clusterPeople, countChanges, coveredColumns, damped, DEFAULT_CLUSTER_SETTINGS, matchLabels, MIN_STATEMENTS } from '../prototype/clusters.ts';
 import type { ClusterSettings } from '../prototype/clusters.ts';
-import { LABEL_WIDTH, Matrix, TRAIT_COLOURS } from '../prototype/Matrix.tsx';
+import { LABEL_WIDTH, Matrix, NO_HOVER, TRAIT_COLOURS } from '../prototype/Matrix.tsx';
 import type { Hover } from '../prototype/Matrix.tsx';
 import { COLUMN_ORDERS, columnOrderOf, orderColumns, orderRows, ROW_ORDERS, rowOrderOf } from '../prototype/orders.ts';
 import type { ColumnOrder, RowOrder, SortBy } from '../prototype/orders.ts';
@@ -436,22 +436,24 @@ function ClusterPanel({ clustering, snapshot, statementCount, redundantSort, onC
 const LOCKED_HEIGHT = 200;
 
 /**
- * The cell size. Rows are `cell` pixels high, or, with `locked`, share `LOCKED_HEIGHT` between them (1px each at
- * 200 people). Columns are as wide as rows are high, or, with `fill`, widened to fill the width of the box the
- * matrix sits in (in whole pixels, so the 1px gaps stay even).
+ * The cell size. `cell` is the default edge, for each side the options don't set: rows are `cell` high, or, with
+ * `locked`, share `LOCKED_HEIGHT` between them (1px each at 200 people); columns are `cell` wide, or, with `fill`,
+ * widened to fill the width of the box the matrix sits in (in whole pixels, so the 1px gaps stay even). With both
+ * set, `cell` sets nothing.
  */
 function useCellSizing() {
   const [cell, setCell] = useState(14);
   const [fill, setFill] = useState(false);
   const [locked, setLocked] = useState(false);
+  const [gaps, setGaps] = useState(true);
   const [box, setBox] = useState<HTMLDivElement | null>(null);
   const available = useElementSize(fill ? box : null)?.width;
   const sizeFor = (columns: number, rows: number) => {
     const height = locked && rows > 0 ? LOCKED_HEIGHT / rows : cell;
-    const width = available === undefined || columns === 0 ? height : Math.max(3, Math.floor((available - LABEL_WIDTH) / columns));
-    return { height, width };
+    const width = available === undefined || columns === 0 ? cell : Math.max(3, Math.floor((available - LABEL_WIDTH) / columns));
+    return { gap: gaps ? 1 : 0, height, width };
   };
-  return { cell, fill, locked, setBox, setCell, setFill, setLocked, sizeFor };
+  return { cell, fill, gaps, locked, setBox, setCell, setFill, setGaps, setLocked, sizeFor };
 }
 
 export function MatrixPrototype() {
@@ -459,8 +461,8 @@ export function MatrixPrototype() {
   const timeline = useTimeline(head, stream);
   const { cursor, seek, snapshot } = timeline;
   const [shown, setShown] = useState<Shown>('score');
-  const { cell, fill, locked, setBox, setCell, setFill, setLocked, sizeFor } = useCellSizing();
-  const [hover, setHover] = useState<Hover>({ col: null, row: null });
+  const { cell, fill, gaps, locked, setBox, setCell, setFill, setGaps, setLocked, sizeFor } = useCellSizing();
+  const [hover, setHover] = useState<Hover>(NO_HOVER);
 
   const [rowOrderName, setRowOrderName] = useState<RowOrder>('clusters');
   const [colOrderName, setColOrderName] = useState<ColumnOrder>('seen');
@@ -541,15 +543,16 @@ export function MatrixPrototype() {
             <Tabs onValueChange={(value) => setShown(value === 'answer' ? 'answer' : 'score')} tabs={SHOWN_TABS} value={shown} />
           </div>
           <Slider
-            disabled={locked}
-            label={fill ? `Row height: ${cell}px` : `Cell size: ${cell}px`}
+            disabled={locked && fill}
+            label={`Default cell edge: ${cell}px`}
             max={24}
             min={4}
             onValueChange={(v) => typeof v === 'number' && setCell(v)}
             value={cell}
           />
+          <Checkbox checked={gaps} label="Gaps between cells" onCheckedChange={(checked) => setGaps(checked === true)} />
           <Checkbox checked={locked} label={`Lock the rows to ${LOCKED_HEIGHT}px in all`} onCheckedChange={(checked) => setLocked(checked === true)} />
-          <Checkbox checked={fill} label="Fill the width (cells no longer square)" onCheckedChange={(checked) => setFill(checked === true)} />
+          <Checkbox checked={fill} label="Fill the width" onCheckedChange={(checked) => setFill(checked === true)} />
         </Surface>
         <ClusterPanel
           clustering={clustering}

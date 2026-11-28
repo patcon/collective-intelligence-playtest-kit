@@ -109,6 +109,17 @@
   background: radial-gradient(circle closest-side, var(--vote-blank) 35%, transparent 40%);
 }
 
+/*
+ * Around a hovered cluster, in its colour (set inline). The box is exactly the cluster's cells, and the stroke is
+ * drawn flush outside it, so it covers none of the cluster's own cells, only the gap and its neighbours' edges.
+ */
+.pm-group {
+  position: absolute;
+  pointer-events: none;
+  outline: 3px solid;
+  outline-offset: 0;
+}
+
 .pm-hl {
   position: absolute;
   pointer-events: none;

@@ -13,7 +13,11 @@ import './prototype.css';
 export interface Hover {
   row: string | null;
   col: ItemId | null;
+  /** Over the names column: outline the hovered person's whole cluster. */
+  group: boolean;
 }
+
+export const NO_HOVER: Hover = { col: null, group: false, row: null };
 
 export const TRAIT_COLOURS: Readonly<Record<Trait, string>> = {
   AGR: '#16a34a',
@@ -27,17 +31,14 @@ export const LABEL_WIDTH = 64;
 const HEADER_HEIGHT = 22;
 
 /**
- * Every row and column gets a slot `cell` pixels long (columns `cellWidth`, rows `cellHeight`), and everything in
- * it (cells, the header and its trait bar, the row's name, the highlights) fills the first `cell - 1` of them, the
- * box, leaving a 1px gap after: so it all lines up, and a highlight's 1px outline falls in the gaps either side.
- * Slots under `MIN_GAPPED` pixels (rows locked to a fixed height with many people) have no gap: it would be most
- * of the slot.
+ * Every row and column gets a slot `cell` pixels long (columns `width`, rows `height`), and everything in it
+ * (cells, the header and its trait bar, the row's name, the highlights) fills the first `cell - gap` of them, the
+ * box, leaving a `gap` (1px, or 0 with gaps off) after: so it all lines up, and a highlight's 1px outline falls in
+ * the gaps either side. A box is never under 1px, so 1px rows simply lose their gap.
  */
-function boxOf(cell: number): number {
-  return cell >= MIN_GAPPED ? cell - 1 : cell;
+function boxOf(cell: number, gap: number): number {
+  return Math.max(1, cell - gap);
 }
-
-const MIN_GAPPED = 4;
 
 /** Milliseconds each position waits before moving, so the whole ripple takes at most about half a second. */
 function stagger(count: number): number {
@@ -58,13 +59,29 @@ function cellClass(value: number | null | undefined): string {
 function hoverAt(x: number, y: number, size: CellSize, rowOrder: ReadonlyArray<string>, colOrder: ReadonlyArray<ItemId>): Hover {
   const col = x >= LABEL_WIDTH ? (colOrder[Math.floor((x - LABEL_WIDTH) / size.width)] ?? null) : null;
   const row = y >= HEADER_HEIGHT ? (rowOrder[Math.floor((y - HEADER_HEIGHT) / size.height)] ?? null) : null;
-  return { col, row };
+  return { col, group: x < LABEL_WIDTH && row !== null, row };
+}
+
+/** The runs of consecutive positions in `positions` (sorted), as [first, count]: one per contiguous block. */
+function runsOf(positions: ReadonlyArray<number>): Array<[number, number]> {
+  const runs: Array<[number, number]> = [];
+  for (const p of positions) {
+    const last = runs.at(-1);
+    if (last && last[0] + last[1] === p) {
+      last[1] += 1;
+    } else {
+      runs.push([p, 1]);
+    }
+  }
+  return runs;
 }
 
 /** A cell's slot, in whole pixels: square, or wider to fill the width. */
 export interface CellSize {
   width: number;
   height: number;
+  /** Between cells: 1px, or 0 for none. */
+  gap: number;
 }
 
 interface RowProps {
@@ -73,15 +90,16 @@ interface RowProps {
   shown: Shown;
   width: number;
   height: number;
+  gap: number;
   y: number;
   delay: number;
   cluster: number | undefined;
 }
 
-const Row = memo(function Row({ participant, statements, shown, width, height, y, delay, cluster }: RowProps) {
+const Row = memo(function Row({ participant, statements, shown, width, height, gap, y, delay, cluster }: RowProps) {
   return (
     <div className="pm-row pm-moves" data-row={participant.id} style={{ height, transform: `translateY(${y}px)`, transitionDelay: `${delay}ms` }}>
-      <span className="pm-name" style={{ height: boxOf(height), width: LABEL_WIDTH - 4 }}>
+      <span className="pm-name" style={{ height: boxOf(height, gap), width: LABEL_WIDTH - 4 }}>
         <span className="pm-swatch" style={{ background: clusterColour(cluster) }} />
         {height >= 9 ? participant.name : null}
       </span>
@@ -94,11 +112,11 @@ const Row = memo(function Row({ participant, statements, shown, width, height, y
             data-col={s.id}
             key={s.id}
             style={{
-              height: boxOf(height),
+              height: boxOf(height, gap),
               left: LABEL_WIDTH,
               transform: `translateX(var(--x-${s.id}))`,
               transitionDelay: `var(--dx-${s.id}), 0ms`,
-              width: boxOf(width),
+              width: boxOf(width, gap),
             }}
           />
         );
@@ -106,6 +124,30 @@ const Row = memo(function Row({ participant, statements, shown, width, height, y
     </div>
   );
 });
+
+interface ClusterOutlineProps {
+  clusters: ReadonlyMap<string, number>;
+  hoverRow: string | null;
+  rowOrder: ReadonlyArray<string>;
+  size: CellSize;
+  width: number;
+}
+
+/** An outline in the cluster's colour around everyone in the hovered person's cluster: one per contiguous block. */
+function ClusterOutline({ clusters, hoverRow, rowOrder, size, width }: ClusterOutlineProps) {
+  const label = hoverRow === null ? -1 : (clusters.get(hoverRow) ?? -1);
+  if (label < 0) {
+    return null;
+  }
+  const positions = rowOrder.flatMap((id, i) => (clusters.get(id) === label ? [i] : []));
+  return runsOf(positions).map(([first, count]) => (
+    <div
+      className="pm-group"
+      key={first}
+      style={{ outlineColor: clusterColour(label), height: count * size.height - size.gap, left: 0, top: first * size.height, width: width - size.gap }}
+    />
+  ));
+}
 
 interface MatrixProps {
   snapshot: StreamSnapshot;
@@ -121,7 +163,7 @@ interface MatrixProps {
 }
 
 export function Matrix({ snapshot, rowOrder, colOrder, clusters, shown, size, hover, onHover, sortBy, onSortBy }: MatrixProps) {
-  const { width, height } = size;
+  const { width, height, gap } = size;
   const { statements, participants } = snapshot;
   const rowPos = new Map(rowOrder.map((id, i) => [id, i]));
   const colStep = stagger(colOrder.length);
@@ -137,11 +179,11 @@ export function Matrix({ snapshot, rowOrder, colOrder, clusters, shown, size, ho
   return (
     <div
       className="pm"
-      onPointerLeave={() => onHover({ col: null, row: null })}
+      onPointerLeave={() => onHover(NO_HOVER)}
       onPointerMove={(event) => {
         const bounds = event.currentTarget.getBoundingClientRect();
         const next = hoverAt(event.clientX - bounds.left, event.clientY - bounds.top, size, rowOrder, colOrder);
-        if (next.row !== hover.row || next.col !== hover.col) {
+        if (next.row !== hover.row || next.col !== hover.col || next.group !== hover.group) {
           onHover(next);
         }
       }}
@@ -154,7 +196,7 @@ export function Matrix({ snapshot, rowOrder, colOrder, clusters, shown, size, ho
           data-sorted={sortBy?.id === s.id || undefined}
           key={s.id}
           onClick={() => onSortBy(s.id)}
-          style={{ height: HEADER_HEIGHT - 2, left: LABEL_WIDTH, transform: `translateX(var(--x-${s.id}))`, transitionDelay: `var(--dx-${s.id})`, width: boxOf(width) }}
+          style={{ height: HEADER_HEIGHT - 2, left: LABEL_WIDTH, transform: `translateX(var(--x-${s.id}))`, transitionDelay: `var(--dx-${s.id})`, width: boxOf(width, gap) }}
           title={`${seenNumber.get(s.id)}. ${s.text} (${s.trait}${s.keyed === -1 ? ', reversed' : ''}). Click to sort people by it.`}
           type="button"
         >
@@ -167,6 +209,7 @@ export function Matrix({ snapshot, rowOrder, colOrder, clusters, shown, size, ho
           const pos = rowPos.get(p.id) ?? 0;
           return (
             <Row
+              gap={gap}
               height={height}
               cluster={clusters.get(p.id)}
               delay={Math.round(pos * rowStep)}
@@ -179,9 +222,10 @@ export function Matrix({ snapshot, rowOrder, colOrder, clusters, shown, size, ho
             />
           );
         })}
-        {hoverRow === undefined ? null : (
-          <div className="pm-hl" style={{ height: boxOf(height), left: 0, top: 0, transform: `translateY(${hoverRow * height}px)`, width: LABEL_WIDTH + colOrder.length * width - 1 }} />
+        {hoverRow === undefined || hover.group ? null : (
+          <div className="pm-hl" style={{ height: boxOf(height, gap), left: 0, top: 0, transform: `translateY(${hoverRow * height}px)`, width: LABEL_WIDTH + colOrder.length * width - gap }} />
         )}
+        {hover.group ? <ClusterOutline clusters={clusters} hoverRow={hover.row} rowOrder={rowOrder} size={size} width={LABEL_WIDTH + colOrder.length * width} /> : null}
       </div>
       {hover.col === null ? null : (
         <div
@@ -191,7 +235,7 @@ export function Matrix({ snapshot, rowOrder, colOrder, clusters, shown, size, ho
             left: LABEL_WIDTH,
             top: 0,
             transform: `translateX(var(--x-${hover.col}))`,
-            width: boxOf(width),
+            width: boxOf(width, gap),
           }}
         />
       )}
