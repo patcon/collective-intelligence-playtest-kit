@@ -24,7 +24,7 @@ export const COLUMN_ORDERS = [
   { label: 'Seen', value: 'seen' },
   { label: 'Trait', value: 'trait' },
   { label: 'Agreed', value: 'agreement' },
-  { label: 'Divisive', value: 'division' },
+  { label: 'Variance', value: 'division' },
   { label: 'Similar', value: 'similar' },
   { label: 'CA', value: 'ca' },
 ] as const;
@@ -174,28 +174,66 @@ export interface RowContext {
   /** Cluster label per participant; -1 or missing is none. */
   clusters: ReadonlyMap<string, number>;
   sortBy: SortBy | null;
+  /** Order within clusters, and break ties, by PC1 (see `pc1Rows`), instead of by similarity or the previous order. */
+  byPc1: boolean;
+}
+
+/** The row orders that group or tie people, so a secondary order (PC1) changes something. */
+export const SECONDARY_ROW_ORDERS: ReadonlySet<RowOrder> = new Set(['agreement', 'clusters', 'statement']);
+
+const dot = (a: ReadonlyArray<number>, b: ReadonlyArray<number>) => a.reduce((sum, x, i) => sum + x * (b[i] ?? 0), 0);
+
+/** The first principal axis of `centred` (rows by columns, columns centred), by power iteration on its covariance. */
+function principalAxis(centred: ReadonlyArray<ReadonlyArray<number>>, columns: number): Array<number> {
+  let axis = Array.from({ length: columns }, () => 1 / Math.sqrt(columns));
+  for (let iteration = 0; iteration < 100; iteration += 1) {
+    const projected = centred.map((row) => dot(row, axis));
+    const next = Array.from({ length: columns }, (_, c) => centred.reduce((sum, row, i) => sum + (row[c] ?? 0) * (projected[i] ?? 0), 0));
+    const norm = Math.hypot(...next) || 1;
+    axis = next.map((x) => x / norm);
+  }
+  return axis;
 }
 
 /**
- * Clusters in label order (labels are kept steady from run to run, so each block stays where it is), each in
- * similarity order inside; no cluster last.
+ * Rows by their score on the first principal component of the answers (missing answers filled in with the
+ * statement's mean), highest first; rows without enough answers last. PC1's sign is arbitrary, so it's set to rise
+ * with the person's mean value: with Score shown, the top is roughly the highest scorers across traits.
  */
-function clusterRows(table: Table, prev: ReadonlyArray<string>, clusters: ReadonlyMap<string, number>): Array<string> {
-  const similar = similarRows(table, prev);
-  return byKey(similar, similar, (id) => -((clusters.get(id) ?? -1) >= 0 ? (clusters.get(id) ?? 0) : Number.POSITIVE_INFINITY));
+function pc1Rows(table: Table, prev: ReadonlyArray<string>): Array<string> {
+  const { ready } = readiness(table);
+  if (ready.length < 3) {
+    return [...table.rowIds];
+  }
+  const all = filled(table);
+  const columns = table.colIds.length;
+  const rows = ready.map((i) => all[i] ?? []);
+  const means = Array.from({ length: columns }, (_, c) => rows.reduce((sum, row) => sum + (row[c] ?? 0), 0) / rows.length);
+  const centred = rows.map((row) => row.map((v, c) => v - (means[c] ?? 0)));
+  const axis = principalAxis(centred, columns);
+  const projected = centred.map((row) => dot(row, axis));
+  const sign = dot(projected, centred.map((row) => row.reduce((a, b) => a + b, 0))) < 0 ? -1 : 1;
+  const scores = new Map(ready.map((i, k) => [table.rowIds[i] ?? '', sign * (projected[k] ?? 0)]));
+  return byKey(table.rowIds, prev, (id) => scores.get(id) ?? null);
 }
 
-export function orderRows(order: RowOrder, table: Table, prev: ReadonlyArray<string>, { clusters, sortBy }: RowContext): Array<string> {
+/** Clusters in label order (labels are kept steady from run to run, so each block stays where it is), each in `within`'s order inside; no cluster last. */
+function clusterRows(within: ReadonlyArray<string>, clusters: ReadonlyMap<string, number>): Array<string> {
+  return byKey(within, within, (id) => -((clusters.get(id) ?? -1) >= 0 ? (clusters.get(id) ?? 0) : Number.POSITIVE_INFINITY));
+}
+
+export function orderRows(order: RowOrder, table: Table, prev: ReadonlyArray<string>, { clusters, sortBy, byPc1 }: RowContext): Array<string> {
+  const base = byPc1 && SECONDARY_ROW_ORDERS.has(order) ? pc1Rows(table, prev) : prev;
   const rowIndex = new Map(table.rowIds.map((id, i) => [id, i]));
   const rowOf = (id: string) => table.values[rowIndex.get(id) ?? -1] ?? [];
   const column = sortBy ? table.colIds.indexOf(sortBy.id) : -1;
   const orders: Record<RowOrder, () => Array<string>> = {
-    agreement: () => byKey(table.rowIds, prev, (id) => mean(rowOf(id))),
+    agreement: () => byKey(table.rowIds, base, (id) => mean(rowOf(id))),
     ca: () => caRows(table, prev),
-    clusters: () => clusterRows(table, prev, clusters),
+    clusters: () => clusterRows(byPc1 ? base : similarRows(table, prev), clusters),
     joined: () => [...table.rowIds],
     similar: () => similarRows(table, prev),
-    statement: () => byKey(table.rowIds, prev, (id) => rowOf(id)[column] ?? null, sortBy?.dir ?? 1),
+    statement: () => byKey(table.rowIds, base, (id) => rowOf(id)[column] ?? null, sortBy?.dir ?? 1),
   };
   return orders[order]();
 }

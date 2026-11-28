@@ -10,7 +10,7 @@ import { CLUSTER_ALGORITHMS, clusterColour, clusterPeople, countChanges, covered
 import type { ClusterSettings } from '../prototype/clusters.ts';
 import { LABEL_WIDTH, Matrix, NO_HOVER, TRAIT_COLOURS } from '../prototype/Matrix.tsx';
 import type { Hover } from '../prototype/Matrix.tsx';
-import { COLUMN_ORDERS, columnOrderOf, orderColumns, orderRows, ROW_ORDERS, rowOrderOf } from '../prototype/orders.ts';
+import { COLUMN_ORDERS, columnOrderOf, orderColumns, orderRows, ROW_ORDERS, rowOrderOf, SECONDARY_ROW_ORDERS } from '../prototype/orders.ts';
 import type { ColumnOrder, RowOrder, SortBy } from '../prototype/orders.ts';
 import { AnswerStream, STREAM_SPEEDS } from '../prototype/stream.ts';
 import type { Participant, StreamSnapshot } from '../prototype/stream.ts';
@@ -469,6 +469,7 @@ export function MatrixPrototype() {
   const [sortBy, setSortBy] = useState<SortBy | null>(null);
   const [live, setLive] = useState(true);
   const [token, setToken] = useState(0);
+  const [byPc1, setByPc1] = useState(false);
 
   const table = useMemo(() => tableOf(snapshot, shown), [snapshot, shown]);
   const clustering = useClustering(table, cursor);
@@ -485,8 +486,8 @@ export function MatrixPrototype() {
 
   const rowOrder = useOrder(
     table.rowIds,
-    (prev) => orderRows(rowOrderName, table, prev, { clusters, sortBy }),
-    `${rowOrderName}:${sortBy?.id}:${sortBy?.dir}:${shown}`,
+    (prev) => orderRows(rowOrderName, table, prev, { byPc1, clusters, sortBy }),
+    `${rowOrderName}:${sortBy?.id}:${sortBy?.dir}:${shown}:${byPc1}`,
     token,
     live,
   );
@@ -526,6 +527,12 @@ export function MatrixPrototype() {
               onValueChange={(value) => setRowOrderName(rowOrderOf(value) ?? 'joined')}
               tabs={[...ROW_ORDERS, ...(sortBy ? [{ label: `By ${sortBy.id} ${sortBy.dir === 1 ? '▼' : '▲'}`, value: 'statement' }] : [])]}
               value={rowOrderName}
+            />
+            <Checkbox
+              checked={byPc1}
+              disabled={!SECONDARY_ROW_ORDERS.has(rowOrderName)}
+              label="Then by PC1 (within clusters, and ties)"
+              onCheckedChange={(checked) => setByPc1(checked === true)}
             />
           </div>
           <div className="flex flex-col gap-1">
