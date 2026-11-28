@@ -1,0 +1,134 @@
+/*
+ * PROTOTYPE. The animated matrix. Everything is absolutely placed and moved with transforms, so a new order is
+ * a transition, not a re-layout. Each column's x and stagger delay are custom properties on the root
+ * (--x-<id>, --dx-<id>): a column reorder changes only the root's style, and every cell follows by itself.
+ * The delay grows with an item's new position, so a re-sort ripples across (after Bostock's Les Misérables).
+ */
+
+.pm {
+  --dur: 750ms;
+  position: relative;
+  font-size: 10px;
+  user-select: none;
+}
+
+.pm-moves {
+  transition: transform var(--dur) cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pm-moves {
+    transition: none;
+  }
+}
+
+.pm-col {
+  position: absolute;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 2px;
+  padding: 0;
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-color-kumo-subtle);
+  cursor: pointer;
+  background: none;
+  border: 0;
+}
+
+.pm-col[data-sorted] {
+  font-weight: 700;
+  color: var(--text-color-kumo-default);
+}
+
+.pm-trait {
+  width: 100%;
+  height: 4px;
+  border-radius: 1px;
+}
+
+.pm-row {
+  position: absolute;
+  left: 0;
+}
+
+.pm-name {
+  position: absolute;
+  left: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  overflow: hidden;
+  white-space: nowrap;
+  color: var(--text-color-kumo-subtle);
+}
+
+.pm-swatch {
+  flex: none;
+  width: 8px;
+  height: 100%;
+  border-radius: 1px;
+  transition: background-color 400ms;
+}
+
+.pm-cell {
+  position: absolute;
+  top: 0;
+  border-radius: 1px;
+  transition:
+    transform var(--dur) cubic-bezier(0.65, 0, 0.35, 1),
+    background-color 300ms;
+}
+
+.pm-a1 {
+  background: var(--vote-1);
+}
+.pm-a2 {
+  background: var(--vote-2);
+}
+.pm-a3 {
+  background: var(--vote-3);
+}
+.pm-a4 {
+  background: var(--vote-4);
+}
+.pm-a5 {
+  background: var(--vote-5);
+}
+.pm-skip {
+  /* A centred ✕ as big as the cell's narrower side, so it keeps its shape in wide cells. */
+  background: var(--vote-mark);
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Cpath d='M1.5 1.5l7 7M8.5 1.5l-7 7' stroke='black' stroke-width='1.4'/%3E%3C/svg%3E")
+    center / contain no-repeat;
+}
+.pm-blank {
+  /* Sized to the closest side, so the dot follows the cell's narrower side and stays put as cells widen. */
+  background: radial-gradient(circle closest-side, var(--vote-blank) 35%, transparent 40%);
+}
+
+.pm-hl {
+  position: absolute;
+  pointer-events: none;
+  background: var(--vote-highlight);
+  outline: 1px solid var(--vote-mark);
+}
+
+/* The hover details: stuck to the top of the page while the matrix scrolls under it. */
+.pm-info {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+/* The hovered statement and its trait; each tinted inline, with the answer's and the score's colour. */
+.pm-quote {
+  padding: 2px 8px;
+  border-left: 4px solid transparent;
+  border-radius: 3px;
+  transition:
+    background-color 120ms,
+    border-color 120ms;
+}

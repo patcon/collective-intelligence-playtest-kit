@@ -7,6 +7,7 @@ if (window.location.pathname === '/') {
 
 // Each page is its own chunk, so phones on `/participate` don't download the demo page and vice versa.
 const Demo = lazy(() => import('./pages/Demo.tsx').then((m) => ({ default: m.Demo })));
+const MatrixPrototype = lazy(() => import('./pages/MatrixPrototype.tsx').then((m) => ({ default: m.MatrixPrototype })));
 const Participate = lazy(() => import('./pages/Participate.tsx').then((m) => ({ default: m.Participate })));
 
 /** The same spinner `index.html` shows before React starts (styled there), so loading looks continuous. */
@@ -16,7 +17,11 @@ function PageLoading() {
 
 /** The page for this path: a phone's, or else the demo page. */
 function Page() {
-  return window.location.pathname.startsWith('/participate') ? <Participate /> : <Demo />;
+  const path = window.location.pathname;
+  if (path.startsWith('/prototype')) {
+    return <MatrixPrototype />;
+  }
+  return path.startsWith('/participate') ? <Participate /> : <Demo />;
 }
 
 export default function App() {
